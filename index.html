@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Citizen Grievance Redressal Portal | Government of India</title>
+  <meta name="description" content="Submit your grievance related to public services to the appropriate government department." />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Google Fonts: Noto Sans for official Indian government feel -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Serif:wght@600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ============================================================
+       SITE HEADER
+  ============================================================ -->
+  <header class="site-header" role="banner">
+    <div class="header-inner">
+      <div class="header-emblem" aria-hidden="true">
+        <!-- Ashoka Chakra SVG emblem (simplified) -->
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="28" cy="28" r="26" stroke="#1a3a6b" stroke-width="2.5"/>
+          <circle cx="28" cy="28" r="10" stroke="#1a3a6b" stroke-width="2"/>
+          <circle cx="28" cy="28" r="3" fill="#1a3a6b"/>
+          <!-- 24 spokes -->
+          <g stroke="#1a3a6b" stroke-width="1.2">
+            <line x1="28" y1="18" x2="28" y2="2"/><line x1="28" y1="38" x2="28" y2="54"/>
+            <line x1="18" y1="28" x2="2" y2="28"/><line x1="38" y1="28" x2="54" y2="28"/>
+            <line x1="21.17" y1="21.17" x2="9.51" y2="9.51"/><line x1="34.83" y1="34.83" x2="46.49" y2="46.49"/>
+            <line x1="34.83" y1="21.17" x2="46.49" y2="9.51"/><line x1="21.17" y1="34.83" x2="9.51" y2="46.49"/>
+            <line x1="24.52" y1="18.43" x2="20.52" y2="3.06"/><line x1="31.48" y1="37.57" x2="35.48" y2="52.94"/>
+            <line x1="18.43" y1="24.52" x2="3.06" y2="20.52"/><line x1="37.57" y1="31.48" x2="52.94" y2="35.48"/>
+            <line x1="18.43" y1="31.48" x2="3.06" y2="35.48"/><line x1="37.57" y1="24.52" x2="52.94" y2="20.52"/>
+            <line x1="24.52" y1="37.57" x2="20.52" y2="52.94"/><line x1="31.48" y1="18.43" x2="35.48" y2="3.06"/>
+          </g>
+        </svg>
+      </div>
+      <div class="header-titles">
+        <p class="header-sup">भारत सरकार | Government of India</p>
+        <h1 class="header-main">Citizen Grievance Redressal Portal</h1>
+        <p class="header-sub">Public Grievance Management System &mdash; PGMS 2.0</p>
+      </div>
+      <div class="header-badge" aria-label="Official Government Website">
+        <span class="badge-dot"></span>Official
+      </div>
+    </div>
+    <!-- Tricolour stripe -->
+    <div class="tricolour" aria-hidden="true">
+      <span class="tc-orange"></span>
+      <span class="tc-white"></span>
+      <span class="tc-green"></span>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN CONTENT
+  ============================================================ -->
+  <main class="main-content" id="main">
+
+    <!-- Notice Banner -->
+    <div class="notice-banner" role="note" aria-label="Important notice">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span>Fields marked with <strong>*</strong> are mandatory. Grievances are typically resolved within <strong>30 working days</strong>. You will receive an SMS/Email update on submission.</span>
+    </div>
+
+    <!-- ============================================================
+         PROGRESS INDICATOR
+    ============================================================ -->
+    <nav class="progress-nav" aria-label="Form progress steps">
+      <ol class="steps-list" role="list">
+        <li class="step active" data-step="1" id="step-nav-1">
+          <span class="step-num" aria-hidden="true">1</span>
+          <span class="step-label">Personal<br/>Details</span>
+        </li>
+        <li class="step-connector" aria-hidden="true"></li>
+        <li class="step" data-step="2" id="step-nav-2">
+          <span class="step-num" aria-hidden="true">2</span>
+          <span class="step-label">Location<br/>Details</span>
+        </li>
+        <li class="step-connector" aria-hidden="true"></li>
+        <li class="step" data-step="3" id="step-nav-3">
+          <span class="step-num" aria-hidden="true">3</span>
+          <span class="step-label">Grievance<br/>Details</span>
+        </li>
+        <li class="step-connector" aria-hidden="true"></li>
+        <li class="step" data-step="4" id="step-nav-4">
+          <span class="step-num" aria-hidden="true">4</span>
+          <span class="step-label">Review &amp;<br/>Submit</span>
+        </li>
+      </ol>
+      <!-- Progress bar -->
+      <div class="progress-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1" aria-label="Form completion progress" id="progress-bar">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+    </nav>
+
+    <!-- ============================================================
+         FORM
+    ============================================================ -->
+    <form id="grievance-form" novalidate autocomplete="on" aria-label="Citizen Grievance Submission Form">
+
+      <!-- ======================================================
+           STEP 1: PERSONAL DETAILS
+      ====================================================== -->
+      <section class="form-section" id="form-step-1" data-step="1" aria-labelledby="step1-heading">
+        <div class="section-heading">
+          <div class="section-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <h2 id="step1-heading" class="section-title">Citizen Details</h2>
+            <p class="section-desc">Basic personal information of the complainant</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <!-- Full Name -->
+          <div class="field-group full-width">
+            <label for="full-name" class="field-label">Full Name <span class="required-star" aria-label="required">*</span></label>
+            <input
+              type="text"
+              id="full-name"
+              name="fullName"
+              class="field-input"
+              placeholder="Enter your full name as per official records"
+              autocomplete="name"
+              maxlength="100"
+              aria-required="true"
+              aria-describedby="full-name-err"
+            />
+            <span class="field-error" id="full-name-err" role="alert" aria-live="polite"></span>
+          </div>
+
+          <!-- Mobile Number -->
+          <div class="field-group">
+            <label for="mobile" class="field-label">Mobile Number <span class="required-star" aria-label="required">*</span></label>
+            <div class="input-prefix-wrap">
+              <span class="input-prefix" aria-hidden="true">+91</span>
+              <input
+                type="tel"
+                id="mobile"
+                name="mobile"
+                class="field-input has-prefix"
+                placeholder="9XXXXXXXXX"
+                autocomplete="tel"
+                maxlength="10"
+                inputmode="numeric"
+                aria-required="true"
+                aria-describedby="mobile-err mobile-hint"
+              />
+            </div>
+            <span class="field-hint" id="mobile-hint">10-digit Indian mobile number</span>
+            <span class="field-error" id="mobile-err" role="alert" aria-live="polite"></span>
+          </div>
+
+          <!-- Email -->
+          <div class="field-group">
+            <label for="email" class="field-label">Email Address <span class="optional-tag">Optional</span></label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="field-input"
+              placeholder="yourname@example.com"
+              autocomplete="email"
+              aria-describedby="email-err"
+            />
+            <span class="field-error" id="email-err" role="alert" aria-live="polite"></span>
+          </div>
+
+          <!-- Aadhaar Number -->
+          <div class="field-group">
+            <label for="aadhaar" class="field-label">Aadhaar Number <span class="optional-tag">Optional</span></label>
+            <input
+              type="text"
+              id="aadhaar"
+              name="aadhaar"
+              class="field-input"
+              placeholder="XXXX XXXX XXXX"
+              maxlength="14"
+              inputmode="numeric"
+              aria-describedby="aadhaar-err aadhaar-hint"
+            />
+            <span class="field-hint" id="aadhaar-hint">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Last 8 digits will be masked for privacy
+            </span>
+            <span class="field-error" id="aadhaar-err" role="alert" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button type="button" class="btn btn-primary" id="next-1" data-next="2">
+            Next: Location Details
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ======================================================
+           STEP 2: LOCATION DETAILS
+      ====================================================== -->
+      <section class="form-section hidden" id="form-step-2" data-step="2" aria-labelledby="step2-heading">
+        <div class="section-heading">
+          <div class="section-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div>
+            <h2 id="step2-heading" class="section-title">Location Details</h2>
+            <p class="section-desc">Specify the location where the issue occurred</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <!-- State -->
+          <div class="field-group">
+            <label for="state" class="field-label">State <span class="required-star" aria-label="required">*</span></label>
+            <div class="select-wrap">
+              <select id="state" name="state" class="field-select" aria-required="true" aria-describedby="state-err">
+                <option value="">-- Select State --</option>
+                <option value="AN">Andaman and Nicobar Islands</option>
+                <option value="AP">Andhra Pradesh</option>
+                <option value="AR">Arunachal Pradesh</option>
+                <option value="AS">Assam</option>
+                <option value="BR">Bihar</option>
+                <option value="CH">Chandigarh</option>
+                <option value="CT">Chhattisgarh</option>
+                <option value="DH">Dadra and Nagar Haveli and Daman and Diu</option>
+                <option value="DL">Delhi</option>
+                <option value="GA">Goa</option>
+                <option value="GJ">Gujarat</option>
+                <option value="HR">Haryana</option>
+                <option value="HP">Himachal Pradesh</option>
+                <option value="JK">Jammu and Kashmir</option>
+                <option value="JH">Jharkhand</option>
+                <option value="KA">Karnataka</option>
+                <option value="KL">Kerala</option>
+                <option value="LA">Ladakh</option>
+                <option value="LD">Lakshadweep</option>
+                <option value="MP">Madhya Pradesh</option>
+                <option value="MH">Maharashtra</option>
+                <option value="MN">Manipur</option>
+                <option value="ML">Meghalaya</option>
+                <option value="MZ">Mizoram</option>
+                <option value="NL">Nagaland</option>
+                <option value="OD">Odisha</option>
+                <option value="PY">Puducherry</option>
+                <option value="PB">Punjab</option>
+                <option value="RJ">Rajasthan</option>
+                <option value="SK">Sikkim</option>
+                <option value="TN">Tamil Nadu</option>
+                <option value="TG">Telangana</option>
+                <option value="TR">Tripura</option>
+                <option value="UP">Uttar Pradesh</option>
+                <option value="UK">Uttarakhand</option>
+                <option value="WB">West Bengal</option>
+              </select>
+              <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <span class="field-error" id="state-err" role="alert" aria-live="polite"></span>
+          </div>
+
+          <!-- District -->
+          <div class="field-group">
+            <label for="district" class="field-label">District <span class="required-star" aria-label="required">*</span></label>
+            <div class="select-wrap">
+              <select id="district" name="district" class="field-select" aria-required="true" aria-describedby="district-err" disabled>
+                <option value="">-- Select District --</option>
+              </select>
+              <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <span class="field-error" id="district-err" role="alert" aria-live="polite"></span>
+          </div>
+
+          <!-- City/Town -->
+          <div class="field-group">
+            <label for="city" class="field-label">City / Town <span class="required-star" aria-label="required">*</span></label>
+            <input type="text" id="city" name="city" class="field-input" placeholder="Enter city or town name" aria-required="true" aria-describedby="city-err" />
+            <span class="field-error" id="city-err" role="alert" aria-live="polite"></span>
+          </div>
+
+          <!-- Pincode -->
+          <div class="field-group">
+            <label for="pincode" class="field-label">Pincode <span class="required-star" aria-label="required">*</span></label>
+            <input type="text" id="pincode" name="pincode" class="field-input" placeholder="6-digit pincode" maxlength="6" inputmode="numeric" aria-required="true" aria-describedby="pincode-err" />
+            <span class="field-error" id="pincode-err" role="alert" aria-live="polite"></span>
+          </div>
+
+          <!-- Area/Locality -->
+          <div class="field-group full-width">
+            <label for="locality" class="field-label">Area / Locality <span class="required-star" aria-label="required">*</span></label>
+            <input type="text" id="locality" name="locality" class="field-input" placeholder="Enter area, ward, sector or locality name" aria-required="true" aria-describedby="locality-err" />
+            <span class="field-error" id="locality-err" role="alert" aria-live="polite"></span>
+          </div>
+
+          <!-- Landmark -->
+          <div class="field-group full-width">
+            <label for="landmark" class="field-label">Landmark <span class="optional-tag">Optional</span></label>
+            <input type="text" id="landmark" name="landmark" class="field-input" placeholder="e.g., Near Post Office, Behind Bus Stand" />
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button type="button" class="btn btn-secondary" data-prev="1">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
+          <button type="button" class="btn btn-primary" id="next-2" data-next="3">
+            Next: Grievance Details
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ======================================================
+           STEP 3: GRIEVANCE DETAILS
+      ====================================================== -->
+      <section class="form-section hidden" id="form-step-3" data-step="3" aria-labelledby="step3-heading">
+        <div class="section-heading">
+          <div class="section-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div>
+            <h2 id="step3-heading" class="section-title">Grievance Details</h2>
+            <p class="section-desc">Describe your complaint clearly and provide evidence</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <!-- Grievance Category -->
+          <div class="field-group">
+            <label for="category" class="field-label">Grievance Category <span class="required-star" aria-label="required">*</span></label>
+            <div class="select-wrap">
+              <select id="category" name="category" class="field-select" aria-required="true" aria-describedby="category-err">
+                <option value="">-- Select Category --</option>
+                <option value="roads">Roads &amp; Infrastructure</option>
+                <option value="water">Water Supply</option>
+                <option value="electricity">Electricity</option>
+                <option value="sanitation">Sanitation &amp; Waste</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="education">Education</option>
+                <option value="police">Police &amp; Law Enforcement</option>
+                <option value="corruption">Corruption &amp; Misconduct</option>
+                <option value="other">Other</option>
+              </select>
+              <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <span class="field-error" id="category-err" role="alert" aria-live="polite"></span>
+          </div>
+
+          <!-- Department Concerned -->
+          <div class="field-group">
+            <label for="department" class="field-label">Department Concerned <span class="required-star" aria-label="required">*</span></label>
+            <div class="select-wrap">
+              <select id="department" name="department" class="field-select" aria-required="true" aria-describedby="department-err department-hint">
+                <option value="">-- Select category first --</option>
+              </select>
+              <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <span class="field-hint" id="department-hint">Auto-suggested based on selected category</span>
+            <span class="field-error" id="department-err" role="alert" aria-live="polite"></span>
+          </div>
+
+          <!-- Grievance Title -->
+          <div class="field-group full-width">
+            <label for="title" class="field-label">Grievance Title <span class="required-star" aria-label="required">*</span></label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              class="field-input"
+              placeholder="Brief one-line summary of your grievance"
+              maxlength="100"
+              aria-required="true"
+              aria-describedby="title-err title-count"
+            />
+            <div class="field-meta-row">
+              <span class="field-error" id="title-err" role="alert" aria-live="polite"></span>
+              <span class="char-count" id="title-count" aria-live="polite">0 / 100</span>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="field-group full-width">
+            <label for="description" class="field-label">Detailed Description <span class="required-star" aria-label="required">*</span></label>
+            <textarea
+              id="description"
+              name="description"
+              class="field-textarea"
+              rows="6"
+              placeholder="Provide a detailed description of your grievance including what happened, when it started, and how it is affecting you..."
+              maxlength="2000"
+              aria-required="true"
+              aria-describedby="description-err description-count description-hint"
+            ></textarea>
+            <div class="field-meta-row">
+              <span class="field-hint" id="description-hint">Minimum 50 characters required</span>
+              <span class="char-count" id="description-count" aria-live="polite">0 / 2000</span>
+            </div>
+            <span class="field-error" id="description-err" role="alert" aria-live="polite"></span>
+          </div>
+
+          <!-- Date of Incident -->
+          <div class="field-group">
+            <label for="incident-date" class="field-label">Date of Incident <span class="required-star" aria-label="required">*</span></label>
+            <input
+              type="date"
+              id="incident-date"
+              name="incidentDate"
+              class="field-input"
+              aria-required="true"
+              aria-describedby="incident-date-err"
+            />
+            <span class="field-error" id="incident-date-err" role="alert" aria-live="polite"></span>
+          </div>
+
+          <!-- Photo Upload -->
+          <div class="field-group">
+            <label class="field-label" for="photo-upload">Upload Photos <span class="optional-tag">Optional</span></label>
+            <div class="upload-box" id="photo-drop-zone" tabindex="0" role="button" aria-describedby="photo-hint photo-err">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <p>Click or drag images here</p>
+              <p class="upload-sub">JPG / PNG only &bull; Max 3 images &bull; 5MB each</p>
+              <input type="file" id="photo-upload" name="photos" multiple accept="image/jpeg,image/png" class="visually-hidden" aria-label="Upload photos" />
+            </div>
+            <span class="field-hint" id="photo-hint">Attach evidence photos to strengthen your complaint</span>
+            <span class="field-error" id="photo-err" role="alert" aria-live="polite"></span>
+            <!-- Image preview thumbnails -->
+            <div class="image-previews" id="image-previews" aria-label="Photo previews" aria-live="polite"></div>
+          </div>
+
+          <!-- Video Upload -->
+          <div class="field-group">
+            <label class="field-label" for="video-upload">Upload Video <span class="optional-tag">Optional</span></label>
+            <div class="upload-box" id="video-drop-zone" tabindex="0" role="button" aria-describedby="video-hint video-err">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+              <p>Click or drag video here</p>
+              <p class="upload-sub">MP4, MOV &bull; Max 1 video &bull; 50MB</p>
+              <input type="file" id="video-upload" name="video" accept="video/mp4,video/quicktime,video/*" class="visually-hidden" aria-label="Upload video" />
+            </div>
+            <span class="field-hint" id="video-hint">Large files may take time to upload on mobile networks</span>
+            <span class="field-error" id="video-err" role="alert" aria-live="polite"></span>
+            <div id="video-name-display" class="video-name-display hidden" aria-live="polite"></div>
+          </div>
+
+          <!-- Still unresolved? -->
+          <div class="field-group">
+            <fieldset class="radio-group">
+              <legend class="field-label">Is this issue still unresolved? <span class="required-star" aria-label="required">*</span></legend>
+              <div class="radio-options">
+                <label class="radio-label">
+                  <input type="radio" name="stillUnresolved" value="yes" aria-required="true" /> Yes, it is still ongoing
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="stillUnresolved" value="no" /> No, it was resolved
+                </label>
+              </div>
+              <span class="field-error" id="unresolved-err" role="alert" aria-live="polite"></span>
+            </fieldset>
+          </div>
+
+          <!-- Reported before? -->
+          <div class="field-group">
+            <fieldset class="radio-group">
+              <legend class="field-label">Have you reported this before? <span class="required-star" aria-label="required">*</span></legend>
+              <div class="radio-options">
+                <label class="radio-label">
+                  <input type="radio" name="reportedBefore" value="yes" aria-required="true" /> Yes
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="reportedBefore" value="no" /> No
+                </label>
+              </div>
+              <span class="field-error" id="reported-err" role="alert" aria-live="polite"></span>
+            </fieldset>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button type="button" class="btn btn-secondary" data-prev="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
+          <button type="button" class="btn btn-primary" id="next-3" data-next="4">
+            Next: Review &amp; Submit
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ======================================================
+           STEP 4: REVIEW & SUBMIT
+      ====================================================== -->
+      <section class="form-section hidden" id="form-step-4" data-step="4" aria-labelledby="step4-heading">
+        <div class="section-heading">
+          <div class="section-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div>
+            <h2 id="step4-heading" class="section-title">Review &amp; Submit</h2>
+            <p class="section-desc">Review your details and provide consent before submission</p>
+          </div>
+        </div>
+
+        <!-- Review Summary -->
+        <div class="review-summary" id="review-summary" aria-label="Grievance summary">
+          <h3 class="review-subtitle">Summary of Your Grievance</h3>
+          <div class="review-grid" id="review-grid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Consent Section -->
+        <div class="consent-section">
+          <h3 class="consent-title">Declaration &amp; Consent</h3>
+
+          <div class="checkbox-group">
+            <label class="checkbox-label" id="consent1-label">
+              <input type="checkbox" id="consent-truth" name="consentTruth" aria-required="true" aria-describedby="consent-truth-err" />
+              <span class="checkbox-custom" aria-hidden="true"></span>
+              <span>I solemnly declare that the information provided in this grievance form is true and accurate to the best of my knowledge. I understand that furnishing false information may result in legal action. <span class="required-star" aria-label="required">*</span></span>
+            </label>
+            <span class="field-error" id="consent-truth-err" role="alert" aria-live="polite"></span>
+          </div>
+
+          <div class="checkbox-group">
+            <label class="checkbox-label" id="consent2-label">
+              <input type="checkbox" id="consent-contact" name="consentContact" aria-required="true" aria-describedby="consent-contact-err" />
+              <span class="checkbox-custom" aria-hidden="true"></span>
+              <span>I consent to the relevant Government Department contacting me via the provided mobile number or email for grievance resolution purposes. <span class="required-star" aria-label="required">*</span></span>
+            </label>
+            <span class="field-error" id="consent-contact-err" role="alert" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button type="button" class="btn btn-secondary" data-prev="3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
+          <button type="submit" class="btn btn-submit" id="submit-btn" disabled aria-describedby="submit-note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Submit Grievance
+          </button>
+        </div>
+        <p class="submit-note" id="submit-note">By submitting, you agree to the declarations above. Do not submit duplicate complaints.</p>
+      </section>
+
+    </form><!-- end #grievance-form -->
+
+    <!-- ============================================================
+         SUCCESS SCREEN
+    ============================================================ -->
+    <section class="success-screen hidden" id="success-screen" aria-labelledby="success-heading" aria-live="assertive">
+      <div class="success-icon" aria-hidden="true">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+      </div>
+      <h2 id="success-heading" class="success-title">Grievance Submitted Successfully!</h2>
+      <p class="success-body">Your grievance has been registered. The concerned department will review your complaint and take appropriate action within <strong>30 working days</strong>.</p>
+
+      <div class="ref-card">
+        <p class="ref-label">Your Grievance Reference Number</p>
+        <p class="ref-number" id="ref-number">—</p>
+        <p class="ref-hint">Please note this number for future tracking. An acknowledgement SMS will be sent to your registered mobile number.</p>
+      </div>
+
+      <div class="success-actions">
+        <button type="button" class="btn btn-primary" id="print-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print Acknowledgement
+        </button>
+        <button type="button" class="btn btn-secondary" id="new-grievance-btn">
+          Submit Another Grievance
+        </button>
+      </div>
+    </section>
+
+  </main><!-- end .main-content -->
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <p class="footer-title">Citizen Grievance Redressal Portal</p>
+        <p>A Government of India Initiative under the Right to Public Services Act</p>
+      </div>
+      <div class="footer-col">
+        <p class="footer-title">Helpline</p>
+        <p>Toll-Free: <strong>1800-111-555</strong></p>
+        <p>Mon–Sat: 9:00 AM – 6:00 PM</p>
+      </div>
+      <div class="footer-col">
+        <p class="footer-title">Links</p>
+        <ul class="footer-links">
+          <li><a href="#" aria-label="Track your grievance status">Track Grievance</a></li>
+          <li><a href="#" aria-label="Read frequently asked questions">FAQ</a></li>
+          <li><a href="#" aria-label="Read our privacy policy">Privacy Policy</a></li>
+          <li><a href="#" aria-label="Read website disclaimer">Disclaimer</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 Government of India. All Rights Reserved. | Designed for accessibility – WCAG 2.1 AA compliant.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
