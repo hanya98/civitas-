@@ -753,8 +753,82 @@ el('grievance-form').addEventListener('submit', function (e) {
   btn.disabled = true;
   btn.textContent = 'Submitting…';
 
-  setTimeout(showSuccess, 1800);
+  setTimeout(function () {
+    submitGrievanceToDb();
+    showSuccess();
+  }, 1800);
 });
+
+/* ================================================================
+   20b. SAVE TO SHARED DB (localStorage bridge → tracking.js)
+================================================================ */
+function submitGrievanceToDb() {
+  /* -- Citizen ID from Aadhaar field (raw digits → formatted) -- */
+  var aadhaarRaw = el('aadhaar').dataset.raw || '';
+  var citizenId = aadhaarRaw.length === 12
+    ? aadhaarRaw.replace(/(\d{4})(\d{4})(\d{4})/, '$1 $2 $3')
+    : aadhaarRaw || 'UNKNOWN';
+
+  /* Persist citizen ID so tracking.js can use it */
+  try { localStorage.setItem('pgms_citizen_id', citizenId); } catch (e) {}
+
+  /* -- Build grievance record matching tracking.js DB schema -- */
+  var catEl = el('category');
+  var catText = catEl.selectedIndex > 0 ? catEl.options[catEl.selectedIndex].text : el('category').value;
+  // Normalise category to short label (Road, Water, etc.)
+  var CAT_MAP = {
+    roads: 'Road', water: 'Water', electricity: 'Electricity',
+    sanitation: 'Sanitation', healthcare: 'Healthcare',
+    education: 'Education', police: 'Police',
+    corruption: 'Corruption', other: 'General'
+  };
+  var catShort = CAT_MAP[el('category').value] || catText;
+
+  var now = new Date().toISOString();
+  var stateCode = el('state').value || 'XX';
+  var cat3 = (el('category').value || 'OTH').slice(0, 3).toUpperCase();
+  var rnd = Math.floor(10000000 + Math.random() * 90000000);
+  var newId = 'PGMS/' + new Date().getFullYear() + '/' + stateCode + '/' + cat3 + '/' + rnd;
+
+  /* SLA: 7 days from now */
+  var expectedBy = new Date(Date.now() + 7 * 86400000).toISOString();
+
+  var grievance = {
+    id: newId,
+    citizenId: citizenId,
+    title: el('title').value.trim(),
+    description: el('description').value.trim(),
+    category: catShort,
+    department: el('department').value || '—',
+    status: 'Submitted',
+    priority: 1,
+    location: {
+      lat: null, lng: null,
+      address: [el('locality').value.trim(), el('city').value.trim()].filter(Boolean).join(', '),
+      ward: '',
+      pincode: el('pincode').value.trim()
+    },
+    attachments: [],
+    timeline: [
+      { status: 'Submitted', changedAt: now, changedBy: 'System', note: 'Grievance registered via portal' }
+    ],
+    assignedTo: null,
+    raisedAt: now,
+    updatedAt: now,
+    resolvedAt: null,
+    expectedBy: expectedBy
+  };
+
+  /* Persist grievance list in localStorage */
+  try {
+    var existing = JSON.parse(localStorage.getItem('pgms_grievances') || '[]');
+    existing.push(grievance);
+    localStorage.setItem('pgms_grievances', JSON.stringify(existing));
+  } catch (e) {}
+
+  /* Expose reference ID for showSuccess */
+  window._lastGrievanceId = newId;
+}
 
 function showSuccess() {
   el('grievance-form').style.display = 'none';
@@ -762,10 +836,14 @@ function showSuccess() {
   screen.classList.remove('hidden');
 
   var now = new Date();
-  var stateCode = el('state').value || 'XX';
-  var cat = (el('category').value || 'OTH').slice(0, 3).toUpperCase();
-  var rnd = Math.floor(10000000 + Math.random() * 90000000);
-  el('ref-number').textContent = 'PGMS/' + now.getFullYear() + '/' + stateCode + '/' + cat + '/' + rnd;
+  var refId = window._lastGrievanceId;
+  if (!refId) {
+    var stateCode = el('state').value || 'XX';
+    var cat = (el('category').value || 'OTH').slice(0, 3).toUpperCase();
+    var rnd = Math.floor(10000000 + Math.random() * 90000000);
+    refId = 'PGMS/' + now.getFullYear() + '/' + stateCode + '/' + cat + '/' + rnd;
+  }
+  el('ref-number').textContent = refId;
 
   screen.scrollIntoView({ behavior: 'smooth', block: 'start' });
   var heading = el('success-heading');
