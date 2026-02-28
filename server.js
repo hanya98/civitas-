@@ -9,12 +9,12 @@
  */
 
 require('dotenv').config();
-const http  = require('http');
-const fs    = require('fs');
-const path  = require('path');
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 const https = require('https');
 
-const PORT           = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 /* ── VALIDATE KEYS ON STARTUP ── */
@@ -28,14 +28,14 @@ if (!GEMINI_API_KEY) {
 /* ── MIME TYPES ── */
 const MIME = {
   '.html': 'text/html; charset=utf-8',
-  '.css':  'text/css; charset=utf-8',
-  '.js':   'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
   '.json': 'application/json',
-  '.ico':  'image/x-icon',
-  '.png':  'image/png',
-  '.jpg':  'image/jpeg',
-  '.svg':  'image/svg+xml',
-  '.woff2':'font/woff2',
+  '.ico': 'image/x-icon',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.svg': 'image/svg+xml',
+  '.woff2': 'font/woff2',
 };
 
 /* ── COLLECT JSON BODY ── */
@@ -46,7 +46,7 @@ function readBody(req) {
       body += chunk;
       if (body.length > 20000) reject(new Error('Body too large'));
     });
-    req.on('end',   () => { try { resolve(JSON.parse(body)); } catch (e) { reject(e); } });
+    req.on('end', () => { try { resolve(JSON.parse(body)); } catch (e) { reject(e); } });
     req.on('error', reject);
   });
 }
@@ -55,16 +55,16 @@ function readBody(req) {
 function callGemini(promptText) {
   return new Promise((resolve, reject) => {
     const payload = JSON.stringify({
-      contents:         [{ parts: [{ text: promptText }] }],
+      contents: [{ parts: [{ text: promptText }] }],
       generationConfig: { temperature: 0.1, maxOutputTokens: 150 },
     });
 
     const options = {
       hostname: 'generativelanguage.googleapis.com',
-      path:     `/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-      method:   'POST',
-      headers:  {
-        'Content-Type':   'application/json',
+      path: `/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(payload),
       },
     };
@@ -72,7 +72,7 @@ function callGemini(promptText) {
     const req = https.request(options, res => {
       let data = '';
       res.on('data', chunk => data += chunk);
-      res.on('end',  () => { try { resolve(JSON.parse(data)); } catch (e) { reject(e); } });
+      res.on('end', () => { try { resolve(JSON.parse(data)); } catch (e) { reject(e); } });
     });
     req.on('error', reject);
     req.write(payload);
@@ -84,7 +84,7 @@ function callGemini(promptText) {
 const server = http.createServer(async (req, res) => {
 
   /* CORS — allow any origin during development */
-  res.setHeader('Access-Control-Allow-Origin',  '*');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
@@ -116,10 +116,10 @@ Respond with ONLY valid JSON, no markdown, no extra text:
 {"priority":"High","reason":"One concise sentence explaining the priority decision."}`;
 
       const geminiRes = await callGemini(prompt);
-      const raw       = geminiRes?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      const clean     = raw.replace(/```json|```/gi, '').trim();
-      const parsed    = JSON.parse(clean);
-      const priority  = ['High','Medium','Low'].includes(parsed.priority) ? parsed.priority : 'Medium';
+      const raw = geminiRes?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const clean = raw.replace(/```json|```/gi, '').trim();
+      const parsed = JSON.parse(clean);
+      const priority = ['High', 'Medium', 'Low'].includes(parsed.priority) ? parsed.priority : 'Medium';
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ priority, reason: parsed.reason || '' }));
@@ -134,9 +134,9 @@ Respond with ONLY valid JSON, no markdown, no extra text:
 
   /* ── STATIC FILE SERVING ── */
   let filePath = '.' + url;
-  if (filePath === './' || filePath === '.') filePath = './citizen-portal.html';
+  if (filePath === './' || filePath === '.') filePath = './index.html';
 
-  const ext      = path.extname(filePath);
+  const ext = path.extname(filePath);
   const mimeType = MIME[ext] || 'application/octet-stream';
 
   fs.readFile(filePath, (err, data) => {
@@ -157,8 +157,8 @@ Respond with ONLY valid JSON, no markdown, no extra text:
 
 server.listen(PORT, () => {
   console.log('\n✅  PGMS 2.0 server running');
-  console.log(`\n    Citizen Portal    →  http://localhost:${PORT}/citizen-portal.html`);
-  console.log(`    Admin Dashboard   →  http://localhost:${PORT}/admin-dashboard.html`);
+  console.log(`\n    Citizen Portal    →  http://localhost:${PORT}/citizen.html`);
+  console.log(`    Admin Dashboard   →  http://localhost:${PORT}/admin.html`);
   console.log(`    Development Map   →  http://localhost:${PORT}/development.html`);
   console.log(`\n    API:`);
   console.log(`    POST /api/priority  →  Gemini AI priority\n`);

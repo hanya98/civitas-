@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Development Near Me | PGMS 2.0</title>
-  <meta name="description" content="Track ongoing construction and government development projects near your location." />
+  <meta name="description"
+    content="Track ongoing construction and government development projects near your location." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Serif:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Serif:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="development.css" />
 </head>
 
@@ -17,14 +21,18 @@
     <div class="header-inner">
       <div class="header-emblem" aria-hidden="true">
         <svg width="40" height="40" viewBox="0 0 56 56" fill="none">
-          <circle cx="28" cy="28" r="26" stroke="#1a3a6b" stroke-width="2.5"/>
-          <circle cx="28" cy="28" r="10" stroke="#1a3a6b" stroke-width="2"/>
-          <circle cx="28" cy="28" r="3" fill="#1a3a6b"/>
+          <circle cx="28" cy="28" r="26" stroke="#1a3a6b" stroke-width="2.5" />
+          <circle cx="28" cy="28" r="10" stroke="#1a3a6b" stroke-width="2" />
+          <circle cx="28" cy="28" r="3" fill="#1a3a6b" />
           <g stroke="#1a3a6b" stroke-width="1.2">
-            <line x1="28" y1="18" x2="28" y2="2"/><line x1="28" y1="38" x2="28" y2="54"/>
-            <line x1="18" y1="28" x2="2" y2="28"/><line x1="38" y1="28" x2="54" y2="28"/>
-            <line x1="21.17" y1="21.17" x2="9.51" y2="9.51"/><line x1="34.83" y1="34.83" x2="46.49" y2="46.49"/>
-            <line x1="34.83" y1="21.17" x2="46.49" y2="9.51"/><line x1="21.17" y1="34.83" x2="9.51" y2="46.49"/>
+            <line x1="28" y1="18" x2="28" y2="2" />
+            <line x1="28" y1="38" x2="28" y2="54" />
+            <line x1="18" y1="28" x2="2" y2="28" />
+            <line x1="38" y1="28" x2="54" y2="28" />
+            <line x1="21.17" y1="21.17" x2="9.51" y2="9.51" />
+            <line x1="34.83" y1="34.83" x2="46.49" y2="46.49" />
+            <line x1="34.83" y1="21.17" x2="46.49" y2="9.51" />
+            <line x1="21.17" y1="34.83" x2="9.51" y2="46.49" />
           </g>
         </svg>
       </div>
@@ -34,8 +42,8 @@
         <p class="header-sub">Public Grievance Management System 2.0 — Infrastructure Tracker</p>
       </div>
       <nav class="header-nav">
-        <a href="citizen-portal.html" class="nav-link">🏠 Portal</a>
-        <a href="admin-dashboard.html" class="nav-link">📋 Admin</a>
+        <a href="citizen.html" class="nav-link">🏠 Portal</a>
+        <a href="admin.html" class="nav-link">📋 Admin</a>
         <a href="development.html" class="nav-link active">🏗️ Development</a>
       </nav>
     </div>
@@ -59,7 +67,8 @@
             <div class="location-title">📍 Your Location</div>
             <button class="locate-btn" id="locate-btn">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
               </svg>
               Detect
             </button>
@@ -83,7 +92,9 @@
       <!-- FILTER CARD -->
       <div class="filter-card">
         <div class="filter-card-title">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+          </svg>
           Filter by Type
         </div>
         <div class="filter-tags">
@@ -124,16 +135,32 @@
       <!-- LEGEND -->
       <div class="filter-card">
         <div class="filter-card-title">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
           Map Legend
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
-          <div style="display:flex;align-items:center;gap:10px"><span style="width:12px;height:12px;border-radius:50%;background:#1a3a6b;border:2px solid #fff;box-shadow:0 0 0 2px #1a3a6b;flex-shrink:0"></span><span style="color:#4a5568">Your location</span></div>
-          <div style="display:flex;align-items:center;gap:10px"><span style="width:10px;height:10px;border-radius:50%;background:#f39c12;flex-shrink:0"></span><span style="color:#4a5568">Roads &amp; Infrastructure</span></div>
-          <div style="display:flex;align-items:center;gap:10px"><span style="width:10px;height:10px;border-radius:50%;background:#e74c3c;flex-shrink:0"></span><span style="color:#4a5568">Building Construction</span></div>
-          <div style="display:flex;align-items:center;gap:10px"><span style="width:10px;height:10px;border-radius:50%;background:#1a3a6b;opacity:0.7;flex-shrink:0"></span><span style="color:#4a5568">Government Schemes</span></div>
-          <div style="display:flex;align-items:center;gap:10px"><span style="width:10px;height:10px;border-radius:50%;background:#8b5cf6;flex-shrink:0"></span><span style="color:#4a5568">Metro / Transport</span></div>
-          <div style="display:flex;align-items:center;gap:10px"><span style="width:10px;height:10px;border-radius:50%;background:#27ae60;flex-shrink:0"></span><span style="color:#4a5568">Utility Work</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span
+              style="width:12px;height:12px;border-radius:50%;background:#1a3a6b;border:2px solid #fff;box-shadow:0 0 0 2px #1a3a6b;flex-shrink:0"></span><span
+              style="color:#4a5568">Your location</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span
+              style="width:10px;height:10px;border-radius:50%;background:#f39c12;flex-shrink:0"></span><span
+              style="color:#4a5568">Roads &amp; Infrastructure</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span
+              style="width:10px;height:10px;border-radius:50%;background:#e74c3c;flex-shrink:0"></span><span
+              style="color:#4a5568">Building Construction</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span
+              style="width:10px;height:10px;border-radius:50%;background:#1a3a6b;opacity:0.7;flex-shrink:0"></span><span
+              style="color:#4a5568">Government Schemes</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span
+              style="width:10px;height:10px;border-radius:50%;background:#8b5cf6;flex-shrink:0"></span><span
+              style="color:#4a5568">Metro / Transport</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span
+              style="width:10px;height:10px;border-radius:50%;background:#27ae60;flex-shrink:0"></span><span
+              style="color:#4a5568">Utility Work</span></div>
         </div>
       </div>
 
@@ -156,13 +183,15 @@
         <div id="map">
           <div class="map-placeholder">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#718096" stroke-width="1.5">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-              <circle cx="12" cy="10" r="3"/>
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
             </svg>
-            <div style="margin-top:12px;font-size:14px;font-weight:600;color:#4a5568">Detect your location to load the map</div>
+            <div style="margin-top:12px;font-size:14px;font-weight:600;color:#4a5568">Detect your location to load the
+              map</div>
             <div style="margin-top:6px;font-size:12px">Click the "Detect" button on the left</div>
           </div>
-        </div>      </div>
+        </div>
+      </div>
 
       <!-- PROJECTS LIST -->
       <div style="display:flex;flex-direction:column;gap:14px">
@@ -214,7 +243,7 @@
   <!-- FOOTER -->
   <footer class="site-footer">
     <p>© 2025 Government of India | PGMS 2.0 — Infrastructure Transparency Initiative &nbsp;|&nbsp;
-       Data sourced from Google Places API &nbsp;|&nbsp; Project metadata is AI-estimated for display purposes
+      Data sourced from Google Places API &nbsp;|&nbsp; Project metadata is AI-estimated for display purposes
     </p>
   </footer>
 
@@ -222,4 +251,5 @@
   <script src="development.js"></script>
 
 </body>
+
 </html>

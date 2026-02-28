@@ -6,36 +6,36 @@
 ================================================================ */
 
 /* ── STATE ── */
-let complaints   = [];
-let sortCol      = 'submittedAt';
-let sortDir      = 'desc';
-let activeId     = null;
-let toastTimer   = null;
-let unsubscribe  = null;   // Firestore real-time listener handle
+let complaints = [];
+let sortCol = 'submittedAt';
+let sortDir = 'desc';
+let activeId = null;
+let toastTimer = null;
+let unsubscribe = null;   // Firestore real-time listener handle
 
 /* ── BADGE HTML ── */
 function priorityBadgeHTML(priority, reason, setBy) {
-  const cls = { High:'priority-High', Medium:'priority-Medium', Low:'priority-Low' }[priority] || 'priority-Low';
-  const icon    = setBy === 'Admin' ? '✏️' : '🤖';
+  const cls = { High: 'priority-High', Medium: 'priority-Medium', Low: 'priority-Low' }[priority] || 'priority-Low';
+  const icon = setBy === 'Admin' ? '✏️' : '🤖';
   const byLabel = setBy === 'Admin' ? 'Set by Admin' : 'AI assessed';
   const tooltip = reason ? `${icon} ${byLabel}: ${reason}` : `${icon} ${byLabel}`;
   // data-tooltip is read by CSS/JS for the hover card
-  return `<span class="badge-priority ${cls}" data-tooltip="${tooltip.replace(/"/g,'&quot;')}" tabindex="0">
+  return `<span class="badge-priority ${cls}" data-tooltip="${tooltip.replace(/"/g, '&quot;')}" tabindex="0">
     <span class="dot"></span>${priority}
     <span class="priority-info-icon">${icon}</span>
   </span>`;
 }
 
 function statusBadgeHTML(status) {
-  const key = (status || '').replace(/\s+/g,'');
-  const cls = { Pending:'status-Pending', InReview:'status-InReview', Resolved:'status-Resolved', Rejected:'status-Rejected' }[key] || 'status-Pending';
+  const key = (status || '').replace(/\s+/g, '');
+  const cls = { Pending: 'status-Pending', InReview: 'status-InReview', Resolved: 'status-Resolved', Rejected: 'status-Rejected' }[key] || 'status-Pending';
   return `<span class="badge-status ${cls}">${status}</span>`;
 }
 
 /* ── ESCAPE HTML ── */
 function esc(str) {
   if (str == null) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 /* ── TOAST ── */
@@ -49,17 +49,17 @@ function showToast(msg) {
 
 /* ── RENDER STATS ── */
 function renderStats() {
-  document.getElementById('stat-total').textContent    = complaints.length;
-  document.getElementById('stat-pending').textContent  = complaints.filter(c => c.status === 'Pending').length;
-  document.getElementById('stat-high').textContent     = complaints.filter(c => c.priority === 'High').length;
+  document.getElementById('stat-total').textContent = complaints.length;
+  document.getElementById('stat-pending').textContent = complaints.filter(c => c.status === 'Pending').length;
+  document.getElementById('stat-high').textContent = complaints.filter(c => c.priority === 'High').length;
   document.getElementById('stat-resolved').textContent = complaints.filter(c => c.status === 'Resolved').length;
 }
 
 /* ── FILTER + SORT ── */
 function getFiltered() {
-  const q       = document.getElementById('search-input').value.toLowerCase().trim();
-  const fCat    = document.getElementById('filter-cat').value;
-  const fPri    = document.getElementById('filter-pri').value;
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  const fCat = document.getElementById('filter-cat').value;
+  const fPri = document.getElementById('filter-pri').value;
   const fStatus = document.getElementById('filter-status').value;
 
   let result = complaints.filter(c => {
@@ -67,16 +67,16 @@ function getFiltered() {
       const hay = [c.id, c.fullName, c.title, c.city, c.district, c.mobile, c.categoryName, c.status].join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
     }
-    if (fCat    && c.category !== fCat)    return false;
-    if (fPri    && c.priority !== fPri)    return false;
-    if (fStatus && c.status   !== fStatus) return false;
+    if (fCat && c.category !== fCat) return false;
+    if (fPri && c.priority !== fPri) return false;
+    if (fStatus && c.status !== fStatus) return false;
     return true;
   });
 
   result.sort((a, b) => {
     const av = String(a[sortCol] || '').toLowerCase();
     const bv = String(b[sortCol] || '').toLowerCase();
-    const d  = sortDir === 'asc' ? 1 : -1;
+    const d = sortDir === 'asc' ? 1 : -1;
     return av < bv ? -d : av > bv ? d : 0;
   });
   return result;
@@ -85,11 +85,11 @@ function getFiltered() {
 /* ── RENDER TABLE ── */
 function renderTable() {
   const filtered = getFiltered();
-  const tbody    = document.getElementById('table-body');
-  const emptyEl  = document.getElementById('empty-state');
-  const errorEl  = document.getElementById('error-state');
-  const table    = document.getElementById('complaints-table');
-  const count    = document.getElementById('results-count');
+  const tbody = document.getElementById('table-body');
+  const emptyEl = document.getElementById('empty-state');
+  const errorEl = document.getElementById('error-state');
+  const table = document.getElementById('complaints-table');
+  const count = document.getElementById('results-count');
 
   if (errorEl) errorEl.style.display = 'none';
 
@@ -101,24 +101,24 @@ function renderTable() {
     emptyEl.style.display = 'block';
     if (complaints.length === 0) {
       document.getElementById('empty-title').textContent = 'No complaints submitted yet';
-      document.getElementById('empty-sub').textContent   = 'Submit a grievance from the Citizen Portal — it will appear here in real-time.';
+      document.getElementById('empty-sub').textContent = 'Submit a grievance from the Citizen Portal — it will appear here in real-time.';
     } else {
       document.getElementById('empty-title').textContent = 'No results match your filters';
-      document.getElementById('empty-sub').textContent   = 'Try adjusting the search or filter criteria.';
+      document.getElementById('empty-sub').textContent = 'Try adjusting the search or filter criteria.';
     }
     return;
   }
 
-  table.style.display  = '';
+  table.style.display = '';
   emptyEl.style.display = 'none';
 
   tbody.innerHTML = filtered.map(c => {
-    const parts   = c.id ? c.id.split('/') : [];
+    const parts = c.id ? c.id.split('/') : [];
     const shortId = parts.length >= 5
-      ? parts.slice(0,3).join('/') + '/\u2026/' + parts[parts.length-1]
+      ? parts.slice(0, 3).join('/') + '/\u2026/' + parts[parts.length - 1]
       : (c.id || '—');
     const dateStr = c.submittedAt
-      ? new Date(c.submittedAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
+      ? new Date(c.submittedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
       : '—';
     const loc = [c.city, c.district].filter(Boolean).join(', ');
     return `<tr>
@@ -141,7 +141,7 @@ function renderAll() {
 
 /* ── SORT HEADERS ── */
 document.querySelectorAll('th.sortable').forEach(th => {
-  th.addEventListener('click', function() {
+  th.addEventListener('click', function () {
     const col = this.getAttribute('data-col');
     if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
     else { sortCol = col; sortDir = 'desc'; }
@@ -158,7 +158,7 @@ document.querySelectorAll('th.sortable').forEach(th => {
 });
 
 /* ── FILTERS ── */
-document.getElementById('search-input').addEventListener('input', function() {
+document.getElementById('search-input').addEventListener('input', function () {
   document.getElementById('search-clear').style.display = this.value ? 'block' : 'none';
   renderTable();
 });
@@ -173,8 +173,8 @@ document.getElementById('filter-status').addEventListener('change', renderTable)
 document.getElementById('reset-btn').addEventListener('click', () => {
   document.getElementById('search-input').value = '';
   document.getElementById('search-clear').style.display = 'none';
-  document.getElementById('filter-cat').value    = '';
-  document.getElementById('filter-pri').value    = '';
+  document.getElementById('filter-cat').value = '';
+  document.getElementById('filter-pri').value = '';
   document.getElementById('filter-status').value = '';
   renderTable();
 });
@@ -193,9 +193,9 @@ function openModal(id) {
 
   document.getElementById('modal-id').textContent = c.id;
   document.getElementById('modal-priority-badge').innerHTML = priorityBadgeHTML(c.priority, c.priorityReason, c.prioritySetBy);
-  document.getElementById('modal-status-badge').innerHTML   = statusBadgeHTML(c.status);
+  document.getElementById('modal-status-badge').innerHTML = statusBadgeHTML(c.status);
   document.getElementById('modal-date').textContent = c.submittedAt ? new Date(c.submittedAt).toLocaleString('en-IN') : '—';
-  document.getElementById('modal-status-select').value   = c.status;
+  document.getElementById('modal-status-select').value = c.status;
   document.getElementById('modal-priority-select').value = c.priority || 'Medium';
 
   // Show AI reason if available
@@ -218,16 +218,16 @@ function openModal(id) {
       row('Category', c.categoryName) + row('Department', c.department) +
       row('Incident Date', c.incidentDate) +
       row('Still Unresolved', c.stillUnresolved === 'Yes' || c.stillUnresolved === 'yes' ? 'Yes' : 'No') +
-      row('Reported Before',  c.reportedBefore  === 'Yes' || c.reportedBefore  === 'yes' ? 'Yes' : 'No') +
+      row('Reported Before', c.reportedBefore === 'Yes' || c.reportedBefore === 'yes' ? 'Yes' : 'No') +
       row('Times Previously Reported', c.timesReported > 0 ? `${c.timesReported} time(s)` : 'First complaint') +
-      row('Photos Attached',  c.photoCount > 0 ? `${c.photoCount} photo(s)` : 'None')) +
+      row('Photos Attached', c.photoCount > 0 ? `${c.photoCount} photo(s)` : 'None')) +
     `<div style="margin-bottom:16px">
        <div class="modal-row-label">Grievance Title</div>
-       <div class="modal-row-val" style="font-size:14px;font-weight:600">${esc(c.title||'—')}</div>
+       <div class="modal-row-val" style="font-size:14px;font-weight:600">${esc(c.title || '—')}</div>
      </div>
      <div>
        <div class="modal-row-label">Description</div>
-       <div class="modal-desc-box">${esc(c.description||'—')}</div>
+       <div class="modal-desc-box">${esc(c.description || '—')}</div>
      </div>`;
 
   document.getElementById('modal-overlay').classList.add('open');
@@ -239,7 +239,7 @@ function section(title, content) {
   return `<div class="modal-section"><div class="modal-section-title">${title}</div><div class="modal-grid">${content}</div></div>`;
 }
 function row(label, val) {
-  return `<div class="modal-row"><div class="modal-row-label">${label}</div><div class="modal-row-val">${esc(val||'—')}</div></div>`;
+  return `<div class="modal-row"><div class="modal-row-label">${label}</div><div class="modal-row-val">${esc(val || '—')}</div></div>`;
 }
 
 function closeModal() {
@@ -251,24 +251,24 @@ document.getElementById('modal-close-top').addEventListener('click', closeModal)
 document.getElementById('modal-close-bottom').addEventListener('click', closeModal);
 document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 
-document.getElementById('modal-save-btn').addEventListener('click', async function() {
+document.getElementById('modal-save-btn').addEventListener('click', async function () {
   if (!activeId) return;
-  const newStatus   = document.getElementById('modal-status-select').value;
+  const newStatus = document.getElementById('modal-status-select').value;
   const newPriority = document.getElementById('modal-priority-select').value;
 
   const current = complaints.find(c => c.id === activeId);
   const oldPriority = current?.priority;
 
-  this.disabled    = true;
+  this.disabled = true;
   this.textContent = 'Saving…';
 
   try {
-    const docId  = activeId.replace(/\//g,'_');
+    const docId = activeId.replace(/\//g, '_');
     const update = { status: newStatus, priority: newPriority };
 
     // If admin changed priority, note that it was manually overridden
     if (newPriority !== oldPriority) {
-      update.prioritySetBy  = 'Admin';
+      update.prioritySetBy = 'Admin';
       update.priorityReason = `Manually changed from ${oldPriority} to ${newPriority} by admin`;
     }
 
@@ -277,10 +277,10 @@ document.getElementById('modal-save-btn').addEventListener('click', async functi
     showToast(`✅ Saved — Status: ${newStatus}, Priority: ${newPriority}`);
     closeModal();
     renderAll();
-  } catch(err) {
+  } catch (err) {
     console.error('Save error:', err);
     showToast('❌ Failed to save. Check connection.');
-    this.disabled    = false;
+    this.disabled = false;
     this.textContent = 'Save Changes';
   }
 });
@@ -321,7 +321,7 @@ function showFirebaseError(error) {
         <div class="error-title">⚠️ Firebase Connection Error</div>
         <div class="error-msg">
           Could not connect to Firestore. Please check:<br><br>
-          • Your <strong>Firebase config</strong> in admin-dashboard.html is correct<br>
+          • Your <strong>Firebase config</strong> in admin.html is correct<br>
           • Your <strong>Firestore Rules</strong> allow read/write access<br>
           • You have an <strong>active internet connection</strong>
         </div>
