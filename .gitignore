@@ -1,0 +1,18 @@
+# ── SECRETS — never push these ──
+.env
+
+# ── Node ──
+node_modules/
+npm-debug.log*
+
+# ── OS junk ──
+.DS_Store
+Thumbs.db
+
+# ── Editor ──
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,13 +14,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <!-- ═══════════════════════════════════════════════════════════
-       🔧 FIREBASE CONFIGURATION — PASTE YOUR CONFIG HERE
-       (Must be the SAME config as in citizen-portal.html)
-       Steps:
-       1. Go to https://console.firebase.google.com
-       2. Open your project → ⚙ Settings → Your apps → Web App
-       3. Copy the firebaseConfig and paste below
-       4. Firestore Rules (for dev):  allow read, write: if true;
+       🔧 FIREBASE CONFIGURATION
   ════════════════════════════════════════════════════════════ -->
   <script>
     const firebaseConfig = {
@@ -35,6 +30,7 @@
     window.db = firebase.firestore();
   </script>
 </head>
+
 <body>
 
   <!-- ── HEADER ── -->
@@ -168,7 +164,8 @@
       <div id="empty-state" class="empty-state" style="display:none">
         <div class="empty-icon">📭</div>
         <div class="empty-title" id="empty-title">No complaints yet</div>
-        <div class="empty-sub"  id="empty-sub">Complaints submitted via the Citizen Portal will appear here in real-time.</div>
+        <div class="empty-sub" id="empty-sub">Complaints submitted via the Citizen Portal will appear here in real-time.
+        </div>
       </div>
 
       <!-- ERROR STATE (populated by JS) -->
@@ -203,6 +200,12 @@
           <option value="Resolved">Resolved</option>
           <option value="Rejected">Rejected</option>
         </select>
+        <span class="status-label" style="margin-left: 15px;">Priority:</span>
+        <select class="status-select" id="modal-priority-select">
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
         <button class="save-btn" id="modal-save-btn">Save Status</button>
         <button class="close-btn" id="modal-close-bottom">Close</button>
       </div>
@@ -214,4 +217,5 @@
 
   <script src="admin.js"></script>
 </body>
+
 </html>

@@ -14,9 +14,16 @@ let toastTimer   = null;
 let unsubscribe  = null;   // Firestore real-time listener handle
 
 /* ── BADGE HTML ── */
-function priorityBadgeHTML(priority) {
+function priorityBadgeHTML(priority, reason, setBy) {
   const cls = { High:'priority-High', Medium:'priority-Medium', Low:'priority-Low' }[priority] || 'priority-Low';
-  return `<span class="badge-priority ${cls}"><span class="dot"></span>${priority}</span>`;
+  const icon    = setBy === 'Admin' ? '✏️' : '🤖';
+  const byLabel = setBy === 'Admin' ? 'Set by Admin' : 'AI assessed';
+  const tooltip = reason ? `${icon} ${byLabel}: ${reason}` : `${icon} ${byLabel}`;
+  // data-tooltip is read by CSS/JS for the hover card
+  return `<span class="badge-priority ${cls}" data-tooltip="${tooltip.replace(/"/g,'&quot;')}" tabindex="0">
+    <span class="dot"></span>${priority}
+    <span class="priority-info-icon">${icon}</span>
+  </span>`;
 }
 
 function statusBadgeHTML(status) {
@@ -120,7 +127,7 @@ function renderTable() {
       <td><div class="td-name">${esc(c.fullName)}</div><div class="td-mobile">${esc(c.mobile)}</div></td>
       <td class="td-cat">${esc(c.categoryName || c.category)}</td>
       <td class="td-loc">${esc(loc)}</td>
-      <td>${priorityBadgeHTML(c.priority)}</td>
+      <td>${priorityBadgeHTML(c.priority, c.priorityReason, c.prioritySetBy)}</td>
       <td>${statusBadgeHTML(c.status)}</td>
       <td style="text-align:center"><button class="view-btn" data-id="${esc(c.id)}">View</button></td>
     </tr>`;
@@ -185,10 +192,20 @@ function openModal(id) {
   activeId = id;
 
   document.getElementById('modal-id').textContent = c.id;
-  document.getElementById('modal-priority-badge').innerHTML = priorityBadgeHTML(c.priority);
+  document.getElementById('modal-priority-badge').innerHTML = priorityBadgeHTML(c.priority, c.priorityReason, c.prioritySetBy);
   document.getElementById('modal-status-badge').innerHTML   = statusBadgeHTML(c.status);
   document.getElementById('modal-date').textContent = c.submittedAt ? new Date(c.submittedAt).toLocaleString('en-IN') : '—';
-  document.getElementById('modal-status-select').value = c.status;
+  document.getElementById('modal-status-select').value   = c.status;
+  document.getElementById('modal-priority-select').value = c.priority || 'Medium';
+
+  // Show AI reason if available
+  const reasonEl = document.getElementById('modal-priority-reason');
+  if (reasonEl) {
+    const setBy = c.prioritySetBy === 'Admin' ? '✏️ Set by Admin' : '🤖 AI assessed';
+    reasonEl.innerHTML = c.priorityReason
+      ? `<span style="font-size:11px;color:#718096">${setBy}: ${c.priorityReason}</span>`
+      : `<span style="font-size:11px;color:#718096">🤖 AI assessed</span>`;
+  }
 
   const body = document.getElementById('modal-body');
   body.innerHTML =
@@ -200,8 +217,9 @@ function openModal(id) {
     section('Grievance Details',
       row('Category', c.categoryName) + row('Department', c.department) +
       row('Incident Date', c.incidentDate) +
-      row('Still Unresolved', c.stillUnresolved === 'yes' ? 'Yes' : c.stillUnresolved === 'no' ? 'No' : '—') +
-      row('Reported Before',  c.reportedBefore  === 'yes' ? 'Yes' : c.reportedBefore  === 'no' ? 'No' : '—') +
+      row('Still Unresolved', c.stillUnresolved === 'Yes' || c.stillUnresolved === 'yes' ? 'Yes' : 'No') +
+      row('Reported Before',  c.reportedBefore  === 'Yes' || c.reportedBefore  === 'yes' ? 'Yes' : 'No') +
+      row('Times Previously Reported', c.timesReported > 0 ? `${c.timesReported} time(s)` : 'First complaint') +
       row('Photos Attached',  c.photoCount > 0 ? `${c.photoCount} photo(s)` : 'None')) +
     `<div style="margin-bottom:16px">
        <div class="modal-row-label">Grievance Title</div>
@@ -214,7 +232,7 @@ function openModal(id) {
 
   document.getElementById('modal-overlay').classList.add('open');
   document.getElementById('modal-save-btn').disabled = false;
-  document.getElementById('modal-save-btn').textContent = 'Save Status';
+  document.getElementById('modal-save-btn').textContent = 'Save Changes';
 }
 
 function section(title, content) {
@@ -235,24 +253,35 @@ document.getElementById('modal-overlay').addEventListener('click', e => { if (e.
 
 document.getElementById('modal-save-btn').addEventListener('click', async function() {
   if (!activeId) return;
-  const newStatus = document.getElementById('modal-status-select').value;
-  this.disabled   = true;
+  const newStatus   = document.getElementById('modal-status-select').value;
+  const newPriority = document.getElementById('modal-priority-select').value;
+
+  const current = complaints.find(c => c.id === activeId);
+  const oldPriority = current?.priority;
+
+  this.disabled    = true;
   this.textContent = 'Saving…';
 
   try {
-    // Build the Firestore doc ID from the complaint ID (slashes replaced with underscores)
-    const docId = activeId.replace(/\//g,'_');
-    await window.db.collection('complaints').doc(docId).update({ status: newStatus });
-    // Update local cache
-    complaints = complaints.map(c => c.id === activeId ? { ...c, status: newStatus } : c);
-    showToast(`Status updated to "${newStatus}"`);
+    const docId  = activeId.replace(/\//g,'_');
+    const update = { status: newStatus, priority: newPriority };
+
+    // If admin changed priority, note that it was manually overridden
+    if (newPriority !== oldPriority) {
+      update.prioritySetBy  = 'Admin';
+      update.priorityReason = `Manually changed from ${oldPriority} to ${newPriority} by admin`;
+    }
+
+    await window.db.collection('complaints').doc(docId).update(update);
+    complaints = complaints.map(c => c.id === activeId ? { ...c, ...update } : c);
+    showToast(`✅ Saved — Status: ${newStatus}, Priority: ${newPriority}`);
     closeModal();
     renderAll();
   } catch(err) {
-    console.error('Status update error:', err);
-    showToast('Failed to update status. Check connection.');
+    console.error('Save error:', err);
+    showToast('❌ Failed to save. Check connection.');
     this.disabled    = false;
-    this.textContent = 'Save Status';
+    this.textContent = 'Save Changes';
   }
 });
 
