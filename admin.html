@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,7 +13,13 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <!-- ═══════════════════════════════════════════════════════════
-       🔧 FIREBASE CONFIGURATION
+       🔧 FIREBASE CONFIGURATION — PASTE YOUR CONFIG HERE
+       (Must be the SAME config as in citizen.html)
+       Steps:
+       1. Go to https://console.firebase.google.com
+       2. Open your project → ⚙ Settings → Your apps → Web App
+       3. Copy the firebaseConfig and paste below
+       4. Firestore Rules (for dev):  allow read, write: if true;
   ════════════════════════════════════════════════════════════ -->
   <script>
     const firebaseConfig = {
@@ -23,14 +28,13 @@
       projectId: "grievance-form-39f6a",
       storageBucket: "grievance-form-39f6a.firebasestorage.app",
       messagingSenderId: "149185682282",
-      appId: "1:149185682282:web:f02439a874c6b74a2ca313",
-      measurementId: "G-C1V94ZB1YK"
+      appId: "1:149185682282:web:785c21c17d3470592ca313",
+      measurementId: "G-9V6SPFXDV0"
     };
     firebase.initializeApp(firebaseConfig);
     window.db = firebase.firestore();
   </script>
 </head>
-
 <body>
 
   <!-- ── HEADER ── -->
@@ -49,6 +53,7 @@
         </span>
         <span class="admin-badge">Admin Panel</span>
         <button class="refresh-btn" id="refresh-btn">⟳ Refresh</button>
+        <button class="refresh-btn" id="backfill-btn" style="background:rgba(255,164,0,0.2);border-color:rgba(255,164,0,0.4)" title="Assign AI officers to all complaints that have no assignments yet">⚡ Assign Unassigned</button>
       </div>
     </div>
     <div class="tricolour">
@@ -60,6 +65,19 @@
 
   <!-- ── MAIN ── -->
   <div id="main">
+
+    <!-- TABS -->
+    <div id="main-tabs">
+      <button class="main-tab active" data-tab="complaints">
+        📋 Complaints <span class="tab-count" id="tab-complaints-count">0</span>
+      </button>
+      <button class="main-tab" data-tab="assignments">
+        👥 Assignments <span class="tab-count" id="tab-assignments-count">0</span>
+      </button>
+    </div>
+
+    <!-- ══ TAB: COMPLAINTS ══ -->
+    <div class="tab-panel active" id="tab-complaints">
 
     <!-- STATS -->
     <div id="stats-grid">
@@ -164,15 +182,127 @@
       <div id="empty-state" class="empty-state" style="display:none">
         <div class="empty-icon">📭</div>
         <div class="empty-title" id="empty-title">No complaints yet</div>
-        <div class="empty-sub" id="empty-sub">Complaints submitted via the Citizen Portal will appear here in real-time.
-        </div>
+        <div class="empty-sub"  id="empty-sub">Complaints submitted via the Citizen Portal will appear here in real-time.</div>
       </div>
 
       <!-- ERROR STATE (populated by JS) -->
       <div id="error-state" style="display:none"></div>
     </div>
 
+    </div><!-- /#tab-complaints -->
+
+    <!-- ══ TAB: ASSIGNMENTS ══ -->
+    <div class="tab-panel" id="tab-assignments">
+
+      <!-- ASSIGN STATS -->
+      <div id="assign-stats">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#e8eef8">👥</div>
+          <div><div class="stat-value" id="astat-total">—</div><div class="stat-label">Total Assigned</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fff8ec">⏳</div>
+          <div><div class="stat-value" id="astat-inprogress">—</div><div class="stat-label">In Progress</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fdf2f2">🔺</div>
+          <div><div class="stat-value" id="astat-overdue">—</div><div class="stat-label">Overdue</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#e6f4ed">✅</div>
+          <div><div class="stat-value" id="astat-completed">—</div><div class="stat-label">Completed</div></div>
+        </div>
+      </div>
+
+      <!-- ASSIGN TOOLBAR -->
+      <div id="assign-toolbar">
+        <div class="search-wrap" style="max-width:300px">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="assign-search" placeholder="Search by name, role, department…" />
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Role</span>
+          <select id="assign-filter-role" class="filter-select">
+            <option value="">All Roles</option>
+            <option>Department Head</option>
+            <option>Field Inspector</option>
+            <option>Engineer</option>
+            <option>Medical Officer</option>
+            <option>Legal Officer</option>
+            <option>Contractor</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Status</span>
+          <select id="assign-filter-status" class="filter-select">
+            <option value="">All Statuses</option>
+            <option>Assigned</option>
+            <option>In Progress</option>
+            <option>Completed</option>
+            <option>Escalated</option>
+          </select>
+        </div>
+        <button class="reset-btn" id="assign-reset-btn">✕ Reset</button>
+      </div>
+
+      <!-- ASSIGNMENTS GRID -->
+      <div class="assign-grid" id="assign-grid">
+        <div class="assign-empty">
+          <div class="assign-empty-icon">👥</div>
+          <div class="assign-empty-title">No assignments yet</div>
+          <div class="assign-empty-sub">Assignments are created automatically when citizens submit complaints.</div>
+        </div>
+      </div>
+
+    </div><!-- /#tab-assignments -->
+
   </div><!-- /#main -->
+
+  <!-- ── AUDIT TRAIL MODAL ── -->
+  <div id="audit-modal-overlay">
+    <div id="audit-modal" role="dialog">
+      <div class="audit-header">
+        <div class="audit-title">📋 Assignment History</div>
+        <button class="audit-close" id="audit-close">×</button>
+      </div>
+      <div class="audit-body" id="audit-body"></div>
+    </div>
+  </div>
+
+  <!-- ── REASSIGN MODAL ── -->
+  <div id="reassign-modal-overlay">
+    <div id="reassign-modal" role="dialog">
+      <div class="reassign-header">
+        <div class="reassign-title">🔄 Reassign / Escalate</div>
+        <button class="reassign-close" id="reassign-close">×</button>
+      </div>
+      <div class="reassign-body">
+        <div class="reassign-field">
+          <label class="reassign-label">New Officer Name</label>
+          <input type="text" class="reassign-input" id="reassign-name" placeholder="Sh. Officer Name" />
+        </div>
+        <div class="reassign-field">
+          <label class="reassign-label">Department</label>
+          <input type="text" class="reassign-input" id="reassign-dept" placeholder="Department name" />
+        </div>
+        <div class="reassign-field">
+          <label class="reassign-label">Reason</label>
+          <input type="text" class="reassign-input" id="reassign-reason" placeholder="Reason for reassignment" />
+        </div>
+        <div class="reassign-field">
+          <label class="reassign-label">Action</label>
+          <select class="reassign-input" id="reassign-action">
+            <option value="Reassigned">Reassign to new officer</option>
+            <option value="Escalated">Escalate to senior</option>
+          </select>
+        </div>
+      </div>
+      <div class="reassign-footer">
+        <button class="reassign-btn-cancel" id="reassign-cancel">Cancel</button>
+        <button class="reassign-btn-save" id="reassign-save">Save</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ── DETAIL MODAL ── -->
   <div id="modal-overlay">
@@ -192,22 +322,32 @@
         </div>
       </div>
       <div class="modal-body" id="modal-body"></div>
+      <!-- Assignments inside complaint modal -->
+      <div class="modal-assignments" id="modal-assignments">
+        <div class="modal-assignments-title">👥 Assigned Officers</div>
+        <div id="modal-assign-list"><div class="assign-loading"><span class="loading-dot"></span> Loading assignments…</div></div>
+      </div>
       <div class="modal-footer">
-        <span class="status-label">Update Status:</span>
-        <select class="status-select" id="modal-status-select">
-          <option value="Pending">Pending</option>
-          <option value="In Review">In Review</option>
-          <option value="Resolved">Resolved</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-        <span class="status-label" style="margin-left: 15px;">Priority:</span>
-        <select class="status-select" id="modal-priority-select">
-          <option value="Low">Low</option>
-          <option value="Medium">Medium</option>
-          <option value="High">High</option>
-        </select>
-        <button class="save-btn" id="modal-save-btn">Save Status</button>
-        <button class="close-btn" id="modal-close-bottom">Close</button>
+        <div style="display:flex;flex-direction:column;gap:6px;flex:1;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span class="status-label">Status:</span>
+            <select class="status-select" id="modal-status-select">
+              <option value="Pending">Pending</option>
+              <option value="In Review">In Review</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+            <span class="status-label">Priority:</span>
+            <select class="status-select" id="modal-priority-select">
+              <option value="High">🔴 High</option>
+              <option value="Medium">🟠 Medium</option>
+              <option value="Low">🟢 Low</option>
+            </select>
+            <button class="save-btn" id="modal-save-btn">Save Changes</button>
+            <button class="close-btn" id="modal-close-bottom">Close</button>
+          </div>
+          <div id="modal-priority-reason"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -217,5 +357,4 @@
 
   <script src="admin.js"></script>
 </body>
-
 </html>

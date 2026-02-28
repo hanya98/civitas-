@@ -643,7 +643,48 @@ async function submitToFirebase(btn, spinnerSVG) {
     photoCount:      uploadedPhotos.length,
   };
 
-  await window.db.collection('complaints').doc(refId.replace(/\//g,'_')).set(complaint);
+  const docId = refId.replace(/\//g,'_');
+  await window.db.collection('complaints').doc(docId).set(complaint);
+
+  // ── SILENT AI ASSIGNMENT (runs in background, never shown to citizen) ──
+  try {
+    console.log('[ASSIGN] Calling /api/assign for', refId);
+    const assignRes = await fetch('/api/assign', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        complaintId:  refId,
+        category:     catVal,
+        categoryName: catName,
+        title,
+        description,
+        priority:     complaint.priority,
+        district:     complaint.district,
+        state:        complaint.state,
+      }),
+    });
+    if (!assignRes.ok) throw new Error('Server returned ' + assignRes.status);
+    const data = await assignRes.json();
+    console.log('[ASSIGN] Server response:', data);
+    const { assignments } = data;
+    if (assignments && assignments.length) {
+      console.log('[ASSIGN] Saving', assignments.length, 'assignments to Firestore…');
+      const batch = window.db.batch();
+      assignments.forEach(a => {
+        const aRef = window.db
+          .collection('complaints').doc(docId)
+          .collection('assignments').doc(a.id);
+        batch.set(aRef, a);
+      });
+      await batch.commit();
+      console.log('[ASSIGN] SUCCESS - assignments saved');
+    } else {
+      console.warn('[ASSIGN] No assignments in response');
+    }
+  } catch (e) {
+    console.error('[ASSIGN] FAILED:', e.message);
+  }
+
   showSuccess(refId);
 }
 
