@@ -1,99 +1,32 @@
 /* ================================================================
    PGMS 2.0 — TRACKING PAGE
-   Loads complaints from Firebase Firestore (same project as admin).
-   Falls back to demo data if Firebase is unavailable.
+   Loads complaints from Firebase Firestore
 ================================================================ */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyARUCovi6he0lYE6pikBB_doz72Nae2-h0",
+  authDomain: "grievance-form-39f6a.firebaseapp.com",
+  projectId: "grievance-form-39f6a",
+  storageBucket: "grievance-form-39f6a.firebasestorage.app",
+  messagingSenderId: "149185682282",
+  appId: "1:149185682282:web:785c21c17d3470592ca313",
+  measurementId: "G-9V6SPFXDV0"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 
 /* ── CITIZEN ID — read from localStorage (set by script.js on submit) ── */
 const CITIZEN_ID = (function () {
-  try { return localStorage.getItem('pgms_citizen_id') || '9876 5432 1098'; } catch (e) { return '9876 5432 1098'; }
+  try { return localStorage.getItem('Aadhaar'); } catch (e) { return null; }
 })();
 
 /* ── DEMO / FALLBACK DATA ── */
-const DEMO_COMPLAINTS = [
-    {
-        id: 'GRV-001', citizenId: '9876 5432 1098',
-        title: 'Broken Road Near Bus Stand',
-        description: 'Large pothole on the main road near Rajpur bus stand causing accidents.',
-        category: 'Road', department: 'PWD',
-        status: 'In Progress', priority: 3,
-        location: { lat: 28.6139, lng: 77.2090, address: 'Rajpur Bus Stand, Ward 12', ward: '12', pincode: '110001' },
-        attachments: [],
-        timeline: [
-            { status: 'Submitted', changedAt: '2024-03-01T10:00:00Z', changedBy: 'System', note: 'Grievance registered' },
-            { status: 'Under Review', changedAt: '2024-03-02T09:00:00Z', changedBy: 'Officer A', note: 'Assigned to PWD department' },
-            { status: 'In Progress', changedAt: '2024-03-04T11:30:00Z', changedBy: 'Officer B', note: 'Repair team dispatched to site' },
-        ],
-        assignedTo: 'Officer B',
-        raisedAt: '2024-03-01T10:00:00Z', updatedAt: '2024-03-04T11:30:00Z',
-        resolvedAt: null, expectedBy: '2024-03-08T10:00:00Z'
-    },
-    {
-        id: 'GRV-002', citizenId: '9876 5432 1098',
-        title: 'No Water Supply for 3 Days',
-        description: 'Our colony has had no piped water supply since Monday. Tankers not coming.',
-        category: 'Water', department: 'Jal Board',
-        status: 'Resolved', priority: 3,
-        location: { lat: 28.6200, lng: 77.2100, address: 'Sector 4, Block B', ward: '14', pincode: '110002' },
-        attachments: [],
-        timeline: [
-            { status: 'Submitted', changedAt: '2024-02-20T08:00:00Z', changedBy: 'System', note: 'Grievance registered' },
-            { status: 'Under Review', changedAt: '2024-02-20T12:00:00Z', changedBy: 'Officer C', note: 'Pipeline fault identified' },
-            { status: 'In Progress', changedAt: '2024-02-21T07:00:00Z', changedBy: 'Officer C', note: 'Repair underway' },
-            { status: 'Resolved', changedAt: '2024-02-22T16:00:00Z', changedBy: 'Officer C', note: 'Pipeline repaired. Supply restored.' },
-        ],
-        assignedTo: 'Officer C',
-        raisedAt: '2024-02-20T08:00:00Z', updatedAt: '2024-02-22T16:00:00Z',
-        resolvedAt: '2024-02-22T16:00:00Z', expectedBy: '2024-02-27T08:00:00Z'
-    },
-    {
-        id: 'GRV-003', citizenId: '9876 5432 1098',
-        title: 'Street Light Not Working',
-        description: 'Three street lights on MG Road have been non-functional for 2 weeks.',
-        category: 'Electricity', department: 'BSES',
-        status: 'Submitted', priority: 1,
-        location: { lat: 28.6100, lng: 77.2050, address: 'MG Road, Near Park', ward: '11', pincode: '110003' },
-        attachments: [],
-        timeline: [
-            { status: 'Submitted', changedAt: '2024-03-05T14:00:00Z', changedBy: 'System', note: 'Grievance registered' },
-        ],
-        assignedTo: null,
-        raisedAt: '2024-03-05T14:00:00Z', updatedAt: '2024-03-05T14:00:00Z',
-        resolvedAt: null, expectedBy: '2024-03-12T14:00:00Z'
-    },
-    {
-        id: 'GRV-004', citizenId: '1234 5678 9012',
-        title: 'Garbage Not Collected',
-        description: 'Garbage has not been picked up from our street for 5 days.',
-        category: 'Sanitation', department: 'MCD',
-        status: 'Under Review', priority: 2,
-        location: { lat: 28.6150, lng: 77.2080, address: 'Green Park Colony', ward: '13', pincode: '110001' },
-        attachments: [],
-        timeline: [
-            { status: 'Submitted', changedAt: '2024-03-03T09:00:00Z', changedBy: 'System', note: 'Grievance registered' },
-            { status: 'Under Review', changedAt: '2024-03-04T10:00:00Z', changedBy: 'Officer D', note: 'Sanitation department notified' },
-        ],
-        assignedTo: 'Officer D',
-        raisedAt: '2024-03-03T09:00:00Z', updatedAt: '2024-03-04T10:00:00Z',
-        resolvedAt: null, expectedBy: '2024-03-10T09:00:00Z'
-    },
-    {
-        id: 'GRV-005', citizenId: '9876 5432 1098',
-        title: 'Open Drain Near School',
-        description: 'Uncovered drain near Sunrise School is a safety hazard for children.',
-        category: 'Sanitation', department: 'MCD',
-        status: 'Under Review', priority: 3,
-        location: { lat: 28.6120, lng: 77.2095, address: 'Sunrise School Road', ward: '12', pincode: '110001' },
-        attachments: [],
-        timeline: [
-            { status: 'Submitted', changedAt: '2024-03-06T08:30:00Z', changedBy: 'System', note: 'Grievance registered' },
-            { status: 'Under Review', changedAt: '2024-03-06T14:00:00Z', changedBy: 'Officer E', note: 'Inspection scheduled' },
-        ],
-        assignedTo: 'Officer E',
-        raisedAt: '2024-03-06T08:30:00Z', updatedAt: '2024-03-06T14:00:00Z',
-        resolvedAt: null, expectedBy: '2024-03-13T08:30:00Z'
-    },
-];
+const DEMO_COMPLAINTS = [];
 
 /* ── IN-MEMORY DB — starts with demo data, gets replaced/augmented by Firebase ── */
 const DB = { complaints: [...DEMO_COMPLAINTS] };
@@ -111,10 +44,10 @@ const CAT_SLUG_TO_LABEL = {
 
 function firestoreDocToComplaint(doc) {
   const d = doc;
-  const raisedAt  = d.submittedAt  || d.raisedAt  || new Date().toISOString();
-  const updatedAt = d.updatedAt    || raisedAt;
-  const catLabel  = d.categoryName || CAT_SLUG_TO_LABEL[d.category] || d.category || 'General';
-  const priNum    = PRIORITY_MAP[d.priority] || 2;
+  const raisedAt = d.submittedAt || d.raisedAt || new Date().toISOString();
+  const updatedAt = d.updatedAt || raisedAt;
+  const catLabel = d.categoryName || CAT_SLUG_TO_LABEL[d.category] || d.category || 'General';
+  const priNum = PRIORITY_MAP[d.priority] || 2;
 
   // Build a basic timeline if none stored
   const timeline = d.timeline && d.timeline.length
@@ -140,22 +73,22 @@ function firestoreDocToComplaint(doc) {
   } : null);
 
   return {
-    id:          d.id || doc._docId || 'GRV-???',
-    citizenId:   d.aadhaar || d.citizenId || CITIZEN_ID,
-    title:       d.title        || d.subject       || '(No title)',
-    description: d.description  || '',
-    category:    catLabel,
-    department:  d.department   || '',
-    status:      d.status       || 'Submitted',
-    priority:    priNum,
-    location:    location,
-    attachments: d.attachments  || [],
-    timeline:    timeline,
-    assignedTo:  d.assignedTo   || null,
-    raisedAt:    raisedAt,
-    updatedAt:   updatedAt,
-    resolvedAt:  d.resolvedAt   || (d.status === 'Resolved' ? updatedAt : null),
-    expectedBy:  d.expectedBy   || (() => {
+    id: d.id || doc._docId || 'GRV-???',
+    citizenId: d.aadhaar || d.citizenId || CITIZEN_ID,
+    title: d.title || d.subject || '(No title)',
+    description: d.description || '',
+    category: catLabel,
+    department: d.department || '',
+    status: d.status || 'Submitted',
+    priority: priNum,
+    location: location,
+    attachments: d.attachments || [],
+    timeline: timeline,
+    assignedTo: d.assignedTo || null,
+    raisedAt: raisedAt,
+    updatedAt: updatedAt,
+    resolvedAt: d.resolvedAt || (d.status === 'Resolved' ? updatedAt : null),
+    expectedBy: d.expectedBy || (() => {
       const d7 = new Date(raisedAt);
       d7.setDate(d7.getDate() + 7);
       return d7.toISOString();
@@ -168,8 +101,6 @@ function firestoreDocToComplaint(doc) {
    Merges Firestore complaints into DB, then re-renders.
 ================================================================ */
 (function connectFirebase() {
-  if (!window.db) return; // Firebase not loaded — use demo data only
-
   // Show a loading indicator in the My Complaints list
   const mcList = document.getElementById('mc-list');
   if (mcList) {
@@ -181,135 +112,135 @@ function firestoreDocToComplaint(doc) {
     <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
   }
 
-  window.db.collection('complaints')
-    .orderBy('submittedAt', 'desc')
-    .onSnapshot(
-      snapshot => {
-        // Start fresh from demo data, then overlay Firestore docs
-        DB.complaints = [...DEMO_COMPLAINTS];
-        snapshot.docs.forEach(doc => {
-          const raw = { ...doc.data(), _docId: doc.id };
-          const mapped = firestoreDocToComplaint(raw);
-          // Replace demo entry with same ID if exists, otherwise push
-          const idx = DB.complaints.findIndex(c => c.id === mapped.id);
-          if (idx >= 0) DB.complaints[idx] = mapped;
-          else DB.complaints.push(mapped);
+  const q = query(collection(db, 'complaints'), orderBy('submittedAt', 'desc'));
+
+  onSnapshot(q,
+    snapshot => {
+      // Start fresh from demo data, then overlay Firestore docs
+      DB.complaints = [...DEMO_COMPLAINTS];
+      snapshot.docs.forEach(doc => {
+        const raw = { ...doc.data(), _docId: doc.id };
+        const mapped = firestoreDocToComplaint(raw);
+        // Replace demo entry with same ID if exists, otherwise push
+        const idx = DB.complaints.findIndex(c => c.id === mapped.id);
+        if (idx >= 0) DB.complaints[idx] = mapped;
+        else DB.complaints.push(mapped);
+      });
+
+      // Also merge any localStorage grievances (from script.js form)
+      try {
+        const stored = JSON.parse(localStorage.getItem('pgms_grievances') || '[]');
+        stored.forEach(g => {
+          if (!DB.complaints.some(c => c.id === g.id)) DB.complaints.push(g);
         });
+      } catch (e) { }
 
-        // Also merge any localStorage grievances (from script.js form)
-        try {
-          const stored = JSON.parse(localStorage.getItem('pgms_grievances') || '[]');
-          stored.forEach(g => {
-            if (!DB.complaints.some(c => c.id === g.id)) DB.complaints.push(g);
-          });
-        } catch (e) {}
-
-        // Re-render whichever tab is active
-        renderMyComplaints();
-        const activePage = document.querySelector('.page.active');
-        if (activePage && activePage.id === 'page-nearby') renderNearby();
-      },
-      err => {
-        console.warn('Firebase listener error:', err);
-        // Fall back to demo data + localStorage
-        try {
-          const stored = JSON.parse(localStorage.getItem('pgms_grievances') || '[]');
-          stored.forEach(g => {
-            if (!DB.complaints.some(c => c.id === g.id)) DB.complaints.push(g);
-          });
-        } catch (e) {}
-        renderMyComplaints();
-      }
-    );
+      // Re-render whichever tab is active
+      renderMyComplaints();
+      const activePage = document.querySelector('.page.active');
+      if (activePage && activePage.id === 'page-nearby') renderNearby();
+    },
+    err => {
+      console.warn('Firebase listener error:', err);
+      // Fall back to demo data + localStorage
+      try {
+        const stored = JSON.parse(localStorage.getItem('pgms_grievances') || '[]');
+        stored.forEach(g => {
+          if (!DB.complaints.some(c => c.id === g.id)) DB.complaints.push(g);
+        });
+      } catch (e) { }
+      renderMyComplaints();
+    }
+  );
 })();
 
 
 const Backend = {
 
 
-    getMyComplaints({ status = '', category = '', page = 1, limit = 10 } = {}) {
-        let results = DB.complaints.filter(c => c.citizenId === CITIZEN_ID);
-        if (status) results = results.filter(c => c.status === status);
-        if (category) results = results.filter(c => c.category === category);
-        results.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-        const total = results.length;
-        const data = results.slice((page - 1) * limit, page * limit);
-        return { data, total, page, limit, pages: Math.ceil(total / limit) };
-    },
+  getMyComplaints({ status = '', category = '', page = 1, limit = 10 } = {}) {
+    let results = DB.complaints.filter(c => c.citizenId === CITIZEN_ID);
+    if (status) results = results.filter(c => c.status === status);
+    if (category) results = results.filter(c => c.category === category);
+    results.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    const total = results.length;
+    const data = results.slice((page - 1) * limit, page * limit);
+    return { data, total, page, limit, pages: Math.ceil(total / limit) };
+  },
 
 
-    getNearbyIssues({ lat, lng, radiusKm = 2, status = '', category = '', page = 1, limit = 20 } = {}) {
-        let results = DB.complaints.filter(c => {
-            if (!c.location) return false;
-            return haversineKm(lat, lng, c.location.lat, c.location.lng) <= radiusKm;
-        });
-        if (status) results = results.filter(c => c.status === status);
-        if (category) results = results.filter(c => c.category === category);
-        results = results.map(c => ({ ...c, distanceKm: haversineKm(lat, lng, c.location.lat, c.location.lng) }));
-        results.sort((a, b) => a.distanceKm - b.distanceKm);
-        const total = results.length;
-        const data = results.slice((page - 1) * limit, page * limit);
-        return { data, total, page, limit, pages: Math.ceil(total / limit) };
-    },
+  getNearbyIssues({ lat, lng, radiusKm = 2, status = '', category = '', page = 1, limit = 20 } = {}) {
+    let results = DB.complaints.filter(c => {
+      if (!c.location) return false;
+      return haversineKm(lat, lng, c.location.lat, c.location.lng) <= radiusKm;
+    });
+    if (status) results = results.filter(c => c.status === status);
+    if (category) results = results.filter(c => c.category === category);
+    results = results.map(c => ({ ...c, distanceKm: haversineKm(lat, lng, c.location.lat, c.location.lng) }));
+    results.sort((a, b) => a.distanceKm - b.distanceKm);
+    const total = results.length;
+    const data = results.slice((page - 1) * limit, page * limit);
+    return { data, total, page, limit, pages: Math.ceil(total / limit) };
+  },
 
 
-    getComplaintStatus(id) {
-        const complaint = DB.complaints.find(c => c.id === id.trim());
-        if (!complaint) return null;
-        return { ...complaint, sla: computeSla(complaint) };
-    },
+  getComplaintStatus(id) {
+    const complaint = DB.complaints.find(c => c.id === id.trim());
+    if (!complaint) return null;
+    return { ...complaint, sla: computeSla(complaint) };
+  },
 
 
-    updateStatus(id, newStatus, changedBy = 'System', note = '') {
-        const complaint = DB.complaints.find(c => c.id === id);
-        if (!complaint) return null;
-        const now = new Date().toISOString();
-        complaint.status = newStatus;
-        complaint.updatedAt = now;
-        if (newStatus === 'Resolved') complaint.resolvedAt = now;
-        complaint.timeline.push({ status: newStatus, changedAt: now, changedBy, note });
-        return complaint;
-    }
+  updateStatus(id, newStatus, changedBy = 'System', note = '') {
+    const complaint = DB.complaints.find(c => c.id === id);
+    if (!complaint) return null;
+    const now = new Date().toISOString();
+    complaint.status = newStatus;
+    complaint.updatedAt = now;
+    if (newStatus === 'Resolved') complaint.resolvedAt = now;
+    complaint.timeline.push({ status: newStatus, changedAt: now, changedBy, note });
+    return complaint;
+  }
 };
 
 
 function haversineKm(lat1, lng1, lat2, lng2) {
-    const R = 6371, toRad = d => d * Math.PI / 180;
-    const dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
-    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const R = 6371, toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 
 function computeSla(complaint) {
-    if (['Resolved', 'Rejected'].includes(complaint.status))
-        return { breached: false, daysRemaining: null, label: 'Closed', pct: 100 };
-    if (!complaint.expectedBy)
-        return { breached: false, daysRemaining: null, label: 'No SLA', pct: 0 };
-    const now = Date.now();
-    const raised = new Date(complaint.raisedAt).getTime();
-    const deadline = new Date(complaint.expectedBy).getTime();
-    const total = deadline - raised;
-    const elapsed = now - raised;
-    const pct = Math.min(100, Math.round((elapsed / total) * 100));
-    const msLeft = deadline - now;
-    const daysRemaining = Math.ceil(msLeft / 86400000);
-    if (daysRemaining < 0)
-        return { breached: true, daysRemaining: Math.abs(daysRemaining), label: `Overdue by ${Math.abs(daysRemaining)}d`, pct: 100 };
-    if (daysRemaining === 0)
-        return { breached: false, daysRemaining: 0, label: 'Due today', pct };
-    return { breached: false, daysRemaining, label: `${daysRemaining} day(s) left`, pct };
+  if (['Resolved', 'Rejected'].includes(complaint.status))
+    return { breached: false, daysRemaining: null, label: 'Closed', pct: 100 };
+  if (!complaint.expectedBy)
+    return { breached: false, daysRemaining: null, label: 'No SLA', pct: 0 };
+  const now = Date.now();
+  const raised = new Date(complaint.raisedAt).getTime();
+  const deadline = new Date(complaint.expectedBy).getTime();
+  const total = deadline - raised;
+  const elapsed = now - raised;
+  const pct = Math.min(100, Math.round((elapsed / total) * 100));
+  const msLeft = deadline - now;
+  const daysRemaining = Math.ceil(msLeft / 86400000);
+  if (daysRemaining < 0)
+    return { breached: true, daysRemaining: Math.abs(daysRemaining), label: `Overdue by ${Math.abs(daysRemaining)}d`, pct: 100 };
+  if (daysRemaining === 0)
+    return { breached: false, daysRemaining: 0, label: 'Due today', pct };
+  return { breached: false, daysRemaining, label: `${daysRemaining} day(s) left`, pct };
 }
 
 
 function fmtDate(iso) {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 function fmtDateTime(iso) {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
 
@@ -317,14 +248,14 @@ function statusSlug(s) { return s.toLowerCase().replace(/\s+/g, '-'); }
 
 
 function renderCard(c, showDist = false) {
-    const slug = statusSlug(c.status);
-    const sla = computeSla(c);
-    const slaClass = sla.breached ? 'overdue' : sla.pct > 70 ? 'warn' : 'ok';
-    const distBadge = showDist && c.distanceKm !== undefined
-        ? `<span class="badge badge-dist">📍 ${c.distanceKm.toFixed(2)} km</span>` : '';
-    const priLabel = ['', '🟢 Low', '🟡 Medium', '🔴 High'][c.priority] || '';
+  const slug = statusSlug(c.status);
+  const sla = computeSla(c);
+  const slaClass = sla.breached ? 'overdue' : sla.pct > 70 ? 'warn' : 'ok';
+  const distBadge = showDist && c.distanceKm !== undefined
+    ? `<span class="badge badge-dist">📍 ${c.distanceKm.toFixed(2)} km</span>` : '';
+  const priLabel = ['', '🟢 Low', '🟡 Medium', '🔴 High'][c.priority] || '';
 
-    return `
+  return `
     <div class="complaint-card status-${slug}" onclick="openDetail('${c.id}')">
       <div class="card-top">
         <div>
@@ -352,26 +283,26 @@ function renderCard(c, showDist = false) {
 
 
 function openDetail(id) {
-    const complaint = Backend.getComplaintStatus(id);
-    if (!complaint) return;
-    const sla = complaint.sla;
-    const slug = statusSlug(complaint.status);
+  const complaint = Backend.getComplaintStatus(id);
+  if (!complaint) return;
+  const sla = complaint.sla;
+  const slug = statusSlug(complaint.status);
 
-    document.getElementById('dp-title').textContent = complaint.title;
+  document.getElementById('dp-title').textContent = complaint.title;
 
-    const timelineHtml = complaint.timeline.map((t, i) => {
-        const tslug = statusSlug(t.status);
-        const isLast = i === complaint.timeline.length - 1;
-        return `
+  const timelineHtml = complaint.timeline.map((t, i) => {
+    const tslug = statusSlug(t.status);
+    const isLast = i === complaint.timeline.length - 1;
+    return `
       <div class="tl-item">
         <div class="tl-dot ${tslug} ${isLast ? 'in-progress' : ''}"></div>
         <div class="tl-status">${t.status}</div>
         <div class="tl-note">${t.note}</div>
         <div class="tl-time">${fmtDateTime(t.changedAt)} · ${t.changedBy}</div>
       </div>`;
-    }).join('');
+  }).join('');
 
-    document.getElementById('dp-body').innerHTML = `
+  document.getElementById('dp-body').innerHTML = `
     <div class="detail-section">
       <div class="detail-section-title">Overview</div>
       <div class="info-grid">
@@ -428,191 +359,218 @@ function openDetail(id) {
     </div>
   `;
 
-    document.getElementById('detailPanel').classList.add('open');
-    document.getElementById('overlay').classList.add('active');
+  document.getElementById('detailPanel').classList.add('open');
+  document.getElementById('overlay').classList.add('active');
 }
 
 
 let mcPage = 1;
 function renderMyComplaints(page = 1) {
-    mcPage = page;
-    const status = document.getElementById('mc-status').value;
-    const category = document.getElementById('mc-category').value;
-    const result = Backend.getMyComplaints({ status, category, page: mcPage, limit: 5 });
-    const list = document.getElementById('mc-list');
+  mcPage = page;
+  const status = document.getElementById('mc-status').value;
+  const category = document.getElementById('mc-category').value;
+  const result = Backend.getMyComplaints({ status, category, page: mcPage, limit: 5 });
+  const list = document.getElementById('mc-list');
 
-    if (!result.data.length) {
-        list.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No complaints found</h3><p>Try different filters or raise a new grievance.</p></div>`;
-    } else {
-        list.innerHTML = result.data.map(c => renderCard(c)).join('');
-    }
-    renderPagination('mc-pagination', result.pages, mcPage, renderMyComplaints);
+  if (!result.data.length) {
+    list.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No complaints found</h3><p>Try different filters or raise a new grievance.</p></div>`;
+  } else {
+    list.innerHTML = result.data.map(c => renderCard(c)).join('');
+  }
+  renderPagination('mc-pagination', result.pages, mcPage, renderMyComplaints);
 }
 
 
 let nbPage = 1;
 function renderNearby(page = 1) {
-    nbPage = page;
-    const lat = parseFloat(document.getElementById('nb-lat').value);
-    const lng = parseFloat(document.getElementById('nb-lng').value);
-    const radius = parseFloat(document.getElementById('nb-radius').value);
-    const status = document.getElementById('nb-status').value;
-    const category = document.getElementById('nb-category').value;
-    const list = document.getElementById('nb-list');
+  nbPage = page;
+  const lat = parseFloat(document.getElementById('nb-lat').value);
+  const lng = parseFloat(document.getElementById('nb-lng').value);
+  const radius = parseFloat(document.getElementById('nb-radius').value);
+  const status = document.getElementById('nb-status').value;
+  const category = document.getElementById('nb-category').value;
+  const list = document.getElementById('nb-list');
 
-    if (isNaN(lat) || isNaN(lng)) {
-        list.innerHTML = `<div class="empty-state"><div class="icon">📡</div><h3>Enter your location</h3><p>Use "Use My Location" or enter coordinates above.</p></div>`;
-        return;
-    }
+  if (isNaN(lat) || isNaN(lng)) {
+    list.innerHTML = `<div class="empty-state"><div class="icon">📡</div><h3>Enter your location</h3><p>Use "Use My Location" or enter coordinates above.</p></div>`;
+    return;
+  }
 
-    const result = Backend.getNearbyIssues({ lat, lng, radiusKm: radius, status, category, page: nbPage, limit: 10 });
+  const result = Backend.getNearbyIssues({ lat, lng, radiusKm: radius, status, category, page: nbPage, limit: 10 });
 
-    if (!result.data.length) {
-        list.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><h3>No issues found nearby</h3><p>Try expanding the search radius.</p></div>`;
-    } else {
-        list.innerHTML = result.data.map(c => renderCard(c, true)).join('');
-    }
+  if (!result.data.length) {
+    list.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><h3>No issues found nearby</h3><p>Try expanding the search radius.</p></div>`;
+  } else {
+    list.innerHTML = result.data.map(c => renderCard(c, true)).join('');
+  }
 
-    initNearbyMap();
-    renderPagination('nb-pagination', result.pages, nbPage, renderNearby);
+  initNearbyMap();
+  renderPagination('nb-pagination', result.pages, nbPage, renderNearby);
 }
 
 function locateMe() {
-    if (!navigator.geolocation) return alert('Geolocation not supported');
-    navigator.geolocation.getCurrentPosition(
-        pos => {
-            document.getElementById('nb-lat').value = pos.coords.latitude.toFixed(6);
-            document.getElementById('nb-lng').value = pos.coords.longitude.toFixed(6);
+  if (!navigator.geolocation) return alert('Geolocation not supported');
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      document.getElementById('nb-lat').value = pos.coords.latitude.toFixed(6);
+      document.getElementById('nb-lng').value = pos.coords.longitude.toFixed(6);
 
-            const pincodeEl = document.getElementById('nb-pincode');
-            const matchedPincode = findPincodeForCoords(pos.coords.latitude, pos.coords.longitude);
-            if (matchedPincode) pincodeEl.value = matchedPincode;
-            else pincodeEl.value = '';
-            renderNearby();
-        },
-        () => alert('Location permission denied. Please enter a pincode manually.')
-    );
+      const pincodeEl = document.getElementById('nb-pincode');
+      const matchedPincode = findPincodeForCoords(pos.coords.latitude, pos.coords.longitude);
+      if (matchedPincode) pincodeEl.value = matchedPincode;
+      else pincodeEl.value = '';
+      renderNearby();
+    },
+    () => alert('Location permission denied. Please enter a pincode manually.')
+  );
 }
 
 
 function lookupStatus() {
-    const id = document.getElementById('st-id').value.trim();
-    const result = document.getElementById('st-result');
+  const id = document.getElementById('st-id').value.trim();
+  const result = document.getElementById('st-result');
 
-    if (!id) {
-        result.innerHTML = `<div class="empty-state"><div class="icon">🔎</div><h3>Enter a Complaint ID</h3></div>`;
-        return;
-    }
+  if (!id) {
+    result.innerHTML = `<div class="empty-state"><div class="icon">🔎</div><h3>Enter a Complaint ID</h3></div>`;
+    return;
+  }
 
-    const complaint = Backend.getComplaintStatus(id);
+  const complaint = Backend.getComplaintStatus(id);
 
-    if (!complaint) {
-        result.innerHTML = `<div class="empty-state"><div class="icon">❌</div><h3>Complaint not found</h3><p>Check the ID and try again.</p></div>`;
-        return;
-    }
+  if (!complaint) {
+    result.innerHTML = `<div class="empty-state"><div class="icon">❌</div><h3>Complaint not found</h3><p>Check the ID and try again.</p></div>`;
+    return;
+  }
 
-    result.innerHTML = renderCard(complaint);
+  result.innerHTML = renderCard(complaint);
 
-    openDetail(id);
+  openDetail(id);
 }
 
 
 document.getElementById('st-id').addEventListener('keydown', e => {
-    if (e.key === 'Enter') lookupStatus();
+  if (e.key === 'Enter') lookupStatus();
 });
 
 
 function renderPagination(containerId, pages, current, callback) {
-    const el = document.getElementById(containerId);
-    if (pages <= 1) { el.innerHTML = ''; return; }
-    let html = '';
-    for (let i = 1; i <= pages; i++) {
-        html += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="${callback.name}(${i})">${i}</button>`;
-    }
-    el.innerHTML = html;
+  const el = document.getElementById(containerId);
+  if (pages <= 1) { el.innerHTML = ''; return; }
+  let html = '';
+  for (let i = 1; i <= pages; i++) {
+    html += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="${callback.name}(${i})">${i}</button>`;
+  }
+  el.innerHTML = html;
 }
 
 
 document.querySelectorAll('.nav-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        tab.classList.add('active');
-        const pageName = tab.dataset.page;
-        document.getElementById('page-' + pageName).classList.add('active');
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    const pageName = tab.dataset.page;
+    document.getElementById('page-' + pageName).classList.add('active');
 
 
-        if (pageName === "nearby") {
-            initNearbyMap();
-        }
-    });
+    if (pageName === "nearby") {
+      initNearbyMap();
+    }
+  });
 });
 
 
 function closePanel() {
-    document.getElementById('detailPanel').classList.remove('open');
-    document.getElementById('overlay').classList.remove('active');
+  document.getElementById('detailPanel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('active');
 }
 document.getElementById('closePanel').addEventListener('click', closePanel);
 document.getElementById('overlay').addEventListener('click', closePanel);
 
 
 const PINCODE_COORDS = {
-    '110001': { lat: 28.6139, lng: 77.2090, label: 'Connaught Place, New Delhi' },
-    '110002': { lat: 28.6200, lng: 77.2100, label: 'Darya Ganj, New Delhi' },
-    '110003': { lat: 28.6100, lng: 77.2050, label: 'Civil Lines, New Delhi' },
-    '110004': { lat: 28.6020, lng: 77.2070, label: 'President Estate, New Delhi' },
-    '110005': { lat: 28.6340, lng: 77.2180, label: 'Kamla Nagar, New Delhi' },
-    '110006': { lat: 28.6545, lng: 77.2250, label: 'Delhi University, New Delhi' },
-    '110007': { lat: 28.6670, lng: 77.2160, label: 'Model Town, New Delhi' },
-    '110008': { lat: 28.6528, lng: 77.1979, label: 'Patel Nagar, New Delhi' },
-    '110009': { lat: 28.6415, lng: 77.2020, label: 'Paharganj, New Delhi' },
-    '110010': { lat: 28.5900, lng: 77.2090, label: 'Pragati Maidan, New Delhi' },
-    '110011': { lat: 28.5991, lng: 77.1900, label: 'Moti Bagh, New Delhi' },
-    '110016': { lat: 28.5700, lng: 77.1800, label: 'Hauz Khas, New Delhi' },
-    '110020': { lat: 28.5672, lng: 77.2100, label: 'Nehru Place, New Delhi' },
-    '110025': { lat: 28.5400, lng: 77.2500, label: 'Okhla, New Delhi' },
-    '110044': { lat: 28.5600, lng: 77.2800, label: 'Sarita Vihar, New Delhi' },
-    '110048': { lat: 28.5494, lng: 77.1850, label: 'Saket, New Delhi' },
-    '110049': { lat: 28.5615, lng: 77.1860, label: 'Green Park, New Delhi' },
-    '110065': { lat: 28.5170, lng: 77.2520, label: 'Kalkaji, New Delhi' },
-    '110092': { lat: 28.6538, lng: 77.2990, label: 'Shahdara, New Delhi' },
-    '400001': { lat: 18.9388, lng: 72.8354, label: 'Fort, Mumbai' },
-    '400050': { lat: 19.0640, lng: 72.8400, label: 'Bandra, Mumbai' },
-    '500001': { lat: 17.3850, lng: 78.4867, label: 'Hyderabad GPO' },
-    '560001': { lat: 12.9716, lng: 77.5946, label: 'Bangalore GPO' },
-    '600001': { lat: 13.0827, lng: 80.2707, label: 'Chennai GPO' },
-    '700001': { lat: 22.5726, lng: 88.3639, label: 'Kolkata GPO' },
-    '302001': { lat: 26.9124, lng: 75.7873, label: 'Jaipur GPO' },
-    '226001': { lat: 26.8467, lng: 80.9462, label: 'Lucknow GPO' },
-    '380001': { lat: 23.0225, lng: 72.5714, label: 'Ahmedabad GPO' },
-    '411001': { lat: 18.5204, lng: 73.8567, label: 'Pune GPO' },
+  // Delhi & NCR
+  '110001': { lat: 28.6139, lng: 77.2090, label: 'Connaught Place, New Delhi' },
+  '110002': { lat: 28.6200, lng: 77.2100, label: 'Darya Ganj, New Delhi' },
+  '110003': { lat: 28.6100, lng: 77.2050, label: 'Civil Lines, New Delhi' },
+  '110004': { lat: 28.6020, lng: 77.2070, label: 'President Estate, New Delhi' },
+  '110005': { lat: 28.6340, lng: 77.2180, label: 'Kamla Nagar, New Delhi' },
+  '110006': { lat: 28.6545, lng: 77.2250, label: 'Delhi University, New Delhi' },
+  '110007': { lat: 28.6670, lng: 77.2160, label: 'Model Town, New Delhi' },
+  '110008': { lat: 28.6528, lng: 77.1979, label: 'Patel Nagar, New Delhi' },
+  '110009': { lat: 28.6415, lng: 77.2020, label: 'Paharganj, New Delhi' },
+  '110010': { lat: 28.5900, lng: 77.2090, label: 'Pragati Maidan, New Delhi' },
+  '110011': { lat: 28.5991, lng: 77.1900, label: 'Moti Bagh, New Delhi' },
+  '110016': { lat: 28.5700, lng: 77.1800, label: 'Hauz Khas, New Delhi' },
+  '110020': { lat: 28.5672, lng: 77.2100, label: 'Nehru Place, New Delhi' },
+  '110025': { lat: 28.5400, lng: 77.2500, label: 'Okhla, New Delhi' },
+  '110044': { lat: 28.5600, lng: 77.2800, label: 'Sarita Vihar, New Delhi' },
+  '110048': { lat: 28.5494, lng: 77.1850, label: 'Saket, New Delhi' },
+  '110049': { lat: 28.5615, lng: 77.1860, label: 'Green Park, New Delhi' },
+  '110058': { lat: 28.6256, lng: 77.0945, label: 'Janakpuri, New Delhi' },
+  '110065': { lat: 28.5170, lng: 77.2520, label: 'Kalkaji, New Delhi' },
+  '110075': { lat: 28.5823, lng: 77.0500, label: 'Dwarka, New Delhi' },
+  '110085': { lat: 28.7256, lng: 77.1205, label: 'Rohini, New Delhi' },
+  '110092': { lat: 28.6538, lng: 77.2990, label: 'Shahdara, New Delhi' },
+
+  // Mumbai & Maharashtra
+  '400001': { lat: 18.9388, lng: 72.8354, label: 'Fort, Mumbai' },
+  '400020': { lat: 18.9322, lng: 72.8264, label: 'Churchgate, Mumbai' },
+  '400050': { lat: 19.0640, lng: 72.8400, label: 'Bandra West, Mumbai' },
+  '400051': { lat: 19.0558, lng: 72.8526, label: 'Bandra East, Mumbai' },
+  '400053': { lat: 19.1136, lng: 72.8348, label: 'Andheri West, Mumbai' },
+  '400076': { lat: 19.1176, lng: 72.9060, label: 'Powai, Mumbai' },
+  '400092': { lat: 19.2288, lng: 72.8541, label: 'Borivali West, Mumbai' },
+  '411001': { lat: 18.5204, lng: 73.8567, label: 'Pune GPO' },
+
+  // Hyderabad & Telangana
+  '500001': { lat: 17.3850, lng: 78.4867, label: 'Hyderabad GPO' },
+  '500032': { lat: 17.4401, lng: 78.3489, label: 'Gachibowli, Hyderabad' },
+  '500033': { lat: 17.4156, lng: 78.4347, label: 'Banjara Hills, Hyderabad' },
+  '500034': { lat: 17.4300, lng: 78.4063, label: 'Jubilee Hills, Hyderabad' },
+  '500081': { lat: 17.4435, lng: 78.3772, label: 'HITEC City, Hyderabad' },
+
+  // Bangalore & Karnataka
+  '560001': { lat: 12.9716, lng: 77.5946, label: 'Bangalore GPO' },
+  '560004': { lat: 12.9406, lng: 77.5738, label: 'Basavanagudi, Bangalore' },
+  '560011': { lat: 12.9250, lng: 77.5938, label: 'Jayanagar, Bangalore' },
+  '560034': { lat: 12.9279, lng: 77.6271, label: 'Koramangala, Bangalore' },
+  '560037': { lat: 12.9591, lng: 77.7126, label: 'Marathahalli, Bangalore' },
+  '560038': { lat: 12.9784, lng: 77.6408, label: 'Indiranagar, Bangalore' },
+  '560066': { lat: 12.9698, lng: 77.7499, label: 'Whitefield, Bangalore' },
+
+  // Others
+  '600001': { lat: 13.0827, lng: 80.2707, label: 'Chennai GPO' },
+  '700001': { lat: 22.5726, lng: 88.3639, label: 'Kolkata GPO' },
+  '302001': { lat: 26.9124, lng: 75.7873, label: 'Jaipur GPO' },
+  '226001': { lat: 26.8467, lng: 80.9462, label: 'Lucknow GPO' },
+  '380001': { lat: 23.0225, lng: 72.5714, label: 'Ahmedabad GPO' },
 };
 
 function findPincodeForCoords(lat, lng) {
-    let bestPincode = null;
-    let bestDist = Infinity;
-    for (const [pin, coords] of Object.entries(PINCODE_COORDS)) {
-        const d = haversineKm(lat, lng, coords.lat, coords.lng);
-        if (d < bestDist) { bestDist = d; bestPincode = pin; }
-    }
-    return bestDist < 15 ? bestPincode : null;
+  let bestPincode = null;
+  let bestDist = Infinity;
+  for (const [pin, coords] of Object.entries(PINCODE_COORDS)) {
+    const d = haversineKm(lat, lng, coords.lat, coords.lng);
+    if (d < bestDist) { bestDist = d; bestPincode = pin; }
+  }
+  return bestDist < 15 ? bestPincode : null;
 }
 
 function searchByPincode() {
-    const pincode = document.getElementById('nb-pincode').value.trim();
-    if (!pincode || pincode.length !== 6 || !/^\d{6}$/.test(pincode)) {
-        alert('Please enter a valid 6-digit Indian pincode.');
-        return;
-    }
-    const coords = PINCODE_COORDS[pincode];
-    if (!coords) {
-        alert('Pincode not found in our database. Try using "Use My Location" for GPS-based search.');
-        return;
-    }
-    document.getElementById('nb-lat').value = coords.lat;
-    document.getElementById('nb-lng').value = coords.lng;
-    renderNearby();
+  const pincode = document.getElementById('nb-pincode').value.trim();
+  if (!pincode || pincode.length !== 6 || !/^\d{6}$/.test(pincode)) {
+    alert('Please enter a valid 6-digit Indian pincode.');
+    return;
+  }
+  const coords = PINCODE_COORDS[pincode];
+  if (!coords) {
+    alert('Pincode not found in our database. Try using "Use My Location" for GPS-based search.');
+    return;
+  }
+  document.getElementById('nb-lat').value = coords.lat;
+  document.getElementById('nb-lng').value = coords.lng;
+  renderNearby();
 }
 
 
@@ -621,68 +579,68 @@ let nearbyMap = null;
 let markersLayer = null;
 
 function initNearbyMap() {
-    const lat = parseFloat(document.getElementById('nb-lat').value);
-    const lng = parseFloat(document.getElementById('nb-lng').value);
+  const lat = parseFloat(document.getElementById('nb-lat').value);
+  const lng = parseFloat(document.getElementById('nb-lng').value);
 
-    if (isNaN(lat) || isNaN(lng)) {
+  if (isNaN(lat) || isNaN(lng)) {
 
-        return;
-    }
-
-
-    if (!nearbyMap) {
-        nearbyMap = L.map("map").setView([lat, lng], 14);
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(nearbyMap);
-    } else {
-        nearbyMap.setView([lat, lng], 14);
-    }
+    return;
+  }
 
 
-    if (markersLayer) {
-        nearbyMap.removeLayer(markersLayer);
-    }
-    markersLayer = L.layerGroup().addTo(nearbyMap);
+  if (!nearbyMap) {
+    nearbyMap = L.map("map").setView([lat, lng], 14);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(nearbyMap);
+  } else {
+    nearbyMap.setView([lat, lng], 14);
+  }
 
 
-    const userIcon = L.divIcon({
-        className: 'user-marker',
-        html: `<div style="
+  if (markersLayer) {
+    nearbyMap.removeLayer(markersLayer);
+  }
+  markersLayer = L.layerGroup().addTo(nearbyMap);
+
+
+  const userIcon = L.divIcon({
+    className: 'user-marker',
+    html: `<div style="
             width: 18px; height: 18px;
             background: #1a3a6b;
             border: 3px solid #fff;
             border-radius: 50%;
             box-shadow: 0 0 0 3px rgba(26,58,107,0.3), 0 2px 8px rgba(0,0,0,0.25);
         "></div>`,
-        iconSize: [18, 18],
-        iconAnchor: [9, 9]
-    });
-    L.marker([lat, lng], { icon: userIcon })
-        .addTo(markersLayer)
-        .bindPopup('<strong>📍 Your Location</strong>');
+    iconSize: [18, 18],
+    iconAnchor: [9, 9]
+  });
+  L.marker([lat, lng], { icon: userIcon })
+    .addTo(markersLayer)
+    .bindPopup('<strong>📍 Your Location</strong>');
 
 
-    const statusColors = {
-        'Submitted': '#718096',
-        'Under Review': '#d4770b',
-        'In Progress': '#1a3a6b',
-        'Resolved': '#006937',
-        'Rejected': '#c0392b'
-    };
+  const statusColors = {
+    'Submitted': '#718096',
+    'Under Review': '#d4770b',
+    'In Progress': '#1a3a6b',
+    'Resolved': '#006937',
+    'Rejected': '#c0392b'
+  };
 
 
-    const radius = parseFloat(document.getElementById('nb-radius').value) || 2;
-    DB.complaints.forEach(c => {
-        if (!c.location) return;
-        const dist = haversineKm(lat, lng, c.location.lat, c.location.lng);
-        if (dist > radius) return;
+  const radius = parseFloat(document.getElementById('nb-radius').value) || 2;
+  DB.complaints.forEach(c => {
+    if (!c.location) return;
+    const dist = haversineKm(lat, lng, c.location.lat, c.location.lng);
+    if (dist > radius) return;
 
-        const color = statusColors[c.status] || '#718096';
-        const markerIcon = L.divIcon({
-            className: 'complaint-marker',
-            html: `<div style="
+    const color = statusColors[c.status] || '#718096';
+    const markerIcon = L.divIcon({
+      className: 'complaint-marker',
+      html: `<div style="
                 width: 14px; height: 14px;
                 background: ${color};
                 border: 2.5px solid #fff;
@@ -690,13 +648,13 @@ function initNearbyMap() {
                 box-shadow: 0 1px 6px rgba(0,0,0,0.3);
                 cursor: pointer;
             "></div>`,
-            iconSize: [14, 14],
-            iconAnchor: [7, 7]
-        });
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
+    });
 
-        L.marker([c.location.lat, c.location.lng], { icon: markerIcon })
-            .addTo(markersLayer)
-            .bindPopup(`
+    L.marker([c.location.lat, c.location.lng], { icon: markerIcon })
+      .addTo(markersLayer)
+      .bindPopup(`
                 <div style="font-family:'DM Sans',sans-serif;min-width:180px;">
                     <strong style="font-size:0.9rem;">${c.title}</strong><br/>
                     <span style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:600;color:#fff;background:${color};">${c.status}</span><br/>
@@ -704,16 +662,28 @@ function initNearbyMap() {
                     <span style="font-size:0.72rem;color:#718096;">${dist.toFixed(2)} km away</span>
                 </div>
             `);
-    });
+  });
 
 
-    const bounds = markersLayer.getLayers().map(l => l.getLatLng && l.getLatLng()).filter(Boolean);
-    if (bounds.length > 1) {
-        nearbyMap.fitBounds(L.latLngBounds(bounds).pad(0.1));
-    }
+  const bounds = markersLayer.getLayers().map(l => l.getLatLng && l.getLatLng()).filter(Boolean);
+  if (bounds.length > 1) {
+    nearbyMap.fitBounds(L.latLngBounds(bounds).pad(0.1));
+  }
 
-    setTimeout(() => nearbyMap.invalidateSize(), 150);
+  setTimeout(() => nearbyMap.invalidateSize(), 150);
 }
+
+/* ================================================================
+   EXPORT FUNCTIONS TO GLOBAL SCOPE
+   Since this is a type="module", HTML onclick handlers won't find 
+   these functions natively.
+================================================================ */
+window.renderMyComplaints = renderMyComplaints;
+window.renderNearby = renderNearby;
+window.locateMe = locateMe;
+window.searchByPincode = searchByPincode;
+window.lookupStatus = lookupStatus;
+window.openDetail = openDetail;
 
 /* NOTE: Initial render is triggered by the Firebase onSnapshot callback above.
    If Firebase is unavailable, the error handler also calls renderMyComplaints(). */

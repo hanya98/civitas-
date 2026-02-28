@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Survey & Suggestions | Citizen Portal</title>
+    <meta name="description"
+        content="Participate in local governance by taking polls and providing feedback on government schemes and development." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Serif:wght@600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="citizen.css" />
+    <link rel="stylesheet" href="survey.css" />
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="site-header" role="banner">
+        <div class="header-inner">
+            <div class="header-emblem" aria-hidden="true">
+                <svg width="52" height="52" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="28" cy="28" r="26" stroke="#1a3a6b" stroke-width="2.5" />
+                    <circle cx="28" cy="28" r="10" stroke="#1a3a6b" stroke-width="2" />
+                    <circle cx="28" cy="28" r="3" fill="#1a3a6b" />
+                    <g stroke="#1a3a6b" stroke-width="1.2">
+                        <line x1="28" y1="18" x2="28" y2="2" />
+                        <line x1="28" y1="38" x2="28" y2="54" />
+                        <line x1="18" y1="28" x2="2" y2="28" />
+                        <line x1="38" y1="28" x2="54" y2="28" />
+                        <line x1="21.17" y1="21.17" x2="9.51" y2="9.51" />
+                        <line x1="34.83" y1="34.83" x2="46.49" y2="46.49" />
+                        <line x1="34.83" y1="21.17" x2="46.49" y2="9.51" />
+                        <line x1="21.17" y1="34.83" x2="9.51" y2="46.49" />
+                        <line x1="24.52" y1="18.43" x2="20.52" y2="3.06" />
+                        <line x1="31.48" y1="37.57" x2="35.48" y2="52.94" />
+                        <line x1="18.43" y1="24.52" x2="3.06" y2="20.52" />
+                        <line x1="37.57" y1="31.48" x2="52.94" y2="35.48" />
+                        <line x1="18.43" y1="31.48" x2="3.06" y2="35.48" />
+                        <line x1="37.57" y1="24.52" x2="52.94" y2="20.52" />
+                        <line x1="24.52" y1="37.57" x2="20.52" y2="52.94" />
+                        <line x1="31.48" y1="18.43" x2="35.48" y2="3.06" />
+                    </g>
+                </svg>
+            </div>
+            <div class="header-titles">
+                <p class="header-sup">भारत सरकार | Government of India</p>
+                <h1 class="header-main">Citizen Grievance Redressal Portal</h1>
+                <p class="header-sub">Public Grievance Management System &mdash; PGMS 2.0</p>
+            </div>
+            <div class="header-badge" aria-label="Official Government Website">
+                <span class="badge-dot"></span>Official
+            </div>
+        </div>
+        <div class="tricolour" aria-hidden="true">
+            <span class="tc-orange"></span><span class="tc-white"></span><span class="tc-green"></span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="main">
+
+        <div class="notice-banner" role="note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Your voice matters! Participate in active polls and provide valuable suggestions to help us build a
+                better community. All submissions are reviewed by the respective departments.</span>
+        </div>
+
+        <!-- TABS NAVIGATION -->
+        <div class="tabs-nav" role="tablist">
+            <button class="tab-btn active" id="tab-polls" role="tab" aria-selected="true" aria-controls="panel-polls">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"></path>
+                    <path d="M16 14v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2z"></path>
+                    <path d="M12 10v10"></path>
+                    <path d="M8 14v6"></path>
+                </svg>
+                Active Polls
+            </button>
+            <button class="tab-btn" id="tab-feedback" role="tab" aria-selected="false" aria-controls="panel-feedback">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                Feedback &amp; Suggestions
+            </button>
+        </div>
+
+        <!-- TAB 1: POLLS -->
+        <div class="tab-panel active" id="panel-polls" role="tabpanel" aria-labelledby="tab-polls">
+            <div class="panel-header">
+                <h2 class="panel-title">Community Polls</h2>
+                <p class="panel-desc">Vote on ongoing initiatives and help local authorities gauge public interest.</p>
+            </div>
+
+            <!-- LOCATION SEARCH -->
+            <div class="poll-search-section"
+                style="background: var(--clr-surface); border: 1px solid var(--clr-border); border-radius: var(--r-md); padding: var(--sp-lg); margin-bottom: var(--sp-xl);">
+                <div class="form-grid">
+                    <div class="field-group full-width"
+                        style="display: flex; flex-direction: row; align-items: flex-end; gap: 12px;">
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: var(--sp-xs);">
+                            <label for="poll-pincode" class="field-label">Find Polls Near You</label>
+                            <input type="text" id="poll-pincode" class="field-input"
+                                placeholder="Enter your 6-digit Pincode or Locality Name" maxlength="50" />
+                        </div>
+                        <button class="btn btn-primary" id="btn-search-polls">Search</button>
+                    </div>
+                </div>
+                <p class="field-hint" style="margin-top: 8px;">Try entering "110001", "Delhi", "Mumbai", or leave blank
+                    for all polls.</p>
+            </div>
+
+            <div class="polls-grid" id="polls-container">
+                <!-- Polls will be populated dynamically via survey.js -->
+            </div>
+        </div>
+
+        <!-- TAB 2: FEEDBACK -->
+        <div class="tab-panel hidden" id="panel-feedback" role="tabpanel" aria-labelledby="tab-feedback">
+
+            <section class="form-section form-feedback" id="feedback-form-card">
+                <div class="section-heading">
+                    <div class="section-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
+                            </path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="section-title">Submit a Suggestion</h2>
+                        <p class="section-desc">Share your ideas or provide feedback on recent government developments.
+                        </p>
+                    </div>
+                </div>
+
+                <form id="suggestion-form" novalidate>
+                    <div class="form-grid">
+
+                        <div class="field-group">
+                            <label for="feedback-category" class="field-label">Category <span
+                                    class="required-star">*</span></label>
+                            <div class="select-wrap">
+                                <select id="feedback-category" class="field-select" required>
+                                    <option value="">-- Select Category --</option>
+                                    <option value="infrastructure">Infrastructure & Development</option>
+                                    <option value="transportation">Public Transport</option>
+                                    <option value="health">Health & Sanitation</option>
+                                    <option value="digital">Digital India Services</option>
+                                    <option value="schemes">Welfare Schemes</option>
+                                    <option value="other">Other Suggestions</option>
+                                </select>
+                                <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </div>
+                            <span class="field-error" id="fb-cat-err"></span>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="feedback-location" class="field-label">Location / Area <span
+                                    class="optional-tag">Optional</span></label>
+                            <input type="text" id="feedback-location" class="field-input"
+                                placeholder="e.g. Sector 12, Delhi" />
+                        </div>
+
+                        <div class="field-group full-width">
+                            <label for="feedback-subject" class="field-label">Subject <span
+                                    class="required-star">*</span></label>
+                            <input type="text" id="feedback-subject" class="field-input"
+                                placeholder="Brief subject for your suggestion" maxlength="100" required />
+                            <span class="field-error" id="fb-sub-err"></span>
+                        </div>
+
+                        <div class="field-group full-width">
+                            <label for="feedback-desc" class="field-label">Detailed Description <span
+                                    class="required-star">*</span></label>
+                            <textarea id="feedback-desc" class="field-textarea" rows="5"
+                                placeholder="Elaborate on your suggestion or feedback..." maxlength="1000"
+                                required></textarea>
+                            <div class="field-meta-row">
+                                <span class="field-error" id="fb-desc-err"></span>
+                                <span class="char-count" id="fb-desc-count">0 / 1000</span>
+                            </div>
+                        </div>
+
+                        <div class="field-group full-width">
+                            <label class="field-label">Rate the current situation or service <span
+                                    class="optional-tag">Optional</span></label>
+                            <div class="star-rating">
+                                <input type="radio" id="star5" name="rating" value="5" /><label for="star5"
+                                    title="Excellent">★</label>
+                                <input type="radio" id="star4" name="rating" value="4" /><label for="star4"
+                                    title="Good">★</label>
+                                <input type="radio" id="star3" name="rating" value="3" /><label for="star3"
+                                    title="Average">★</label>
+                                <input type="radio" id="star2" name="rating" value="2" /><label for="star2"
+                                    title="Poor">★</label>
+                                <input type="radio" id="star1" name="rating" value="1" /><label for="star1"
+                                    title="Very Poor">★</label>
+                            </div>
+                        </div>
+
+                        <div class="field-group full-width">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="fb-anonymous" />
+                                <span class="checkbox-custom"></span>
+                                <span>Submit this feedback anonymously. (Your profile details will not be attached to
+                                    the public records)</span>
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <div class="step-actions">
+                        <button type="submit" class="btn btn-submit" id="submit-feedback-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="9 11 12 14 22 4"></polyline>
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                            </svg>
+                            Submit Suggestion
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- FEEDBACK SUCCESS SCREEN (Originally hidden) -->
+            <section class="success-screen hidden" id="feedback-success-screen">
+                <div class="success-icon">
+                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="9 12 11 14 15 10"></polyline>
+                    </svg>
+                </div>
+                <h2 class="success-title">Thank You For Your Voice!</h2>
+                <p class="success-body" style="max-width: 600px;">Your feedback has been submitted successfully to the
+                    respective department. Continuous community engagement helps the Government improve administration
+                    significantly.</p>
+                <div class="ref-card">
+                    <p class="ref-label">Suggestion Tracking Number</p>
+                    <p class="ref-number" id="fb-ref-number">SUG-82914-XXXX</p>
+                    <p class="ref-hint">You can use this number in the "Track Issue" page to see if authorities have
+                        left remarks on your suggestion.</p>
+                </div>
+                <div class="success-actions">
+                    <button type="button" class="btn btn-secondary" onclick="location.reload()">Submit Another
+                        Suggestion</button>
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast"></div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-inner">
+            <div class="footer-col">
+                <p class="footer-title">Citizen Grievance Redressal Portal</p>
+                <p>A Government of India Initiative under the Right to Public Services Act</p>
+            </div>
+            <div class="footer-col">
+                <p class="footer-title">Helpline</p>
+                <p>Toll-Free: <strong>1800-111-555</strong></p>
+                <p>Mon–Sat: 9:00 AM – 6:00 PM</p>
+            </div>
+            <div class="footer-col">
+                <p class="footer-title">Links</p>
+                <ul class="footer-links">
+                    <li><a href="tracking.html">Track Grievance</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Disclaimer</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Government of India. All Rights Reserved. | WCAG 2.1 AA compliant.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="survey.js"></script>
+</body>
+
+</html>

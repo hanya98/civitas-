@@ -889,24 +889,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-    <!-- ═══ FIREBASE SDK v9 COMPAT ═══ -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyARUCovi6he0lYE6pikBB_doz72Nae2-h0",
-        authDomain: "grievance-form-39f6a.firebaseapp.com",
-        projectId: "grievance-form-39f6a",
-        storageBucket: "grievance-form-39f6a.firebasestorage.app",
-        messagingSenderId: "149185682282",
-        appId: "1:149185682282:web:f02439a874c6b74a2ca313",
-        measurementId: "G-C1V94ZB1YK"
-      };
-      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-      window.db = firebase.firestore();
-    </script>
-
-    <script src="tracking.js"></script>
+    <script type="module" src="tracking.js"></script>
 
 </body>
 
