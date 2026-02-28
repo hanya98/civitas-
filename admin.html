@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGMS 2.0 — Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+
+  <!-- ═══ FIREBASE SDK v9 COMPAT ═══ -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       🔧 FIREBASE CONFIGURATION — PASTE YOUR CONFIG HERE
+       (Must be the SAME config as in citizen-portal.html)
+       Steps:
+       1. Go to https://console.firebase.google.com
+       2. Open your project → ⚙ Settings → Your apps → Web App
+       3. Copy the firebaseConfig and paste below
+       4. Firestore Rules (for dev):  allow read, write: if true;
+  ════════════════════════════════════════════════════════════ -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyARUCovi6he0lYE6pikBB_doz72Nae2-h0",
+      authDomain: "grievance-form-39f6a.firebaseapp.com",
+      projectId: "grievance-form-39f6a",
+      storageBucket: "grievance-form-39f6a.firebasestorage.app",
+      messagingSenderId: "149185682282",
+      appId: "1:149185682282:web:f02439a874c6b74a2ca313",
+      measurementId: "G-C1V94ZB1YK"
+    };
+    firebase.initializeApp(firebaseConfig);
+    window.db = firebase.firestore();
+  </script>
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <div id="app-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <span class="header-icon">🏛️</span>
+        <div>
+          <div class="header-sub">Government of India</div>
+          <div class="header-title">PGMS 2.0 — Admin Dashboard</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <span id="realtime-indicator" class="realtime-badge" style="display:none">
+          <span class="realtime-dot"></span> Live
+        </span>
+        <span class="admin-badge">Admin Panel</span>
+        <button class="refresh-btn" id="refresh-btn">⟳ Refresh</button>
+      </div>
+    </div>
+    <div class="tricolour">
+      <div style="background:#FF6200"></div>
+      <div style="background:#fff"></div>
+      <div style="background:#006937"></div>
+    </div>
+  </div>
+
+  <!-- ── MAIN ── -->
+  <div id="main">
+
+    <!-- STATS -->
+    <div id="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#e8eef8">📋</div>
+        <div>
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-label">Total Complaints</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fff8ec">⏳</div>
+        <div>
+          <div class="stat-value" id="stat-pending">—</div>
+          <div class="stat-label">Pending</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fdf2f2">🔴</div>
+        <div>
+          <div class="stat-value" id="stat-high">—</div>
+          <div class="stat-label">High Priority</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#e6f4ed">✅</div>
+        <div>
+          <div class="stat-value" id="stat-resolved">—</div>
+          <div class="stat-label">Resolved</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div id="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Search by name, complaint ID, city, category…" />
+        <button id="search-clear">×</button>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Category</span>
+        <select id="filter-cat" class="filter-select">
+          <option value="">All Categories</option>
+          <option value="roads">Roads &amp; Infrastructure</option>
+          <option value="water">Water Supply</option>
+          <option value="electricity">Electricity</option>
+          <option value="sanitation">Sanitation &amp; Waste</option>
+          <option value="healthcare">Healthcare</option>
+          <option value="education">Education</option>
+          <option value="police">Police &amp; Law Enforcement</option>
+          <option value="corruption">Corruption &amp; Misconduct</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Priority</span>
+        <select id="filter-pri" class="filter-select">
+          <option value="">All Priorities</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Status</span>
+        <select id="filter-status" class="filter-select">
+          <option value="">All Statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="In Review">In Review</option>
+          <option value="Resolved">Resolved</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      </div>
+      <button class="reset-btn" id="reset-btn">✕ Reset</button>
+    </div>
+
+    <!-- RESULTS COUNT -->
+    <div id="results-count"></div>
+
+    <!-- TABLE -->
+    <div id="table-container">
+      <div class="table-scroll">
+        <table id="complaints-table">
+          <thead>
+            <tr>
+              <th class="sortable" data-col="id">Complaint ID <span class="sort-icon">↕</span></th>
+              <th class="sortable sort-active" data-col="submittedAt">Date <span class="sort-icon">↓</span></th>
+              <th class="sortable" data-col="fullName">Complainant <span class="sort-icon">↕</span></th>
+              <th class="sortable" data-col="categoryName">Category <span class="sort-icon">↕</span></th>
+              <th class="sortable" data-col="city">Location <span class="sort-icon">↕</span></th>
+              <th class="sortable" data-col="priority">Priority <span class="sort-icon">↕</span></th>
+              <th class="sortable" data-col="status">Status <span class="sort-icon">↕</span></th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div id="empty-state" class="empty-state" style="display:none">
+        <div class="empty-icon">📭</div>
+        <div class="empty-title" id="empty-title">No complaints yet</div>
+        <div class="empty-sub"  id="empty-sub">Complaints submitted via the Citizen Portal will appear here in real-time.</div>
+      </div>
+
+      <!-- ERROR STATE (populated by JS) -->
+      <div id="error-state" style="display:none"></div>
+    </div>
+
+  </div><!-- /#main -->
+
+  <!-- ── DETAIL MODAL ── -->
+  <div id="modal-overlay">
+    <div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
+      <div class="modal-header">
+        <div class="modal-header-row">
+          <div>
+            <div class="modal-title" id="modal-title-text">Complaint Details</div>
+            <div class="modal-id" id="modal-id"></div>
+          </div>
+          <button class="modal-close" id="modal-close-top" aria-label="Close">×</button>
+        </div>
+        <div class="modal-meta">
+          <span id="modal-priority-badge"></span>
+          <span id="modal-status-badge"></span>
+          <span class="modal-date" id="modal-date"></span>
+        </div>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer">
+        <span class="status-label">Update Status:</span>
+        <select class="status-select" id="modal-status-select">
+          <option value="Pending">Pending</option>
+          <option value="In Review">In Review</option>
+          <option value="Resolved">Resolved</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+        <button class="save-btn" id="modal-save-btn">Save Status</button>
+        <button class="close-btn" id="modal-close-bottom">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast"></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

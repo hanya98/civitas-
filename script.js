@@ -1,12 +1,9 @@
-/**
- * ================================================================
- * CITIZEN GRIEVANCE REDRESSAL PORTAL — JAVASCRIPT
- * Government of India | PGMS 2.0
- * Complete rewrite — bulletproof navigation + clear error feedback
- * ================================================================
- */
-
 'use strict';
+
+/* ================================================================
+   PGMS 2.0 — CITIZEN PORTAL SCRIPT
+   Uses Firebase Firestore for persistent cross-device storage
+================================================================ */
 
 /* ================================================================
    1. DATA: Districts per State
@@ -50,43 +47,44 @@ const DISTRICTS = {
   WB: ['Kolkata', 'Howrah', 'Hooghly', 'North 24 Parganas', 'South 24 Parganas', 'Darjeeling', 'Malda', 'Murshidabad'],
 };
 
-/* ================================================================
-   2. DATA: Departments per Category
-================================================================ */
 const DEPARTMENTS = {
-  roads:       ['Public Works Department (PWD)', 'National Highways Authority of India (NHAI)', 'Municipal Corporation – Roads Division', 'Urban Local Body (ULB)'],
-  water:       ['Water Supply & Sanitation Department', 'Jal Jeevan Mission', 'Municipal Water Works', 'Ground Water Authority'],
+  roads: ['Public Works Department (PWD)', 'National Highways Authority of India (NHAI)', 'Municipal Corporation – Roads Division', 'Urban Local Body (ULB)'],
+  water: ['Water Supply & Sanitation Department', 'Jal Jeevan Mission', 'Municipal Water Works', 'Ground Water Authority'],
   electricity: ['State Electricity Distribution Company', 'Central Electricity Authority', 'DISCOMS / Power Distribution Unit'],
-  sanitation:  ['Municipal Corporation – Sanitation Wing', 'Swachh Bharat Mission (Urban/Rural)', 'Urban Local Body – Waste Management'],
-  healthcare:  ['State Health Department', 'District Hospital Administration', 'National Health Mission (NHM)', 'Primary Health Centre (PHC)'],
-  education:   ['State School Education Department', 'District Education Office', 'Samagra Shiksha Abhiyan', 'Higher Education Department'],
-  police:      ['State Police Headquarters', 'District Superintendent of Police (SP)', 'Commissioner of Police (Urban)', 'Internal Complaints Committee'],
-  corruption:  ['Central Vigilance Commission (CVC)', 'Lokayukta / Jan Lokpal', 'Central Bureau of Investigation (CBI)', 'State Anti-Corruption Bureau (ACB)'],
-  other:       ["District Collector / DM Office", "Chief Minister's Helpline (State)", "Prime Minister's Office (PMO)", 'Concerned Line Department'],
+  sanitation: ['Municipal Corporation – Sanitation Wing', 'Swachh Bharat Mission (Urban/Rural)', 'Urban Local Body – Waste Management'],
+  healthcare: ['State Health Department', 'District Hospital Administration', 'National Health Mission (NHM)', 'Primary Health Centre (PHC)'],
+  education: ['State School Education Department', 'District Education Office', 'Samagra Shiksha Abhiyan', 'Higher Education Department'],
+  police: ['State Police Headquarters', 'District Superintendent of Police (SP)', 'Commissioner of Police (Urban)', 'Internal Complaints Committee'],
+  corruption: ['Central Vigilance Commission (CVC)', 'Lokayukta / Jan Lokpal', 'Central Bureau of Investigation (CBI)', 'State Anti-Corruption Bureau (ACB)'],
+  other: ["District Collector / DM Office", "Chief Minister's Helpline (State)", "Prime Minister's Office (PMO)", 'Concerned Line Department'],
 };
 
+const PRIORITY_MAP = { corruption: 'High', police: 'High', healthcare: 'High', electricity: 'Medium', water: 'Medium', roads: 'Medium', sanitation: 'Low', education: 'Low', other: 'Low' };
+
 /* ================================================================
-   3. STATE
+   2. STATE
 ================================================================ */
 let currentStep = 1;
 const TOTAL_STEPS = 4;
 let uploadedPhotos = [];
 
 /* ================================================================
-   4. SHORTCUT: get element by ID
+   3. HELPERS
 ================================================================ */
 function el(id) { return document.getElementById(id); }
 
-/* ================================================================
-   5. FIELD ERROR HELPERS
-================================================================ */
+function showToast(msg, duration = 3500) {
+  const t = el('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
 
-/** Mark/clear error on an input, select, or textarea */
 function setError(inputId, message) {
-  var input = el(inputId);
-  var errSpan = el(inputId + '-err');
+  const input = el(inputId);
+  const errSpan = el(inputId + '-err');
   if (!input) return;
-
   if (message) {
     input.classList.add('error');
     input.classList.remove('valid');
@@ -100,330 +98,189 @@ function setError(inputId, message) {
   }
 }
 
-/** Set/clear error on a plain <span> (radios, checkboxes) */
 function setSpanError(spanId, message) {
-  var span = el(spanId);
+  const span = el(spanId);
   if (span) span.textContent = message;
 }
 
 /* ================================================================
-   6. ERROR BANNER — big visible red box inside step card
+   4. ERROR BANNER
 ================================================================ */
-
 function showErrorBanner(stepNum, errors) {
-  var section = el('form-step-' + stepNum);
+  const section = el('form-step-' + stepNum);
   if (!section) return;
-
-  // Remove old banner
-  var old = section.querySelector('.err-banner');
+  const old = section.querySelector('.err-banner');
   if (old) old.remove();
 
-  var banner = document.createElement('div');
+  const banner = document.createElement('div');
   banner.className = 'err-banner';
   banner.setAttribute('role', 'alert');
-
-  var listHTML = '';
-  for (var i = 0; i < errors.length; i++) {
-    listHTML += '<li>' + errors[i] + '</li>';
-  }
-
   banner.innerHTML =
-    '<div class="err-banner-icon">' +
-      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">' +
-        '<circle cx="12" cy="12" r="10"/>' +
-        '<line x1="12" y1="7" x2="12" y2="13"/>' +
-        '<line x1="12" y1="16" x2="12.01" y2="16"/>' +
-      '</svg>' +
-    '</div>' +
-    '<div class="err-banner-body">' +
-      '<strong>Please fix the following before continuing:</strong>' +
-      '<ul>' + listHTML + '</ul>' +
-    '</div>' +
-    '<button type="button" class="err-banner-close" aria-label="Dismiss error">&times;</button>';
+    `<div class="err-banner-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="7" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+     <div class="err-banner-body"><strong>Please fix the following before continuing:</strong><ul>${errors.map(e => `<li>${e}</li>`).join('')}</ul></div>
+     <button type="button" class="err-banner-close" aria-label="Dismiss">&times;</button>`;
 
-  // Place banner after the section heading
-  var heading = section.querySelector('.section-heading');
-  if (heading) {
-    heading.insertAdjacentElement('afterend', banner);
-  } else {
-    section.insertBefore(banner, section.firstChild);
-  }
+  const heading = section.querySelector('.section-heading');
+  if (heading) heading.insertAdjacentElement('afterend', banner);
+  else section.insertBefore(banner, section.firstChild);
 
-  // Wire close button
-  banner.querySelector('.err-banner-close').addEventListener('click', function () {
-    banner.remove();
-  });
-
-  // Scroll banner into view
+  banner.querySelector('.err-banner-close').addEventListener('click', () => banner.remove());
   banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function clearBanner(stepNum) {
-  var section = el('form-step-' + stepNum);
+  const section = el('form-step-' + stepNum);
   if (!section) return;
-  var banner = section.querySelector('.err-banner');
+  const banner = section.querySelector('.err-banner');
   if (banner) banner.remove();
 }
 
 /* ================================================================
-   7. VALIDATION — returns array of error strings
+   5. VALIDATION
 ================================================================ */
-
 function validateStep1() {
-  var errors = [];
+  const errors = [];
+  const name = el('full-name').value.trim();
+  if (!name) { setError('full-name', 'Full name is required.'); errors.push('Full name is required.'); }
+  else if (name.length < 3) { setError('full-name', 'Name must be at least 3 characters.'); errors.push('Full name must be at least 3 characters.'); }
+  else if (!/^[a-zA-Z\s.,''`-]+$/.test(name)) { setError('full-name', 'Name may only contain letters and spaces.'); errors.push('Full name contains invalid characters.'); }
+  else { setError('full-name', ''); }
 
-  /* Full Name */
-  var name = el('full-name').value.trim();
-  if (!name) {
-    setError('full-name', 'Full name is required.');
-    errors.push('Full name is required.');
-  } else if (name.length < 3) {
-    setError('full-name', 'Name must be at least 3 characters long.');
-    errors.push('Full name must be at least 3 characters.');
-  } else if (!/^[a-zA-Z\s.,''`-]+$/.test(name)) {
-    setError('full-name', 'Name may only contain letters and spaces.');
-    errors.push('Full name contains invalid characters.');
-  } else {
-    setError('full-name', '');
-  }
+  const mobile = el('mobile').value.trim();
+  if (!mobile) { setError('mobile', 'Mobile number is required.'); errors.push('Mobile number is required.'); }
+  else if (!/^[6-9]\d{9}$/.test(mobile)) { setError('mobile', 'Must be 10 digits starting with 6, 7, 8 or 9.'); errors.push('Mobile number must be 10 digits starting with 6–9.'); }
+  else { setError('mobile', ''); }
 
-  /* Mobile */
-  var mobile = el('mobile').value.trim();
-  if (!mobile) {
-    setError('mobile', 'Mobile number is required.');
-    errors.push('Mobile number is required.');
-  } else if (!/^[6-9]\d{9}$/.test(mobile)) {
-    setError('mobile', 'Must be 10 digits starting with 6, 7, 8 or 9.');
-    errors.push('Mobile number must be 10 digits starting with 6, 7, 8 or 9.');
-  } else {
-    setError('mobile', '');
-  }
+  const email = el('email').value.trim();
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { setError('email', 'Enter a valid email address.'); errors.push('Email address is invalid.'); }
+  else { setError('email', ''); }
 
-  /* Email — optional */
-  var email = el('email').value.trim();
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
-    setError('email', 'Enter a valid email address.');
-    errors.push('Email address is invalid.');
-  } else {
-    setError('email', '');
-  }
-
-  /* Aadhaar — optional; use data-raw to avoid masking issues */
-  var aadhaarEl = el('aadhaar');
-  var aadhaarRaw = aadhaarEl.dataset.raw || aadhaarEl.value.replace(/[\sX]/gi, '');
-  if (aadhaarRaw && !/^\d{12}$/.test(aadhaarRaw)) {
-    setError('aadhaar', 'Aadhaar must be exactly 12 digits.');
-    errors.push('Aadhaar number must be 12 digits.');
-  } else {
-    setError('aadhaar', '');
-  }
-
+  const aadhaarEl = el('aadhaar');
+  const aadhaarRaw = aadhaarEl.dataset.raw || aadhaarEl.value.replace(/[\sX]/gi, '');
+  if (aadhaarRaw && !/^\d{12}$/.test(aadhaarRaw)) { setError('aadhaar', 'Aadhaar must be exactly 12 digits.'); errors.push('Aadhaar number must be 12 digits.'); }
+  else { setError('aadhaar', ''); }
   return errors;
 }
 
 function validateStep2() {
-  var errors = [];
-
-  if (!el('state').value) {
-    setError('state', 'Please select your state.');
-    errors.push('State is required.');
-  } else { setError('state', ''); }
-
-  if (!el('district').value) {
-    setError('district', 'Please select your district.');
-    errors.push('District is required.');
-  } else { setError('district', ''); }
-
-  if (!el('city').value.trim()) {
-    setError('city', 'City / Town is required.');
-    errors.push('City / Town is required.');
-  } else { setError('city', ''); }
-
-  var pin = el('pincode').value.trim();
-  if (!pin) {
-    setError('pincode', 'Pincode is required.');
-    errors.push('Pincode is required.');
-  } else if (!/^\d{6}$/.test(pin)) {
-    setError('pincode', 'Pincode must be exactly 6 digits.');
-    errors.push('Pincode must be 6 digits.');
-  } else { setError('pincode', ''); }
-
-  if (!el('locality').value.trim()) {
-    setError('locality', 'Area / Locality is required.');
-    errors.push('Area / Locality is required.');
-  } else { setError('locality', ''); }
-
+  const errors = [];
+  if (!el('state').value) { setError('state', 'Please select your state.'); errors.push('State is required.'); } else { setError('state', ''); }
+  if (!el('district').value) { setError('district', 'Please select district.'); errors.push('District is required.'); } else { setError('district', ''); }
+  if (!el('city').value.trim()) { setError('city', 'City / Town is required.'); errors.push('City / Town is required.'); } else { setError('city', ''); }
+  const pin = el('pincode').value.trim();
+  if (!pin) { setError('pincode', 'Pincode is required.'); errors.push('Pincode is required.'); }
+  else if (!/^\d{6}$/.test(pin)) { setError('pincode', 'Pincode must be 6 digits.'); errors.push('Pincode must be 6 digits.'); }
+  else { setError('pincode', ''); }
+  if (!el('locality').value.trim()) { setError('locality', 'Area / Locality is required.'); errors.push('Area / Locality is required.'); } else { setError('locality', ''); }
   return errors;
 }
 
 function validateStep3() {
-  var errors = [];
-
-  if (!el('category').value) {
-    setError('category', 'Please select a grievance category.');
-    errors.push('Grievance category is required.');
-  } else { setError('category', ''); }
-
-  if (!el('department').value) {
-    setError('department', 'Please select the concerned department.');
-    errors.push('Department is required.');
-  } else { setError('department', ''); }
-
-  var title = el('title').value.trim();
-  if (!title) {
-    setError('title', 'Grievance title is required.');
-    errors.push('Grievance title is required.');
-  } else if (title.length < 10) {
-    setError('title', 'Title must be at least 10 characters.');
-    errors.push('Grievance title needs at least 10 characters.');
-  } else { setError('title', ''); }
-
-  var desc = el('description').value.trim();
-  if (!desc) {
-    setError('description', 'Detailed description is required.');
-    errors.push('Description is required.');
-  } else if (desc.length < 50) {
-    setError('description', 'Minimum 50 characters required. Currently: ' + desc.length + '.');
-    errors.push('Description is too short (' + desc.length + '/50 characters minimum).');
-  } else { setError('description', ''); }
-
-  var dateVal = el('incident-date').value;
-  if (!dateVal) {
-    setError('incident-date', 'Date of incident is required.');
-    errors.push('Date of incident is required.');
-  } else if (new Date(dateVal) > new Date()) {
-    setError('incident-date', 'Date cannot be in the future.');
-    errors.push('Date of incident cannot be in the future.');
-  } else { setError('incident-date', ''); }
-
-  var stillUnresolved = document.querySelector('input[name="stillUnresolved"]:checked');
-  if (!stillUnresolved) {
-    setSpanError('unresolved-err', 'Please select Yes or No.');
-    errors.push('Please indicate if the issue is still unresolved.');
-  } else { setSpanError('unresolved-err', ''); }
-
-  var reportedBefore = document.querySelector('input[name="reportedBefore"]:checked');
-  if (!reportedBefore) {
-    setSpanError('reported-err', 'Please select Yes or No.');
-    errors.push('Please indicate if you have reported this before.');
-  } else { setSpanError('reported-err', ''); }
-
+  const errors = [];
+  if (!el('category').value) { setError('category', 'Please select a grievance category.'); errors.push('Grievance category is required.'); } else { setError('category', ''); }
+  if (!el('department').value) { setError('department', 'Please select the department.'); errors.push('Department is required.'); } else { setError('department', ''); }
+  const title = el('title').value.trim();
+  if (!title) { setError('title', 'Grievance title is required.'); errors.push('Grievance title is required.'); }
+  else if (title.length < 10) { setError('title', 'Title must be at least 10 characters.'); errors.push('Grievance title needs at least 10 characters.'); }
+  else { setError('title', ''); }
+  const desc = el('description').value.trim();
+  if (!desc) { setError('description', 'Detailed description is required.'); errors.push('Description is required.'); }
+  else if (desc.length < 50) { setError('description', `Minimum 50 characters required. Currently: ${desc.length}.`); errors.push(`Description is too short (${desc.length}/50 chars min).`); }
+  else { setError('description', ''); }
+  const dateVal = el('incident-date').value;
+  if (!dateVal) { setError('incident-date', 'Date of incident is required.'); errors.push('Date of incident is required.'); }
+  else if (new Date(dateVal) > new Date()) { setError('incident-date', 'Date cannot be in the future.'); errors.push('Date of incident cannot be in the future.'); }
+  else { setError('incident-date', ''); }
+  const stillUnresolved = document.querySelector('input[name="stillUnresolved"]:checked');
+  if (!stillUnresolved) { setSpanError('unresolved-err', 'Please select Yes or No.'); errors.push('Please indicate if the issue is still unresolved.'); } else { setSpanError('unresolved-err', ''); }
+  const reportedBefore = document.querySelector('input[name="reportedBefore"]:checked');
+  if (!reportedBefore) { setSpanError('reported-err', 'Please select Yes or No.'); errors.push('Please indicate if you have reported this before.'); } else { setSpanError('reported-err', ''); }
   return errors;
 }
 
 function validateStep4() {
-  var errors = [];
-
-  if (!el('consent-truth').checked) {
-    setSpanError('consent-truth-err', 'You must confirm the declaration.');
-    errors.push('Please confirm the declaration of truth.');
-  } else { setSpanError('consent-truth-err', ''); }
-
-  if (!el('consent-contact').checked) {
-    setSpanError('consent-contact-err', 'You must consent to be contacted.');
-    errors.push('Please consent to being contacted.');
-  } else { setSpanError('consent-contact-err', ''); }
-
+  const errors = [];
+  if (!el('consent-truth').checked) { setSpanError('consent-truth-err', 'You must confirm the declaration.'); errors.push('Please confirm the declaration of truth.'); } else { setSpanError('consent-truth-err', ''); }
+  if (!el('consent-contact').checked) { setSpanError('consent-contact-err', 'You must consent to be contacted.'); errors.push('Please consent to being contacted.'); } else { setSpanError('consent-contact-err', ''); }
   return errors;
 }
 
 /* ================================================================
-   8. STEP DISPLAY
+   6. STEP NAVIGATION
 ================================================================ */
-
 function showStep(stepNum) {
-  /* Explicitly show/hide each step by ID — no class ambiguity */
-  for (var i = 1; i <= TOTAL_STEPS; i++) {
-    var sec = el('form-step-' + i);
-    if (sec) sec.style.display = (i === stepNum) ? 'block' : 'none';
+  for (let i = 1; i <= TOTAL_STEPS; i++) {
+    const sec = el('form-step-' + i);
+    if (sec) {
+      if (i === stepNum) {
+        sec.classList.remove('hidden');
+      } else {
+        sec.classList.add('hidden');
+      }
+    }
   }
-
   currentStep = stepNum;
   updateProgressUI(stepNum);
-
-  /* Scroll to top of the step */
-  var target = el('form-step-' + stepNum);
+  const target = el('form-step-' + stepNum);
   if (target) {
-    var top = target.getBoundingClientRect().top + window.pageYOffset - 90;
-    window.scrollTo({ top: top, behavior: 'smooth' });
+    const top = target.getBoundingClientRect().top + window.pageYOffset - 90;
+    window.scrollTo({ top, behavior: 'smooth' });
   }
-
-  /* Build review if going to step 4 */
   if (stepNum === 4) buildReview();
 }
 
 function updateProgressUI(activeStep) {
-  /* Progress bar */
-  var fill = el('progress-fill');
+  const fill = el('progress-fill');
   if (fill) fill.style.width = ((activeStep / TOTAL_STEPS) * 100) + '%';
-
-  var bar = el('progress-bar');
+  const bar = el('progress-bar');
   if (bar) bar.setAttribute('aria-valuenow', activeStep);
 
-  /* Step nav items */
-  for (var i = 1; i <= TOTAL_STEPS; i++) {
-    var stepEl = el('step-nav-' + i);
+  for (let i = 1; i <= TOTAL_STEPS; i++) {
+    const stepEl = el('step-nav-' + i);
     if (!stepEl) continue;
-
-    var numEl = stepEl.querySelector('.step-num');
+    const numEl = stepEl.querySelector('.step-num');
     stepEl.classList.remove('active', 'completed');
     stepEl.removeAttribute('aria-current');
-
     if (i === activeStep) {
       stepEl.classList.add('active');
       stepEl.setAttribute('aria-current', 'step');
       if (numEl) numEl.textContent = i;
     } else if (i < activeStep) {
       stepEl.classList.add('completed');
-      if (numEl) numEl.innerHTML =
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">' +
-        '<polyline points="20 6 9 17 4 12"/></svg>';
+      if (numEl) numEl.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`;
     } else {
       if (numEl) numEl.textContent = i;
     }
   }
 }
 
-/* ================================================================
-   9. NEXT / BACK — event delegation (catches clicks on btn + icon)
-================================================================ */
-
 document.addEventListener('click', function (e) {
-  /* NEXT */
-  var nextBtn = e.target.closest('[data-next]');
+  const nextBtn = e.target.closest('[data-next]');
   if (nextBtn) {
-    e.preventDefault();
-    var toStep = parseInt(nextBtn.dataset.next, 10);
-    var fromStep = toStep - 1;
+    const toStep = parseInt(nextBtn.dataset.next, 10);
+    const fromStep = toStep - 1;
     handleNext(fromStep, toStep);
     return;
   }
-
-  /* BACK */
-  var prevBtn = e.target.closest('[data-prev]');
+  const prevBtn = e.target.closest('[data-prev]');
   if (prevBtn) {
-    e.preventDefault();
-    var targetStep = parseInt(prevBtn.dataset.prev, 10);
     clearBanner(currentStep);
-    showStep(targetStep);
+    showStep(parseInt(prevBtn.dataset.prev, 10));
   }
 });
 
 function handleNext(fromStep, toStep) {
-  var errors = [];
+  let errors = [];
   if (fromStep === 1) errors = validateStep1();
   else if (fromStep === 2) errors = validateStep2();
   else if (fromStep === 3) errors = validateStep3();
 
   if (errors.length > 0) {
     showErrorBanner(fromStep, errors);
-    /* Focus first red field */
-    var section = el('form-step-' + fromStep);
+    const section = el('form-step-' + fromStep);
     if (section) {
-      var firstBad = section.querySelector('input.error, select.error, textarea.error');
-      if (firstBad) {
-        setTimeout(function () { firstBad.focus(); }, 300);
-      }
+      const firstBad = section.querySelector('input.error, select.error, textarea.error');
+      if (firstBad) setTimeout(() => firstBad.focus(), 300);
     }
   } else {
     clearBanner(fromStep);
@@ -432,16 +289,15 @@ function handleNext(fromStep, toStep) {
 }
 
 /* ================================================================
-   10. STATE → DISTRICT DROPDOWN
+   7. STATE → DISTRICT
 ================================================================ */
 el('state').addEventListener('change', function () {
-  var code = this.value;
-  var distEl = el('district');
+  const code = this.value;
+  const distEl = el('district');
   distEl.innerHTML = '<option value="">-- Select District --</option>';
-
   if (code && DISTRICTS[code]) {
-    DISTRICTS[code].forEach(function (d) {
-      var opt = document.createElement('option');
+    DISTRICTS[code].forEach(d => {
+      const opt = document.createElement('option');
       opt.value = d; opt.textContent = d;
       distEl.appendChild(opt);
     });
@@ -449,291 +305,205 @@ el('state').addEventListener('change', function () {
   } else {
     distEl.disabled = true;
   }
-
   setError('state', '');
   setError('district', '');
 });
 
 /* ================================================================
-   11. CATEGORY → DEPARTMENT
+   8. CATEGORY → DEPARTMENT
 ================================================================ */
 el('category').addEventListener('change', function () {
-  var cat = this.value;
-  var deptEl = el('department');
-
+  const cat = this.value;
+  const deptEl = el('department');
   if (cat && DEPARTMENTS[cat]) {
     deptEl.innerHTML = '<option value="">-- Select Department --</option>';
-    DEPARTMENTS[cat].forEach(function (d) {
-      var opt = document.createElement('option');
+    DEPARTMENTS[cat].forEach(d => {
+      const opt = document.createElement('option');
       opt.value = d; opt.textContent = d;
       deptEl.appendChild(opt);
     });
   } else {
     deptEl.innerHTML = '<option value="">-- Select category first --</option>';
   }
-
   setError('category', '');
   setError('department', '');
 });
 
 /* ================================================================
-   12. CHARACTER COUNTERS
+   9. CHARACTER COUNTERS
 ================================================================ */
 function updateCounter(inputEl, counterEl, max) {
-  var len = inputEl.value.length;
+  const len = inputEl.value.length;
   counterEl.textContent = len + ' / ' + max;
   counterEl.classList.remove('warning', 'limit');
   if (len >= max) counterEl.classList.add('limit');
   else if (len >= Math.floor(max * 0.85)) counterEl.classList.add('warning');
 }
-
-el('title').addEventListener('input', function () {
-  updateCounter(this, el('title-count'), 100);
-});
-
+el('title').addEventListener('input', function () { updateCounter(this, el('title-count'), 100); });
 el('description').addEventListener('input', function () {
   updateCounter(this, el('description-count'), 2000);
   if (this.value.trim().length >= 50) setError('description', '');
 });
 
 /* ================================================================
-   13. MOBILE — digits only, blur validation
+   10. MOBILE INPUT
 ================================================================ */
-el('mobile').addEventListener('input', function () {
-  this.value = this.value.replace(/\D/g, '').slice(0, 10);
-});
-
+el('mobile').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 10); });
 el('mobile').addEventListener('blur', function () {
-  var v = this.value.trim();
+  const v = this.value.trim();
   if (!v) return;
-  if (!/^[6-9]\d{9}$/.test(v)) {
-    setError('mobile', 'Must be 10 digits starting with 6, 7, 8 or 9.');
-  } else {
-    setError('mobile', '');
-  }
+  if (!/^[6-9]\d{9}$/.test(v)) setError('mobile', 'Must be 10 digits starting with 6, 7, 8 or 9.');
+  else setError('mobile', '');
 });
 
 /* ================================================================
-   14. PINCODE — digits only
+   11. PINCODE
 ================================================================ */
-el('pincode').addEventListener('input', function () {
-  this.value = this.value.replace(/\D/g, '').slice(0, 6);
-});
+el('pincode').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 6); });
 
 /* ================================================================
-   15. AADHAAR — auto-format and mask
+   12. AADHAAR MASK
 ================================================================ */
-var aadhaarEl = el('aadhaar');
-
+const aadhaarEl = el('aadhaar');
 aadhaarEl.addEventListener('input', function () {
-  var digits = this.value.replace(/\D/g, '').slice(0, 12);
+  const digits = this.value.replace(/\D/g, '').slice(0, 12);
   this.dataset.raw = digits;
-  /* Format: XXXX XXXX XXXX */
   this.value = digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
 });
-
 aadhaarEl.addEventListener('blur', function () {
-  var raw = this.dataset.raw || '';
-  if (raw.length === 12) {
-    this.value = 'XXXX XXXX ' + raw.slice(8);
-  }
+  const raw = this.dataset.raw || '';
+  if (raw.length === 12) this.value = 'XXXX XXXX ' + raw.slice(8);
 });
-
 aadhaarEl.addEventListener('focus', function () {
-  var raw = this.dataset.raw || '';
-  if (raw) {
-    this.value = raw.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
-  }
+  const raw = this.dataset.raw || '';
+  if (raw) this.value = raw.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
 });
 
 /* ================================================================
-   16. PHOTO UPLOAD + PREVIEW
+   13. PHOTO UPLOAD
 ================================================================ */
-var MAX_PHOTOS   = 3;
-var MAX_PHOTO_MB = 5;
-
-el('photo-drop-zone').addEventListener('click', function () { el('photo-upload').click(); });
-el('photo-drop-zone').addEventListener('keydown', function (e) {
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el('photo-upload').click(); }
-});
-el('photo-drop-zone').addEventListener('dragover', function (e) {
-  e.preventDefault(); this.classList.add('drag-over');
-});
-el('photo-drop-zone').addEventListener('dragleave', function () { this.classList.remove('drag-over'); });
-el('photo-drop-zone').addEventListener('drop', function (e) {
-  e.preventDefault(); this.classList.remove('drag-over');
-  handlePhotoFiles(e.dataTransfer.files);
-});
-
-el('photo-upload').addEventListener('change', function () {
-  handlePhotoFiles(this.files);
-  this.value = '';
-});
+const MAX_PHOTOS = 3, MAX_PHOTO_MB = 5;
+el('photo-drop-zone').addEventListener('click', () => el('photo-upload').click());
+el('photo-drop-zone').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el('photo-upload').click(); } });
+el('photo-drop-zone').addEventListener('dragover', e => { e.preventDefault(); e.currentTarget.classList.add('drag-over'); });
+el('photo-drop-zone').addEventListener('dragleave', e => e.currentTarget.classList.remove('drag-over'));
+el('photo-drop-zone').addEventListener('drop', e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); handlePhotoFiles(e.dataTransfer.files); });
+el('photo-upload').addEventListener('change', function () { handlePhotoFiles(this.files); this.value = ''; });
 
 function handlePhotoFiles(files) {
-  var errEl = el('photo-err');
-  var msgs = [];
-
-  Array.from(files).forEach(function (file) {
-    if (uploadedPhotos.length >= MAX_PHOTOS) {
-      msgs.push('Max ' + MAX_PHOTOS + ' photos allowed.');
-      return;
-    }
-    if (!['image/jpeg', 'image/png'].includes(file.type)) {
-      msgs.push('"' + file.name + '" must be JPG or PNG.');
-      return;
-    }
-    if (file.size > MAX_PHOTO_MB * 1024 * 1024) {
-      msgs.push('"' + file.name + '" exceeds ' + MAX_PHOTO_MB + 'MB.');
-      return;
-    }
+  const errEl = el('photo-err');
+  const msgs = [];
+  Array.from(files).forEach(file => {
+    if (uploadedPhotos.length >= MAX_PHOTOS) { msgs.push(`Max ${MAX_PHOTOS} photos allowed.`); return; }
+    if (!['image/jpeg', 'image/png'].includes(file.type)) { msgs.push(`"${file.name}" must be JPG or PNG.`); return; }
+    if (file.size > MAX_PHOTO_MB * 1024 * 1024) { msgs.push(`"${file.name}" exceeds ${MAX_PHOTO_MB}MB.`); return; }
     uploadedPhotos.push(file);
     addPhotoPreview(file, uploadedPhotos.length - 1);
   });
-
   if (errEl) errEl.textContent = msgs.join(' ');
 }
 
 function addPhotoPreview(file, index) {
-  var reader = new FileReader();
-  reader.onload = function (ev) {
-    var wrap = document.createElement('div');
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const wrap = document.createElement('div');
     wrap.className = 'image-preview-item';
     wrap.dataset.index = index;
-
-    var img = document.createElement('img');
+    const img = document.createElement('img');
     img.src = ev.target.result;
     img.alt = 'Photo ' + (index + 1);
-
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'remove-btn';
-    btn.innerHTML = '&times;';
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'remove-btn'; btn.innerHTML = '&times;';
     btn.setAttribute('aria-label', 'Remove photo');
-    btn.addEventListener('click', function () {
-      uploadedPhotos.splice(index, 1);
-      wrap.remove();
-      el('photo-err').textContent = '';
-    });
-
-    wrap.appendChild(img);
-    wrap.appendChild(btn);
+    btn.addEventListener('click', () => { uploadedPhotos.splice(index, 1); wrap.remove(); el('photo-err').textContent = ''; });
+    wrap.appendChild(img); wrap.appendChild(btn);
     el('image-previews').appendChild(wrap);
   };
   reader.readAsDataURL(file);
 }
 
 /* ================================================================
-   17. VIDEO UPLOAD
+   14. VIDEO UPLOAD
 ================================================================ */
-var MAX_VIDEO_MB = 50;
-
-el('video-drop-zone').addEventListener('click', function () { el('video-upload').click(); });
-el('video-drop-zone').addEventListener('keydown', function (e) {
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el('video-upload').click(); }
-});
-el('video-drop-zone').addEventListener('dragover', function (e) {
-  e.preventDefault(); this.classList.add('drag-over');
-});
-el('video-drop-zone').addEventListener('dragleave', function () { this.classList.remove('drag-over'); });
-el('video-drop-zone').addEventListener('drop', function (e) {
-  e.preventDefault(); this.classList.remove('drag-over');
-  if (e.dataTransfer.files[0]) processVideoFile(e.dataTransfer.files[0]);
-});
-el('video-upload').addEventListener('change', function () {
-  if (this.files[0]) processVideoFile(this.files[0]);
-});
+const MAX_VIDEO_MB = 50;
+el('video-drop-zone').addEventListener('click', () => el('video-upload').click());
+el('video-drop-zone').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el('video-upload').click(); } });
+el('video-drop-zone').addEventListener('dragover', e => { e.preventDefault(); e.currentTarget.classList.add('drag-over'); });
+el('video-drop-zone').addEventListener('dragleave', e => e.currentTarget.classList.remove('drag-over'));
+el('video-drop-zone').addEventListener('drop', e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if (e.dataTransfer.files[0]) processVideoFile(e.dataTransfer.files[0]); });
+el('video-upload').addEventListener('change', function () { if (this.files[0]) processVideoFile(this.files[0]); });
 
 function processVideoFile(file) {
-  var errEl = el('video-err');
-  var nameEl = el('video-name-display');
+  const errEl = el('video-err');
+  const nameEl = el('video-name-display');
   errEl.textContent = '';
-
   if (file.size > MAX_VIDEO_MB * 1024 * 1024) {
-    errEl.textContent = 'Video exceeds ' + MAX_VIDEO_MB + 'MB. Please compress or shorten it.';
+    errEl.textContent = `Video exceeds ${MAX_VIDEO_MB}MB. Please compress or shorten it.`;
     nameEl.classList.add('hidden');
     return;
   }
-
-  var mb = (file.size / 1024 / 1024).toFixed(1);
-  nameEl.innerHTML = '&#127916; ' + file.name +
-    ' <span style="color:var(--clr-text-muted)">(' + mb + ' MB)</span>';
+  const mb = (file.size / 1024 / 1024).toFixed(1);
+  nameEl.innerHTML = `🎬 ${file.name} <span style="color:var(--clr-text-muted)">(${mb} MB)</span>`;
   nameEl.classList.remove('hidden');
 }
 
 /* ================================================================
-   18. REVIEW SUMMARY (Step 4)
+   15. REVIEW SUMMARY
 ================================================================ */
 function buildReview() {
-  var grid = el('review-grid');
+  const grid = el('review-grid');
   if (!grid) return;
   grid.innerHTML = '';
 
-  var aEl = el('aadhaar');
-  var aRaw = aEl.dataset.raw || '';
-  var aDisplay = aRaw.length === 12 ? 'XXXX XXXX ' + aRaw.slice(8) : (aRaw ? aEl.value : '— Not provided');
+  const aEl = el('aadhaar');
+  const aRaw = aEl.dataset.raw || '';
+  const aDisplay = aRaw.length === 12 ? 'XXXX XXXX ' + aRaw.slice(8) : (aRaw ? aEl.value : '— Not provided');
+  const stateEl = el('state');
+  const stateName = stateEl.selectedIndex > 0 ? stateEl.options[stateEl.selectedIndex].text : '—';
+  const catEl = el('category');
+  const catName = catEl.selectedIndex > 0 ? catEl.options[catEl.selectedIndex].text : '—';
+  const dateRaw = el('incident-date').value;
+  const dateFmt = dateRaw ? new Date(dateRaw + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) : '—';
+  const uEl = document.querySelector('input[name="stillUnresolved"]:checked');
+  const rEl = document.querySelector('input[name="reportedBefore"]:checked');
 
-  var stateEl = el('state');
-  var stateName = stateEl.selectedIndex > 0 ? stateEl.options[stateEl.selectedIndex].text : '—';
-
-  var catEl = el('category');
-  var catName = catEl.selectedIndex > 0 ? catEl.options[catEl.selectedIndex].text : '—';
-
-  var dateRaw = el('incident-date').value;
-  var dateDisplay = dateRaw
-    ? new Date(dateRaw + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })
-    : '—';
-
-  var uEl = document.querySelector('input[name="stillUnresolved"]:checked');
-  var rEl = document.querySelector('input[name="reportedBefore"]:checked');
-
-  var pairs = [
-    ['Full Name',          el('full-name').value.trim() || '—'],
-    ['Mobile Number',      '+91 ' + (el('mobile').value.trim() || '—')],
-    ['Email',              el('email').value.trim() || '— Not provided'],
-    ['Aadhaar',            aDisplay],
-    ['State',              stateName],
-    ['District',           el('district').value || '—'],
-    ['City / Town',        el('city').value.trim() || '—'],
-    ['Pincode',            el('pincode').value.trim() || '—'],
-    ['Locality',           el('locality').value.trim() || '—'],
-    ['Landmark',           el('landmark').value.trim() || '— Not provided'],
-    ['Category',           catName],
-    ['Department',         el('department').value || '—'],
-    ['Date of Incident',   dateDisplay],
-    ['Still Unresolved?',  uEl ? (uEl.value === 'yes' ? 'Yes' : 'No') : '—'],
-    ['Reported Before?',   rEl ? (rEl.value === 'yes' ? 'Yes' : 'No') : '—'],
-    ['Photos Attached',    uploadedPhotos.length > 0 ? uploadedPhotos.length + ' photo(s)' : 'None'],
+  const pairs = [
+    ['Full Name', el('full-name').value.trim() || '—'],
+    ['Mobile Number', '+91 ' + (el('mobile').value.trim() || '—')],
+    ['Email', el('email').value.trim() || '— Not provided'],
+    ['Aadhaar', aDisplay],
+    ['State', stateName],
+    ['District', el('district').value || '—'],
+    ['City / Town', el('city').value.trim() || '—'],
+    ['Pincode', el('pincode').value.trim() || '—'],
+    ['Locality', el('locality').value.trim() || '—'],
+    ['Landmark', el('landmark').value.trim() || '— Not provided'],
+    ['Category', catName],
+    ['Department', el('department').value || '—'],
+    ['Date of Incident', dateFmt],
+    ['Still Unresolved?', uEl ? (uEl.value === 'yes' ? 'Yes' : 'No') : '—'],
+    ['Reported Before?', rEl ? (rEl.value === 'yes' ? 'Yes' : 'No') : '—'],
+    ['Photos Attached', uploadedPhotos.length > 0 ? uploadedPhotos.length + ' photo(s)' : 'None'],
   ];
-
-  var fullSpan = [
-    ['Grievance Title',   el('title').value.trim() || '—'],
-    ['Description',       el('description').value.trim() || '—'],
+  const fullSpan = [
+    ['Grievance Title', el('title').value.trim() || '—'],
+    ['Description', el('description').value.trim() || '—'],
   ];
-
-  pairs.forEach(function (p) { addReviewItem(grid, p[0], p[1], false); });
-  fullSpan.forEach(function (p) { addReviewItem(grid, p[0], p[1], true); });
+  pairs.forEach(p => addReviewItem(grid, p[0], p[1], false));
+  fullSpan.forEach(p => addReviewItem(grid, p[0], p[1], true));
 }
 
 function addReviewItem(grid, key, val, wide) {
-  var div = document.createElement('div');
+  const div = document.createElement('div');
   div.className = 'review-item' + (wide ? ' full-span' : '');
-
-  var k = document.createElement('span');
-  k.className = 'review-key';
-  k.textContent = key;
-
-  var v = document.createElement('span');
-  v.className = 'review-val';
-  v.textContent = val;
-
-  div.appendChild(k);
-  div.appendChild(v);
+  const k = document.createElement('span'); k.className = 'review-key'; k.textContent = key;
+  const v = document.createElement('span'); v.className = 'review-val'; v.textContent = val;
+  div.appendChild(k); div.appendChild(v);
   grid.appendChild(div);
 }
 
 /* ================================================================
-   19. CONSENT → SUBMIT BUTTON
+   16. CONSENT
 ================================================================ */
 function checkConsent() {
   el('submit-btn').disabled = !(el('consent-truth').checked && el('consent-contact').checked);
@@ -742,132 +512,110 @@ el('consent-truth').addEventListener('change', checkConsent);
 el('consent-contact').addEventListener('change', checkConsent);
 
 /* ================================================================
-   20. FORM SUBMIT
+   17. FORM SUBMIT → FIREBASE
 ================================================================ */
-el('grievance-form').addEventListener('submit', function (e) {
+el('grievance-form').addEventListener('submit', async function (e) {
   e.preventDefault();
-  var errors = validateStep4();
+  const errors = validateStep4();
   if (errors.length > 0) { showErrorBanner(4, errors); return; }
 
-  var btn = el('submit-btn');
+  const btn = el('submit-btn');
   btn.disabled = true;
-  btn.textContent = 'Submitting…';
+  btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" /></svg> Submitting…`;
 
-  setTimeout(function () {
-    submitGrievanceToDb();
-    showSuccess();
-  }, 1800);
+  const style = document.createElement('style');
+  style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+  document.head.appendChild(style);
+
+  try {
+    await submitToFirebase();
+  } catch (err) {
+    console.error('Firebase submit error:', err);
+    btn.disabled = false;
+    btn.innerHTML = 'Submit Grievance';
+    showErrorBanner(4, ['Could not save grievance. Check your Firebase config and internet connection.']);
+  }
 });
 
-/* ================================================================
-   20b. SAVE TO SHARED DB (localStorage bridge → tracking.js)
-================================================================ */
-function submitGrievanceToDb() {
-  /* -- Citizen ID from Aadhaar field (raw digits → formatted) -- */
-  var aadhaarRaw = el('aadhaar').dataset.raw || '';
-  var citizenId = aadhaarRaw.length === 12
-    ? aadhaarRaw.replace(/(\d{4})(\d{4})(\d{4})/, '$1 $2 $3')
-    : aadhaarRaw || 'UNKNOWN';
+async function submitToFirebase() {
+  const now = new Date();
+  const stateCode = el('state').value || 'XX';
+  const catVal = el('category').value || 'other';
+  const catCode = catVal.slice(0, 3).toUpperCase();
+  const rnd = Math.floor(10000000 + Math.random() * 90000000);
+  const refId = `PGMS/${now.getFullYear()}/${stateCode}/${catCode}/${rnd}`;
 
-  /* Persist citizen ID so tracking.js can use it */
-  try { localStorage.setItem('pgms_citizen_id', citizenId); } catch (e) {}
+  const stateEl = el('state');
+  const stateName = stateEl.selectedIndex > 0 ? stateEl.options[stateEl.selectedIndex].text : stateCode;
+  const catEl = el('category');
+  const catName = catEl.selectedIndex > 0 ? catEl.options[catEl.selectedIndex].text : catVal;
 
-  /* -- Build grievance record matching tracking.js DB schema -- */
-  var catEl = el('category');
-  var catText = catEl.selectedIndex > 0 ? catEl.options[catEl.selectedIndex].text : el('category').value;
-  // Normalise category to short label (Road, Water, etc.)
-  var CAT_MAP = {
-    roads: 'Road', water: 'Water', electricity: 'Electricity',
-    sanitation: 'Sanitation', healthcare: 'Healthcare',
-    education: 'Education', police: 'Police',
-    corruption: 'Corruption', other: 'General'
-  };
-  var catShort = CAT_MAP[el('category').value] || catText;
-
-  var now = new Date().toISOString();
-  var stateCode = el('state').value || 'XX';
-  var cat3 = (el('category').value || 'OTH').slice(0, 3).toUpperCase();
-  var rnd = Math.floor(10000000 + Math.random() * 90000000);
-  var newId = 'PGMS/' + new Date().getFullYear() + '/' + stateCode + '/' + cat3 + '/' + rnd;
-
-  /* SLA: 7 days from now */
-  var expectedBy = new Date(Date.now() + 7 * 86400000).toISOString();
-
-  var grievance = {
-    id: newId,
-    citizenId: citizenId,
+  const complaint = {
+    id: refId,
+    submittedAt: now.toISOString(),
+    status: 'Pending',
+    priority: PRIORITY_MAP[catVal] || 'Medium',
+    fullName: el('full-name').value.trim(),
+    mobile: '+91 ' + el('mobile').value.trim(),
+    email: el('email').value.trim() || '—',
+    state: stateName,
+    stateCode: stateCode,
+    district: el('district').value || '—',
+    city: el('city').value.trim(),
+    pincode: el('pincode').value.trim(),
+    locality: el('locality').value.trim(),
+    landmark: el('landmark').value.trim() || '—',
+    category: catVal,
+    categoryName: catName,
+    department: el('department').value || '—',
     title: el('title').value.trim(),
     description: el('description').value.trim(),
-    category: catShort,
-    department: el('department').value || '—',
-    status: 'Submitted',
-    priority: 1,
-    location: {
-      lat: null, lng: null,
-      address: [el('locality').value.trim(), el('city').value.trim()].filter(Boolean).join(', '),
-      ward: '',
-      pincode: el('pincode').value.trim()
-    },
-    attachments: [],
-    timeline: [
-      { status: 'Submitted', changedAt: now, changedBy: 'System', note: 'Grievance registered via portal' }
-    ],
-    assignedTo: null,
-    raisedAt: now,
-    updatedAt: now,
-    resolvedAt: null,
-    expectedBy: expectedBy
+    incidentDate: el('incident-date').value,
+    stillUnresolved: (document.querySelector('input[name="stillUnresolved"]:checked') || {}).value || '—',
+    reportedBefore: (document.querySelector('input[name="reportedBefore"]:checked') || {}).value || '—',
+    photoCount: uploadedPhotos.length,
   };
 
-  /* Persist grievance list in localStorage */
-  try {
-    var existing = JSON.parse(localStorage.getItem('pgms_grievances') || '[]');
-    existing.push(grievance);
-    localStorage.setItem('pgms_grievances', JSON.stringify(existing));
-  } catch (e) {}
+  // Save to Firestore using the global db object (initialised in HTML)
+  await window.db.collection('complaints').doc(refId.replace(/\//g, '_')).set(complaint);
 
-  /* Expose reference ID for showSuccess */
-  window._lastGrievanceId = newId;
+  showSuccess(refId);
 }
 
-function showSuccess() {
+/* ================================================================
+   18. SUCCESS SCREEN
+================================================================ */
+function showSuccess(refId) {
   el('grievance-form').style.display = 'none';
-  var screen = el('success-screen');
+  const screen = el('success-screen');
   screen.classList.remove('hidden');
-
-  var now = new Date();
-  var refId = window._lastGrievanceId;
-  if (!refId) {
-    var stateCode = el('state').value || 'XX';
-    var cat = (el('category').value || 'OTH').slice(0, 3).toUpperCase();
-    var rnd = Math.floor(10000000 + Math.random() * 90000000);
-    refId = 'PGMS/' + now.getFullYear() + '/' + stateCode + '/' + cat + '/' + rnd;
-  }
   el('ref-number').textContent = refId;
-
   screen.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  var heading = el('success-heading');
+  const heading = el('success-heading');
   if (heading) heading.focus();
 }
 
-/* ================================================================
-   21. SUCCESS SCREEN BUTTONS
-================================================================ */
-el('print-btn').addEventListener('click', function () { window.print(); });
-el('new-grievance-btn').addEventListener('click', function () { window.location.reload(); });
+el('print-btn').addEventListener('click', () => window.print());
+el('new-grievance-btn').addEventListener('click', () => window.location.reload());
 
 /* ================================================================
-   22. DATE MAX
+   19. DATE MAX
 ================================================================ */
 el('incident-date').setAttribute('max', new Date().toISOString().split('T')[0]);
 
 /* ================================================================
-   23. INIT — show only step 1
+   20. INIT
 ================================================================ */
 (function () {
-  for (var i = 1; i <= TOTAL_STEPS; i++) {
-    var sec = el('form-step-' + i);
-    if (sec) sec.style.display = (i === 1) ? 'block' : 'none';
+  for (let i = 1; i <= TOTAL_STEPS; i++) {
+    const sec = el('form-step-' + i);
+    if (sec) {
+      if (i === 1) {
+        sec.classList.remove('hidden');
+      } else {
+        sec.classList.add('hidden');
+      }
+    }
   }
   updateProgressUI(1);
 })();
