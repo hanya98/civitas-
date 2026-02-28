@@ -1,115 +1,226 @@
 /* ================================================================
-   CITIZEN ID — read from localStorage (set by script.js on submit)
-   Falls back to the demo ID if not set.
+   PGMS 2.0 — TRACKING PAGE
+   Loads complaints from Firebase Firestore (same project as admin).
+   Falls back to demo data if Firebase is unavailable.
 ================================================================ */
+
+/* ── CITIZEN ID — read from localStorage (set by script.js on submit) ── */
 const CITIZEN_ID = (function () {
   try { return localStorage.getItem('pgms_citizen_id') || '9876 5432 1098'; } catch (e) { return '9876 5432 1098'; }
 })();
 
-const DB = {
-    complaints: [
-        {
-            id: 'GRV-001', citizenId: '9876 5432 1098',
-            title: 'Broken Road Near Bus Stand',
-            description: 'Large pothole on the main road near Rajpur bus stand causing accidents.',
-            category: 'Road', department: 'PWD',
-            status: 'In Progress', priority: 3,
-            location: { lat: 28.6139, lng: 77.2090, address: 'Rajpur Bus Stand, Ward 12', ward: '12', pincode: '110001' },
-            attachments: [],
-            timeline: [
-                { status: 'Submitted', changedAt: '2024-03-01T10:00:00Z', changedBy: 'System', note: 'Grievance registered' },
-                { status: 'Under Review', changedAt: '2024-03-02T09:00:00Z', changedBy: 'Officer A', note: 'Assigned to PWD department' },
-                { status: 'In Progress', changedAt: '2024-03-04T11:30:00Z', changedBy: 'Officer B', note: 'Repair team dispatched to site' },
-            ],
-            assignedTo: 'Officer B',
-            raisedAt: '2024-03-01T10:00:00Z', updatedAt: '2024-03-04T11:30:00Z',
-            resolvedAt: null, expectedBy: '2024-03-08T10:00:00Z'
-        },
-        {
-            id: 'GRV-002', citizenId: '9876 5432 1098',
-            title: 'No Water Supply for 3 Days',
-            description: 'Our colony has had no piped water supply since Monday. Tankers not coming.',
-            category: 'Water', department: 'Jal Board',
-            status: 'Resolved', priority: 3,
-            location: { lat: 28.6200, lng: 77.2100, address: 'Sector 4, Block B', ward: '14', pincode: '110002' },
-            attachments: [],
-            timeline: [
-                { status: 'Submitted', changedAt: '2024-02-20T08:00:00Z', changedBy: 'System', note: 'Grievance registered' },
-                { status: 'Under Review', changedAt: '2024-02-20T12:00:00Z', changedBy: 'Officer C', note: 'Pipeline fault identified' },
-                { status: 'In Progress', changedAt: '2024-02-21T07:00:00Z', changedBy: 'Officer C', note: 'Repair underway' },
-                { status: 'Resolved', changedAt: '2024-02-22T16:00:00Z', changedBy: 'Officer C', note: 'Pipeline repaired. Supply restored.' },
-            ],
-            assignedTo: 'Officer C',
-            raisedAt: '2024-02-20T08:00:00Z', updatedAt: '2024-02-22T16:00:00Z',
-            resolvedAt: '2024-02-22T16:00:00Z', expectedBy: '2024-02-27T08:00:00Z'
-        },
-        {
-            id: 'GRV-003', citizenId: '9876 5432 1098',
-            title: 'Street Light Not Working',
-            description: 'Three street lights on MG Road have been non-functional for 2 weeks.',
-            category: 'Electricity', department: 'BSES',
-            status: 'Submitted', priority: 1,
-            location: { lat: 28.6100, lng: 77.2050, address: 'MG Road, Near Park', ward: '11', pincode: '110003' },
-            attachments: [],
-            timeline: [
-                { status: 'Submitted', changedAt: '2024-03-05T14:00:00Z', changedBy: 'System', note: 'Grievance registered' },
-            ],
-            assignedTo: null,
-            raisedAt: '2024-03-05T14:00:00Z', updatedAt: '2024-03-05T14:00:00Z',
-            resolvedAt: null, expectedBy: '2024-03-12T14:00:00Z'
-        },
-        {
-            id: 'GRV-004', citizenId: '1234 5678 9012',
-            title: 'Garbage Not Collected',
-            description: 'Garbage has not been picked up from our street for 5 days.',
-            category: 'Sanitation', department: 'MCD',
-            status: 'Under Review', priority: 2,
-            location: { lat: 28.6150, lng: 77.2080, address: 'Green Park Colony', ward: '13', pincode: '110001' },
-            attachments: [],
-            timeline: [
-                { status: 'Submitted', changedAt: '2024-03-03T09:00:00Z', changedBy: 'System', note: 'Grievance registered' },
-                { status: 'Under Review', changedAt: '2024-03-04T10:00:00Z', changedBy: 'Officer D', note: 'Sanitation department notified' },
-            ],
-            assignedTo: 'Officer D',
-            raisedAt: '2024-03-03T09:00:00Z', updatedAt: '2024-03-04T10:00:00Z',
-            resolvedAt: null, expectedBy: '2024-03-10T09:00:00Z'
-        },
-        {
-            id: 'GRV-005', citizenId: '9876 5432 1098',
-            title: 'Open Drain Near School',
-            description: 'Uncovered drain near Sunrise School is a safety hazard for children.',
-            category: 'Sanitation', department: 'MCD',
-            status: 'Under Review', priority: 3,
-            location: { lat: 28.6120, lng: 77.2095, address: 'Sunrise School Road', ward: '12', pincode: '110001' },
-            attachments: [],
-            timeline: [
-                { status: 'Submitted', changedAt: '2024-03-06T08:30:00Z', changedBy: 'System', note: 'Grievance registered' },
-                { status: 'Under Review', changedAt: '2024-03-06T14:00:00Z', changedBy: 'Officer E', note: 'Inspection scheduled' },
-            ],
-            assignedTo: 'Officer E',
-            raisedAt: '2024-03-06T08:30:00Z', updatedAt: '2024-03-06T14:00:00Z',
-            resolvedAt: null, expectedBy: '2024-03-13T08:30:00Z'
-        },
-    ]
-};
+/* ── DEMO / FALLBACK DATA ── */
+const DEMO_COMPLAINTS = [
+    {
+        id: 'GRV-001', citizenId: '9876 5432 1098',
+        title: 'Broken Road Near Bus Stand',
+        description: 'Large pothole on the main road near Rajpur bus stand causing accidents.',
+        category: 'Road', department: 'PWD',
+        status: 'In Progress', priority: 3,
+        location: { lat: 28.6139, lng: 77.2090, address: 'Rajpur Bus Stand, Ward 12', ward: '12', pincode: '110001' },
+        attachments: [],
+        timeline: [
+            { status: 'Submitted', changedAt: '2024-03-01T10:00:00Z', changedBy: 'System', note: 'Grievance registered' },
+            { status: 'Under Review', changedAt: '2024-03-02T09:00:00Z', changedBy: 'Officer A', note: 'Assigned to PWD department' },
+            { status: 'In Progress', changedAt: '2024-03-04T11:30:00Z', changedBy: 'Officer B', note: 'Repair team dispatched to site' },
+        ],
+        assignedTo: 'Officer B',
+        raisedAt: '2024-03-01T10:00:00Z', updatedAt: '2024-03-04T11:30:00Z',
+        resolvedAt: null, expectedBy: '2024-03-08T10:00:00Z'
+    },
+    {
+        id: 'GRV-002', citizenId: '9876 5432 1098',
+        title: 'No Water Supply for 3 Days',
+        description: 'Our colony has had no piped water supply since Monday. Tankers not coming.',
+        category: 'Water', department: 'Jal Board',
+        status: 'Resolved', priority: 3,
+        location: { lat: 28.6200, lng: 77.2100, address: 'Sector 4, Block B', ward: '14', pincode: '110002' },
+        attachments: [],
+        timeline: [
+            { status: 'Submitted', changedAt: '2024-02-20T08:00:00Z', changedBy: 'System', note: 'Grievance registered' },
+            { status: 'Under Review', changedAt: '2024-02-20T12:00:00Z', changedBy: 'Officer C', note: 'Pipeline fault identified' },
+            { status: 'In Progress', changedAt: '2024-02-21T07:00:00Z', changedBy: 'Officer C', note: 'Repair underway' },
+            { status: 'Resolved', changedAt: '2024-02-22T16:00:00Z', changedBy: 'Officer C', note: 'Pipeline repaired. Supply restored.' },
+        ],
+        assignedTo: 'Officer C',
+        raisedAt: '2024-02-20T08:00:00Z', updatedAt: '2024-02-22T16:00:00Z',
+        resolvedAt: '2024-02-22T16:00:00Z', expectedBy: '2024-02-27T08:00:00Z'
+    },
+    {
+        id: 'GRV-003', citizenId: '9876 5432 1098',
+        title: 'Street Light Not Working',
+        description: 'Three street lights on MG Road have been non-functional for 2 weeks.',
+        category: 'Electricity', department: 'BSES',
+        status: 'Submitted', priority: 1,
+        location: { lat: 28.6100, lng: 77.2050, address: 'MG Road, Near Park', ward: '11', pincode: '110003' },
+        attachments: [],
+        timeline: [
+            { status: 'Submitted', changedAt: '2024-03-05T14:00:00Z', changedBy: 'System', note: 'Grievance registered' },
+        ],
+        assignedTo: null,
+        raisedAt: '2024-03-05T14:00:00Z', updatedAt: '2024-03-05T14:00:00Z',
+        resolvedAt: null, expectedBy: '2024-03-12T14:00:00Z'
+    },
+    {
+        id: 'GRV-004', citizenId: '1234 5678 9012',
+        title: 'Garbage Not Collected',
+        description: 'Garbage has not been picked up from our street for 5 days.',
+        category: 'Sanitation', department: 'MCD',
+        status: 'Under Review', priority: 2,
+        location: { lat: 28.6150, lng: 77.2080, address: 'Green Park Colony', ward: '13', pincode: '110001' },
+        attachments: [],
+        timeline: [
+            { status: 'Submitted', changedAt: '2024-03-03T09:00:00Z', changedBy: 'System', note: 'Grievance registered' },
+            { status: 'Under Review', changedAt: '2024-03-04T10:00:00Z', changedBy: 'Officer D', note: 'Sanitation department notified' },
+        ],
+        assignedTo: 'Officer D',
+        raisedAt: '2024-03-03T09:00:00Z', updatedAt: '2024-03-04T10:00:00Z',
+        resolvedAt: null, expectedBy: '2024-03-10T09:00:00Z'
+    },
+    {
+        id: 'GRV-005', citizenId: '9876 5432 1098',
+        title: 'Open Drain Near School',
+        description: 'Uncovered drain near Sunrise School is a safety hazard for children.',
+        category: 'Sanitation', department: 'MCD',
+        status: 'Under Review', priority: 3,
+        location: { lat: 28.6120, lng: 77.2095, address: 'Sunrise School Road', ward: '12', pincode: '110001' },
+        attachments: [],
+        timeline: [
+            { status: 'Submitted', changedAt: '2024-03-06T08:30:00Z', changedBy: 'System', note: 'Grievance registered' },
+            { status: 'Under Review', changedAt: '2024-03-06T14:00:00Z', changedBy: 'Officer E', note: 'Inspection scheduled' },
+        ],
+        assignedTo: 'Officer E',
+        raisedAt: '2024-03-06T08:30:00Z', updatedAt: '2024-03-06T14:00:00Z',
+        resolvedAt: null, expectedBy: '2024-03-13T08:30:00Z'
+    },
+];
 
-
+/* ── IN-MEMORY DB — starts with demo data, gets replaced/augmented by Firebase ── */
+const DB = { complaints: [...DEMO_COMPLAINTS] };
 
 /* ================================================================
-   MERGE grievances submitted via the grievance form (script.js)
-   into the in-memory DB so they show up in tracking views.
+   FIELD MAPPING — convert Firestore (admin) doc shape
+   → tracking.js complaint shape
 ================================================================ */
-(function mergeLocalStorageGrievances() {
-  try {
-    var stored = JSON.parse(localStorage.getItem('pgms_grievances') || '[]');
-    stored.forEach(function (g) {
-      // Avoid duplicates if the page is reloaded
-      var alreadyIn = DB.complaints.some(function (c) { return c.id === g.id; });
-      if (!alreadyIn) {
-        DB.complaints.push(g);
+const PRIORITY_MAP = { 'High': 3, 'Medium': 2, 'Low': 1 };
+const CAT_SLUG_TO_LABEL = {
+  roads: 'Road', water: 'Water', electricity: 'Electricity',
+  sanitation: 'Sanitation', healthcare: 'Healthcare', education: 'Education',
+  police: 'Police', corruption: 'Corruption', other: 'General'
+};
+
+function firestoreDocToComplaint(doc) {
+  const d = doc;
+  const raisedAt  = d.submittedAt  || d.raisedAt  || new Date().toISOString();
+  const updatedAt = d.updatedAt    || raisedAt;
+  const catLabel  = d.categoryName || CAT_SLUG_TO_LABEL[d.category] || d.category || 'General';
+  const priNum    = PRIORITY_MAP[d.priority] || 2;
+
+  // Build a basic timeline if none stored
+  const timeline = d.timeline && d.timeline.length
+    ? d.timeline
+    : [{ status: 'Submitted', changedAt: raisedAt, changedBy: 'System', note: 'Grievance registered' }];
+
+  // If admin updated the status, append it to the timeline if not already there
+  const lastTlStatus = timeline[timeline.length - 1].status;
+  if (d.status && d.status !== 'Submitted' && d.status !== lastTlStatus) {
+    timeline.push({ status: d.status, changedAt: updatedAt, changedBy: 'Admin', note: `Status updated to ${d.status}` });
+  }
+
+  const location = d.lat && d.lng ? {
+    lat: parseFloat(d.lat), lng: parseFloat(d.lng),
+    address: [d.locality, d.city, d.district].filter(Boolean).join(', ') || d.city || '',
+    ward: d.ward || '',
+    pincode: d.pincode || ''
+  } : (d.pincode ? {
+    lat: null, lng: null,
+    address: [d.locality, d.city, d.district].filter(Boolean).join(', ') || '',
+    ward: d.ward || '',
+    pincode: d.pincode || ''
+  } : null);
+
+  return {
+    id:          d.id || doc._docId || 'GRV-???',
+    citizenId:   d.aadhaar || d.citizenId || CITIZEN_ID,
+    title:       d.title        || d.subject       || '(No title)',
+    description: d.description  || '',
+    category:    catLabel,
+    department:  d.department   || '',
+    status:      d.status       || 'Submitted',
+    priority:    priNum,
+    location:    location,
+    attachments: d.attachments  || [],
+    timeline:    timeline,
+    assignedTo:  d.assignedTo   || null,
+    raisedAt:    raisedAt,
+    updatedAt:   updatedAt,
+    resolvedAt:  d.resolvedAt   || (d.status === 'Resolved' ? updatedAt : null),
+    expectedBy:  d.expectedBy   || (() => {
+      const d7 = new Date(raisedAt);
+      d7.setDate(d7.getDate() + 7);
+      return d7.toISOString();
+    })()
+  };
+}
+
+/* ================================================================
+   FIREBASE REAL-TIME LISTENER
+   Merges Firestore complaints into DB, then re-renders.
+================================================================ */
+(function connectFirebase() {
+  if (!window.db) return; // Firebase not loaded — use demo data only
+
+  // Show a loading indicator in the My Complaints list
+  const mcList = document.getElementById('mc-list');
+  if (mcList) {
+    mcList.innerHTML = `<div class="empty-state">
+      <div class="icon" style="animation:spin 1s linear infinite;display:inline-block">⏳</div>
+      <h3>Loading from Firebase…</h3>
+      <p>Fetching live grievances…</p>
+    </div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
+  }
+
+  window.db.collection('complaints')
+    .orderBy('submittedAt', 'desc')
+    .onSnapshot(
+      snapshot => {
+        // Start fresh from demo data, then overlay Firestore docs
+        DB.complaints = [...DEMO_COMPLAINTS];
+        snapshot.docs.forEach(doc => {
+          const raw = { ...doc.data(), _docId: doc.id };
+          const mapped = firestoreDocToComplaint(raw);
+          // Replace demo entry with same ID if exists, otherwise push
+          const idx = DB.complaints.findIndex(c => c.id === mapped.id);
+          if (idx >= 0) DB.complaints[idx] = mapped;
+          else DB.complaints.push(mapped);
+        });
+
+        // Also merge any localStorage grievances (from script.js form)
+        try {
+          const stored = JSON.parse(localStorage.getItem('pgms_grievances') || '[]');
+          stored.forEach(g => {
+            if (!DB.complaints.some(c => c.id === g.id)) DB.complaints.push(g);
+          });
+        } catch (e) {}
+
+        // Re-render whichever tab is active
+        renderMyComplaints();
+        const activePage = document.querySelector('.page.active');
+        if (activePage && activePage.id === 'page-nearby') renderNearby();
+      },
+      err => {
+        console.warn('Firebase listener error:', err);
+        // Fall back to demo data + localStorage
+        try {
+          const stored = JSON.parse(localStorage.getItem('pgms_grievances') || '[]');
+          stored.forEach(g => {
+            if (!DB.complaints.some(c => c.id === g.id)) DB.complaints.push(g);
+          });
+        } catch (e) {}
+        renderMyComplaints();
       }
-    });
-  } catch (e) {}
+    );
 })();
 
 
@@ -604,5 +715,5 @@ function initNearbyMap() {
     setTimeout(() => nearbyMap.invalidateSize(), 150);
 }
 
-
-renderMyComplaints();
+/* NOTE: Initial render is triggered by the Firebase onSnapshot callback above.
+   If Firebase is unavailable, the error handler also calls renderMyComplaints(). */
