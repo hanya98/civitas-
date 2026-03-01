@@ -1,108 +1,6 @@
 // schemes.js
 
-// Mock Data for Schemes and Policies
-// type: 'scheme' or 'policy'
-const dataStore = [
-    {
-        id: 1,
-        title: 'PM Kisan Samman Nidhi',
-        description: 'Under the scheme an income support of 6,000/- per year in three equal installments will be provided to all land holding farmer families.',
-        type: 'scheme',
-        minAge: 18,
-        maxAge: 120,
-        occupations: ['Farmer'],
-        maxMargin: 1500000,
-        keywords: ['farmer', 'kisan', 'agriculture', 'income support']
-    },
-    {
-        id: 2,
-        title: 'Stand-Up India Scheme',
-        description: 'Facilitates bank loans between 10 lakh and 1 Crore to at least one SC/ST borrower and at least one woman borrower per bank branch for setting up a greenfield enterprise.',
-        type: 'scheme',
-        minAge: 18,
-        maxAge: 120,
-        occupations: ['Business', 'Women', 'Unemployed'],
-        maxMargin: 2000000,
-        keywords: ['business', 'loan', 'entrepreneur', 'startup', 'sc/st', 'women']
-    },
-    {
-        id: 3,
-        title: 'Pradhan Mantri Vaya Vandana Yojana',
-        description: 'A pension scheme announced by the Government of India exclusively for the senior citizens aged 60 years and above.',
-        type: 'scheme',
-        minAge: 60,
-        maxAge: 120,
-        occupations: ['Senior Citizen', 'Any', 'Unemployed'],
-        maxMargin: 2000000,
-        keywords: ['pension', 'senior', 'retirement', 'elderly']
-    },
-    {
-        id: 4,
-        title: 'Post Matric Scholarship Scheme',
-        description: 'Financial assistance to students studying at post matriculation or post-secondary stage to enable them to complete their education.',
-        type: 'scheme',
-        minAge: 14,
-        maxAge: 30,
-        occupations: ['Student'],
-        maxMargin: 250000,
-        keywords: ['education', 'scholarship', 'student', 'college']
-    },
-    {
-        id: 5,
-        title: 'Mudra Yojana (PMMY)',
-        description: 'Loans up to ₹10 Lakhs to non-corporate, non-farm small/micro enterprises.',
-        type: 'scheme',
-        minAge: 18,
-        maxAge: 65,
-        occupations: ['Business', 'Women', 'Unemployed'],
-        maxMargin: 2000000,
-        keywords: ['loan', 'micro', 'business', 'msme', 'mudra']
-    },
-    {
-        id: 6,
-        title: 'Urban Green Cover Mandate 2026',
-        description: 'Local municipal policy mandating 15% green cover allocation for all new commercial real estate projects exceeding 10,000 sq ft.',
-        type: 'policy',
-        minAge: 0,
-        maxAge: 120,
-        occupations: ['Business', 'Any'],
-        maxMargin: 2000000,
-        keywords: ['environment', 'real estate', 'green', 'policy', 'commercial']
-    },
-    {
-        id: 7,
-        title: 'City Vendor Zoning Rules',
-        description: 'Guidelines on allocated zones for street vendors and hawkers within city limits to avoid traffic congestion while supporting local trade.',
-        type: 'policy',
-        minAge: 18,
-        maxAge: 120,
-        occupations: ['Business', 'Unemployed'],
-        maxMargin: 500000,
-        keywords: ['vendor', 'street', 'zoning', 'local', 'trade']
-    },
-    {
-        id: 8,
-        title: 'Mahila Samman Savings Certificate',
-        description: 'A one-time small savings scheme available for a two-year period, offering a fixed interest rate for women and girls.',
-        type: 'scheme',
-        minAge: 0,
-        maxAge: 120,
-        occupations: ['Women', 'Student', 'Senior Citizen', 'Any'],
-        maxMargin: 2000000,
-        keywords: ['savings', 'interest', 'women', 'girl', 'finance']
-    },
-    {
-        id: 9,
-        title: 'Local Noise Pollution Ordinance',
-        description: 'Strict regulations restricting usage of loudspeakers and heavy machinery noise between 10 PM and 6 AM in residential areas.',
-        type: 'policy',
-        minAge: 0,
-        maxAge: 120,
-        occupations: ['Any'],
-        maxMargin: 2000000,
-        keywords: ['noise', 'pollution', 'residential', 'law', 'night']
-    }
-];
+let dataStore = []; // Will be populated from JSON
 
 // DOM Elements
 const keywordSearch = document.getElementById('keywordSearch');
@@ -118,6 +16,21 @@ const resultsCount = document.getElementById('resultsCount');
 
 const tabBtns = document.querySelectorAll('.tab-btn');
 const tabContents = document.querySelectorAll('.tab-content');
+
+// Fetch the external JSON data
+async function loadSchemesData() {
+    try {
+        const response = await fetch('schemes_data.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        dataStore = await response.json();
+        renderData(); // Initial render after data is loaded
+    } catch (error) {
+        console.error('Failure fetching schemes data:', error);
+        resultsCount.textContent = 'Error loading schemes. Please try again later.';
+    }
+}
 
 // Helper to format currency
 function formatCurrency(num) {
@@ -245,6 +158,9 @@ function renderCards(container, items, type) {
             badge = 'Central Govt';
         }
 
+        const applyLink = item.link && item.link !== '#' ? item.link : '#';
+        const linkTarget = applyLink !== '#' ? 'target="_blank" rel="noopener noreferrer"' : '';
+
         card.innerHTML = `
             <div class="card-badge">${badge}</div>
             <h3>${item.title}</h3>
@@ -254,11 +170,11 @@ function renderCards(container, items, type) {
                 <div class="meta-item"><strong>Age:</strong> ${ageString}</div>
                 <div class="meta-item"><strong>Max Income:</strong> ${incLimit}</div>
             </div>
-            <a href="#" class="apply-btn">${type === 'scheme' ? 'Check Details & Apply' : 'Read Full Policy'}</a>
+            <a href="${applyLink}" ${linkTarget} class="apply-btn">${type === 'scheme' ? 'Check Details & Apply' : 'Read Full Policy'}</a>
         `;
         container.appendChild(card);
     });
 }
 
-// Initial Render
-renderData();
+// Initialize app
+loadSchemesData();

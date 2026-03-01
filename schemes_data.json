@@ -1,0 +1,328 @@
+[
+    {
+        "id": 1,
+        "title": "PM Kisan Samman Nidhi",
+        "description": "Under the scheme an income support of 6,000/- per year in three equal installments will be provided to all land holding farmer families.",
+        "type": "scheme",
+        "minAge": 18,
+        "maxAge": 120,
+        "occupations": [
+            "Farmer"
+        ],
+        "maxMargin": 1500000,
+        "keywords": [
+            "farmer",
+            "kisan",
+            "agriculture",
+            "income support"
+        ],
+        "link": "https://pmkisan.gov.in/"
+    },
+    {
+        "id": 2,
+        "title": "Stand-Up India Scheme",
+        "description": "Facilitates bank loans between 10 lakh and 1 Crore to at least one SC/ST borrower and at least one woman borrower per bank branch for setting up a greenfield enterprise.",
+        "type": "scheme",
+        "minAge": 18,
+        "maxAge": 120,
+        "occupations": [
+            "Business",
+            "Women",
+            "Unemployed"
+        ],
+        "maxMargin": 2000000,
+        "keywords": [
+            "business",
+            "loan",
+            "entrepreneur",
+            "startup",
+            "sc/st",
+            "women"
+        ],
+        "link": "https://www.standupmitra.in/"
+    },
+    {
+        "id": 3,
+        "title": "Pradhan Mantri Vaya Vandana Yojana",
+        "description": "A pension scheme announced by the Government of India exclusively for the senior citizens aged 60 years and above.",
+        "type": "scheme",
+        "minAge": 60,
+        "maxAge": 120,
+        "occupations": [
+            "Senior Citizen",
+            "Any",
+            "Unemployed"
+        ],
+        "maxMargin": 2000000,
+        "keywords": [
+            "pension",
+            "senior",
+            "retirement",
+            "elderly"
+        ],
+        "link": "https://pib.gov.in/PressReleasePage.aspx?PRID=1858810"
+    },
+    {
+        "id": 4,
+        "title": "Post Matric Scholarship Scheme",
+        "description": "Financial assistance to students studying at post matriculation or post-secondary stage to enable them to complete their education.",
+        "type": "scheme",
+        "minAge": 14,
+        "maxAge": 30,
+        "occupations": [
+            "Student"
+        ],
+        "maxMargin": 250000,
+        "keywords": [
+            "education",
+            "scholarship",
+            "student",
+            "college"
+        ],
+        "link": "https://scholarships.gov.in/"
+    },
+    {
+        "id": 5,
+        "title": "Pradhan Mantri Mudra Yojana (PMMY)",
+        "description": "Loans up to ₹10 Lakhs to non-corporate, non-farm small/micro enterprises.",
+        "type": "scheme",
+        "minAge": 18,
+        "maxAge": 65,
+        "occupations": [
+            "Business",
+            "Women",
+            "Unemployed"
+        ],
+        "maxMargin": 2000000,
+        "keywords": [
+            "loan",
+            "micro",
+            "business",
+            "msme",
+            "mudra"
+        ],
+        "link": "https://www.mudra.org.in/"
+    },
+    {
+        "id": 6,
+        "title": "Urban Green Cover Mandate 2026",
+        "description": "Local municipal policy mandating 15% green cover allocation for all new commercial real estate projects exceeding 10,000 sq ft.",
+        "type": "policy",
+        "minAge": 0,
+        "maxAge": 120,
+        "occupations": [
+            "Business",
+            "Any"
+        ],
+        "maxMargin": 2000000,
+        "keywords": [
+            "environment",
+            "real estate",
+            "green",
+            "policy",
+            "commercial"
+        ],
+        "link": "#"
+    },
+    {
+        "id": 7,
+        "title": "City Vendor Zoning Rules",
+        "description": "Guidelines on allocated zones for street vendors and hawkers within city limits to avoid traffic congestion while supporting local trade.",
+        "type": "policy",
+        "minAge": 18,
+        "maxAge": 120,
+        "occupations": [
+            "Business",
+            "Unemployed"
+        ],
+        "maxMargin": 500000,
+        "keywords": [
+            "vendor",
+            "street",
+            "zoning",
+            "local",
+            "trade"
+        ],
+        "link": "#"
+    },
+    {
+        "id": 8,
+        "title": "Mahila Samman Savings Certificate",
+        "description": "A one-time small savings scheme available for a two-year period, offering a fixed interest rate for women and girls.",
+        "type": "scheme",
+        "minAge": 0,
+        "maxAge": 120,
+        "occupations": [
+            "Women",
+            "Student",
+            "Senior Citizen",
+            "Any"
+        ],
+        "maxMargin": 2000000,
+        "keywords": [
+            "savings",
+            "interest",
+            "women",
+            "girl",
+            "finance"
+        ],
+        "link": "https://www.indiapost.gov.in/Financial/Pages/Content/Mahila-Samman-Savings-Certificate.aspx"
+    },
+    {
+        "id": 9,
+        "title": "Local Noise Pollution Ordinance",
+        "description": "Strict regulations restricting usage of loudspeakers and heavy machinery noise between 10 PM and 6 AM in residential areas.",
+        "type": "policy",
+        "minAge": 0,
+        "maxAge": 120,
+        "occupations": [
+            "Any"
+        ],
+        "maxMargin": 2000000,
+        "keywords": [
+            "noise",
+            "pollution",
+            "residential",
+            "law",
+            "night"
+        ],
+        "link": "#"
+    },
+    {
+        "id": 10,
+        "title": "Ayushman Bharat Pradhan Mantri Jan Arogya Yojana (AB-PMJAY)",
+        "description": "Health insurance cover of up to ₹5 lakhs per family per year for secondary and tertiary care hospitalization.",
+        "type": "scheme",
+        "minAge": 0,
+        "maxAge": 120,
+        "occupations": [
+            "Any"
+        ],
+        "maxMargin": 200000,
+        "keywords": [
+            "health",
+            "insurance",
+            "hospital",
+            "medical"
+        ],
+        "link": "https://pmjay.gov.in/"
+    },
+    {
+        "id": 11,
+        "title": "Atal Pension Yojana (APY)",
+        "description": "Guaranteed minimum pension of Rs. 1,000 to Rs. 5,000 per month for unorganized sector workers.",
+        "type": "scheme",
+        "minAge": 18,
+        "maxAge": 40,
+        "occupations": [
+            "Unemployed",
+            "Farmer",
+            "Business",
+            "Any"
+        ],
+        "maxMargin": 1000000,
+        "keywords": [
+            "pension",
+            "retirement",
+            "unorganized sector"
+        ],
+        "link": "https://www.myscheme.gov.in/schemes/apy"
+    },
+    {
+        "id": 12,
+        "title": "Pradhan Mantri Awas Yojana (PMAY-Urban)",
+        "description": "Provides central assistance to implementing agencies for providing houses to eligible families/beneficiaries against the validated demand for houses.",
+        "type": "scheme",
+        "minAge": 18,
+        "maxAge": 120,
+        "occupations": [
+            "Any"
+        ],
+        "maxMargin": 600000,
+        "keywords": [
+            "housing",
+            "home",
+            "urban",
+            "construction"
+        ],
+        "link": "https://pmay-urban.gov.in/"
+    },
+    {
+        "id": 13,
+        "title": "Sukanya Samriddhi Yojana",
+        "description": "A small deposit scheme for the girl child launched as a part of the 'Beti Bachao Beti Padhao' campaign.",
+        "type": "scheme",
+        "minAge": 0,
+        "maxAge": 10,
+        "occupations": [
+            "Any"
+        ],
+        "maxMargin": 2000000,
+        "keywords": [
+            "girl",
+            "child",
+            "savings",
+            "education",
+            "marriage"
+        ],
+        "link": "https://www.indiapost.gov.in/Financial/pages/content/post-office-saving-schemes.aspx"
+    },
+    {
+        "id": 14,
+        "title": "Pradhan Mantri Fasal Bima Yojana (PMFBY)",
+        "description": "Provides comprehensive insurance cover against failure of the crop thus helping in stabilising the income of the farmers.",
+        "type": "scheme",
+        "minAge": 18,
+        "maxAge": 120,
+        "occupations": [
+            "Farmer"
+        ],
+        "maxMargin": 2000000,
+        "keywords": [
+            "agriculture",
+            "insurance",
+            "crop",
+            "farmer"
+        ],
+        "link": "https://pmfby.gov.in/"
+    },
+    {
+        "id": 15,
+        "title": "Startup India Seed Fund Scheme",
+        "description": "Provides financial assistance to startups for proof of concept, prototype development, product trials, market entry, and commercialization.",
+        "type": "scheme",
+        "minAge": 18,
+        "maxAge": 120,
+        "occupations": [
+            "Business"
+        ],
+        "maxMargin": 2000000,
+        "keywords": [
+            "startup",
+            "seed fund",
+            "business",
+            "innovation",
+            "entrepreneur"
+        ],
+        "link": "https://seedfund.startupindia.gov.in/"
+    },
+    {
+        "id": 16,
+        "title": "National Single Window System Policy",
+        "description": "Mandates integration of all state-level business approvals into a central online clearing portal for MSMEs within 14 working days.",
+        "type": "policy",
+        "minAge": 18,
+        "maxAge": 120,
+        "occupations": [
+            "Business"
+        ],
+        "maxMargin": 2000000,
+        "keywords": [
+            "business",
+            "clearance",
+            "approval",
+            "portal"
+        ],
+        "link": "https://www.nsws.gov.in/"
+    }
+]
