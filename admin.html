@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -35,6 +36,7 @@
     window.db = firebase.firestore();
   </script>
 </head>
+
 <body>
 
   <!-- ── HEADER ── -->
@@ -52,8 +54,11 @@
           <span class="realtime-dot"></span> Live
         </span>
         <span class="admin-badge">Admin Panel</span>
+        <a href="admin-polls.html" class="nav-link" style="margin-right: 15px;">📊 Manage Polls</a>
         <button class="refresh-btn" id="refresh-btn">⟳ Refresh</button>
-        <button class="refresh-btn" id="backfill-btn" style="background:rgba(255,164,0,0.2);border-color:rgba(255,164,0,0.4)" title="Assign AI officers to all complaints that have no assignments yet">⚡ Assign Unassigned</button>
+        <button class="refresh-btn" id="backfill-btn"
+          style="background:rgba(255,164,0,0.2);border-color:rgba(255,164,0,0.4)"
+          title="Assign AI officers to all complaints that have no assignments yet">⚡ Assign Unassigned</button>
       </div>
     </div>
     <div class="tricolour">
@@ -79,115 +84,116 @@
     <!-- ══ TAB: COMPLAINTS ══ -->
     <div class="tab-panel active" id="tab-complaints">
 
-    <!-- STATS -->
-    <div id="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon" style="background:#e8eef8">📋</div>
-        <div>
-          <div class="stat-value" id="stat-total">—</div>
-          <div class="stat-label">Total Complaints</div>
+      <!-- STATS -->
+      <div id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#e8eef8">📋</div>
+          <div>
+            <div class="stat-value" id="stat-total">—</div>
+            <div class="stat-label">Total Complaints</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fff8ec">⏳</div>
+          <div>
+            <div class="stat-value" id="stat-pending">—</div>
+            <div class="stat-label">Pending</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fdf2f2">🔴</div>
+          <div>
+            <div class="stat-value" id="stat-high">—</div>
+            <div class="stat-label">High Priority</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#e6f4ed">✅</div>
+          <div>
+            <div class="stat-value" id="stat-resolved">—</div>
+            <div class="stat-label">Resolved</div>
+          </div>
         </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background:#fff8ec">⏳</div>
-        <div>
-          <div class="stat-value" id="stat-pending">—</div>
-          <div class="stat-label">Pending</div>
+
+      <!-- TOOLBAR -->
+      <div id="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="Search by name, complaint ID, city, category…" />
+          <button id="search-clear">×</button>
         </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background:#fdf2f2">🔴</div>
-        <div>
-          <div class="stat-value" id="stat-high">—</div>
-          <div class="stat-label">High Priority</div>
+        <div class="filter-group">
+          <span class="filter-label">Category</span>
+          <select id="filter-cat" class="filter-select">
+            <option value="">All Categories</option>
+            <option value="roads">Roads &amp; Infrastructure</option>
+            <option value="water">Water Supply</option>
+            <option value="electricity">Electricity</option>
+            <option value="sanitation">Sanitation &amp; Waste</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="education">Education</option>
+            <option value="police">Police &amp; Law Enforcement</option>
+            <option value="corruption">Corruption &amp; Misconduct</option>
+            <option value="other">Other</option>
+          </select>
         </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background:#e6f4ed">✅</div>
-        <div>
-          <div class="stat-value" id="stat-resolved">—</div>
-          <div class="stat-label">Resolved</div>
+        <div class="filter-group">
+          <span class="filter-label">Priority</span>
+          <select id="filter-pri" class="filter-select">
+            <option value="">All Priorities</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
         </div>
-      </div>
-    </div>
-
-    <!-- TOOLBAR -->
-    <div id="toolbar">
-      <div class="search-wrap">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="search-input" placeholder="Search by name, complaint ID, city, category…" />
-        <button id="search-clear">×</button>
-      </div>
-      <div class="filter-group">
-        <span class="filter-label">Category</span>
-        <select id="filter-cat" class="filter-select">
-          <option value="">All Categories</option>
-          <option value="roads">Roads &amp; Infrastructure</option>
-          <option value="water">Water Supply</option>
-          <option value="electricity">Electricity</option>
-          <option value="sanitation">Sanitation &amp; Waste</option>
-          <option value="healthcare">Healthcare</option>
-          <option value="education">Education</option>
-          <option value="police">Police &amp; Law Enforcement</option>
-          <option value="corruption">Corruption &amp; Misconduct</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <span class="filter-label">Priority</span>
-        <select id="filter-pri" class="filter-select">
-          <option value="">All Priorities</option>
-          <option value="High">High</option>
-          <option value="Medium">Medium</option>
-          <option value="Low">Low</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <span class="filter-label">Status</span>
-        <select id="filter-status" class="filter-select">
-          <option value="">All Statuses</option>
-          <option value="Pending">Pending</option>
-          <option value="In Review">In Review</option>
-          <option value="Resolved">Resolved</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-      </div>
-      <button class="reset-btn" id="reset-btn">✕ Reset</button>
-    </div>
-
-    <!-- RESULTS COUNT -->
-    <div id="results-count"></div>
-
-    <!-- TABLE -->
-    <div id="table-container">
-      <div class="table-scroll">
-        <table id="complaints-table">
-          <thead>
-            <tr>
-              <th class="sortable" data-col="id">Complaint ID <span class="sort-icon">↕</span></th>
-              <th class="sortable sort-active" data-col="submittedAt">Date <span class="sort-icon">↓</span></th>
-              <th class="sortable" data-col="fullName">Complainant <span class="sort-icon">↕</span></th>
-              <th class="sortable" data-col="categoryName">Category <span class="sort-icon">↕</span></th>
-              <th class="sortable" data-col="city">Location <span class="sort-icon">↕</span></th>
-              <th class="sortable" data-col="priority">Priority <span class="sort-icon">↕</span></th>
-              <th class="sortable" data-col="status">Status <span class="sort-icon">↕</span></th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="table-body"></tbody>
-        </table>
+        <div class="filter-group">
+          <span class="filter-label">Status</span>
+          <select id="filter-status" class="filter-select">
+            <option value="">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="In Review">In Review</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+        <button class="reset-btn" id="reset-btn">✕ Reset</button>
       </div>
 
-      <!-- EMPTY STATE -->
-      <div id="empty-state" class="empty-state" style="display:none">
-        <div class="empty-icon">📭</div>
-        <div class="empty-title" id="empty-title">No complaints yet</div>
-        <div class="empty-sub"  id="empty-sub">Complaints submitted via the Citizen Portal will appear here in real-time.</div>
-      </div>
+      <!-- RESULTS COUNT -->
+      <div id="results-count"></div>
 
-      <!-- ERROR STATE (populated by JS) -->
-      <div id="error-state" style="display:none"></div>
-    </div>
+      <!-- TABLE -->
+      <div id="table-container">
+        <div class="table-scroll">
+          <table id="complaints-table">
+            <thead>
+              <tr>
+                <th class="sortable" data-col="id">Complaint ID <span class="sort-icon">↕</span></th>
+                <th class="sortable sort-active" data-col="submittedAt">Date <span class="sort-icon">↓</span></th>
+                <th class="sortable" data-col="fullName">Complainant <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-col="categoryName">Category <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-col="city">Location <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-col="priority">Priority <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-col="status">Status <span class="sort-icon">↕</span></th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div id="empty-state" class="empty-state" style="display:none">
+          <div class="empty-icon">📭</div>
+          <div class="empty-title" id="empty-title">No complaints yet</div>
+          <div class="empty-sub" id="empty-sub">Complaints submitted via the Citizen Portal will appear here in
+            real-time.</div>
+        </div>
+
+        <!-- ERROR STATE (populated by JS) -->
+        <div id="error-state" style="display:none"></div>
+      </div>
 
     </div><!-- /#tab-complaints -->
 
@@ -198,19 +204,31 @@
       <div id="assign-stats">
         <div class="stat-card">
           <div class="stat-icon" style="background:#e8eef8">👥</div>
-          <div><div class="stat-value" id="astat-total">—</div><div class="stat-label">Total Assigned</div></div>
+          <div>
+            <div class="stat-value" id="astat-total">—</div>
+            <div class="stat-label">Total Assigned</div>
+          </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon" style="background:#fff8ec">⏳</div>
-          <div><div class="stat-value" id="astat-inprogress">—</div><div class="stat-label">In Progress</div></div>
+          <div>
+            <div class="stat-value" id="astat-inprogress">—</div>
+            <div class="stat-label">In Progress</div>
+          </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon" style="background:#fdf2f2">🔺</div>
-          <div><div class="stat-value" id="astat-overdue">—</div><div class="stat-label">Overdue</div></div>
+          <div>
+            <div class="stat-value" id="astat-overdue">—</div>
+            <div class="stat-label">Overdue</div>
+          </div>
         </div>
         <div class="stat-card">
           <div class="stat-icon" style="background:#e6f4ed">✅</div>
-          <div><div class="stat-value" id="astat-completed">—</div><div class="stat-label">Completed</div></div>
+          <div>
+            <div class="stat-value" id="astat-completed">—</div>
+            <div class="stat-label">Completed</div>
+          </div>
         </div>
       </div>
 
@@ -325,7 +343,9 @@
       <!-- Assignments inside complaint modal -->
       <div class="modal-assignments" id="modal-assignments">
         <div class="modal-assignments-title">👥 Assigned Officers</div>
-        <div id="modal-assign-list"><div class="assign-loading"><span class="loading-dot"></span> Loading assignments…</div></div>
+        <div id="modal-assign-list">
+          <div class="assign-loading"><span class="loading-dot"></span> Loading assignments…</div>
+        </div>
       </div>
       <div class="modal-footer">
         <div style="display:flex;flex-direction:column;gap:6px;flex:1;flex-wrap:wrap">
@@ -357,4 +377,5 @@
 
   <script src="admin.js"></script>
 </body>
+
 </html>

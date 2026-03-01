@@ -3,7 +3,7 @@
  */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyARUCovi6he0lYE6pikBB_doz72Nae2-h0",
@@ -45,98 +45,50 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- POLLS LOGIC (DYNAMIC) ---
+    // --- POLLS LOGIC (DYNAMIC FROM FIREBASE) ---
     const pollsContainer = document.getElementById('polls-container');
     const searchInput = document.getElementById('poll-pincode');
     const searchBtn = document.getElementById('btn-search-polls');
 
-    // Mock Data for Polls
-    const mockPolls = [
-        {
-            id: 1,
-            location: "Sector 12",
-            pincode: "110001",
-            question: "Do you support the proposed solid waste management schedule changes in your sector?",
-            closesIn: "5 days",
-            votes: "1,402",
-            isNew: true,
-            options: [
-                { value: "yes", label: "Yes, the morning schedule is better.", pct: "62%" },
-                { value: "no", label: "No, keep the current schedule.", pct: "28%" },
-                { value: "neutral", label: "No strong preference.", pct: "10%" }
-            ]
-        },
-        {
-            id: 2,
-            location: "Delhi",
-            pincode: "110001",
-            question: "Which local public park should be prioritized for renovation via the Swachh Bharat funds?",
-            closesIn: "12 days",
-            votes: "845",
-            isNew: false,
-            options: [
-                { value: "central", label: "Central Park (Sector 12)", pct: "45%" },
-                { value: "lakeside", label: "Lake-side Gardens", pct: "35%" },
-                { value: "community", label: "Community Grounds (Sector 4)", pct: "20%" }
-            ]
-        },
-        {
-            id: 3,
-            location: "Mumbai",
-            pincode: "400001",
-            question: "Should the local market street be converted to a pedestrian-only zone on weekends?",
-            closesIn: "2 days",
-            votes: "3,120",
-            isNew: true,
-            options: [
-                { value: "yes", label: "Yes, it will reduce traffic.", pct: "55%" },
-                { value: "no", label: "No, it will hurt local businesses.", pct: "40%" },
-                { value: "maybe", label: "Maybe, try it for a month.", pct: "5%" }
-            ]
-        },
-        {
-            id: 4,
-            location: "All",
-            pincode: "",
-            question: "How satisfied are you with the recent digital payment integrations for property tax?",
-            closesIn: "20 days",
-            votes: "12,450",
-            isNew: false,
-            options: [
-                { value: "satisfied", label: "Very Satisfied, much easier now.", pct: "75%" },
-                { value: "neutral", label: "Neutral.", pct: "15%" },
-                { value: "dissatisfied", label: "Dissatisfied, ran into technical issues.", pct: "10%" }
-            ]
-        },
-        {
-            id: 5,
-            location: "Connaught Place",
-            pincode: "110002",
-            question: "Are you in favor of making the inner circle vehicle-free?",
-            closesIn: "8 days",
-            votes: "5,022",
-            isNew: true,
-            options: [
-                { value: "yes", label: "Yes, it will be safer for pedestrians.", pct: "70%" },
-                { value: "no", label: "No, it will cause parking issues.", pct: "25%" },
-                { value: "neutral", label: "No opinion.", pct: "5%" }
-            ]
-        },
-        {
-            id: 6,
-            location: "Churchgate",
-            pincode: "400020",
-            question: "Should the frequency of local trains be increased during night hours?",
-            closesIn: "15 days",
-            votes: "15,200",
-            isNew: false,
-            options: [
-                { value: "yes", label: "Yes, heavily needed.", pct: "85%" },
-                { value: "no", label: "No, current timetable is fine.", pct: "10%" },
-                { value: "neutral", label: "Not sure.", pct: "5%" }
-            ]
+    let livePolls = [];
+
+    // Fetch Polls from Firestore
+    async function fetchPolls() {
+        if (!pollsContainer) return;
+        pollsContainer.innerHTML = `<div class="loading-state"><div class="spinner"></div><p>Loading live polls...</p></div>`;
+
+        try {
+            const snapshot = await getDocs(collection(db, "polls"));
+            livePolls = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                data.id = doc.id;
+                livePolls.push(data);
+            });
+
+            // Sort by newest first
+            livePolls.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+
+            // Initial render
+            renderPolls("");
+        } catch (err) {
+            console.error("Error fetching polls:", err);
+            pollsContainer.innerHTML = `<p style="padding: 20px; text-align: center; color: #ef4444;">Failed to load polls. Please try again later.</p>`;
         }
-    ];
+    }
+
+    // Helper: calculate time remaining
+    function getClosesInStr(createdAt, durationDays) {
+        if (!createdAt || !durationDays) return "Unknown";
+        const createdMs = createdAt.toMillis ? createdAt.toMillis() : Date.now();
+        const endMs = createdMs + (durationDays * 24 * 60 * 60 * 1000);
+        const now = Date.now();
+        const diffDays = Math.ceil((endMs - now) / (1000 * 60 * 60 * 24));
+
+        if (diffDays < 0) return "Closed";
+        if (diffDays === 0) return "Closing Today";
+        return `${diffDays} days`;
+    }
 
     function renderPolls(filterValue = "") {
         if (!pollsContainer) return;
@@ -144,28 +96,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const query = filterValue.toLowerCase().trim();
 
-        // Filter polls: show if it matches pincode or location exactly, or if it's a general poll ("All" or empty pincode)
-        // Check for nearby pincodes (+- 1)
+        // Filter polls
         const isQueryNumeric = !isNaN(query) && query.length > 0;
         const queryNum = isQueryNumeric ? Number(query) : null;
 
-        const filteredPolls = mockPolls.filter(poll => {
+        const filteredPolls = livePolls.filter(poll => {
             if (!query) return true;
 
-            const isGeneral = poll.location === "All" || !poll.pincode;
+            const loc = poll.location ? poll.location.toLowerCase() : "";
+            const isGeneral = loc === "all" || !poll.pincode;
 
             // Text Match
-            const matchLocation = poll.location.toLowerCase().includes(query);
+            const matchLocation = loc.includes(query);
 
             // Numeric Pincode match including +- 1 bounds
             let matchPincode = false;
             let matchNearbyPincode = false;
 
             if (poll.pincode) {
-                // Exact string match
                 matchPincode = poll.pincode.includes(query);
-
-                // +-1 proximity match
                 if (isQueryNumeric && !isNaN(poll.pincode)) {
                     const pollPinNum = Number(poll.pincode);
                     if (Math.abs(pollPinNum - queryNum) <= 1) {
@@ -183,53 +132,68 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         filteredPolls.forEach(poll => {
-            // Build options HTML
+            // Calculate percentages
+            const totalVotes = poll.totalVotes || 0;
+
+            // Generate options HTML
             const optionsHtml = poll.options.map((opt, idx) => `
-        <label class="radio-label poll-option">
-          <input type="radio" name="poll${poll.id}" value="${opt.value}" /> ${opt.label}
-        </label>
-      `).join('');
+                <label class="radio-label poll-option">
+                  <input type="radio" name="poll-${poll.id}" value="${opt.value}" data-index="${idx}" /> ${opt.label}
+                </label>
+            `).join('');
 
-            // Build results HTML
-            const resultsHtml = poll.options.map((opt) => `
-        <div class="result-bar-wrap">
-          <div class="result-label"><span>${opt.label}</span><span class="pct">${opt.pct}</span></div>
-          <div class="result-track"><div class="result-fill" data-width="${opt.pct}"></div></div>
-        </div>
-      `).join('');
+            // Generate results HTML
+            const resultsHtml = poll.options.map((opt) => {
+                const votes = opt.votes || 0;
+                const pct = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+                return `
+                <div class="result-bar-wrap">
+                  <div class="result-label"><span>${opt.label}</span><span class="pct">${pct}%</span></div>
+                  <div class="result-track"><div class="result-fill" data-width="${pct}%" style="width:0%"></div></div>
+                </div>`;
+            }).join('');
 
-            const badgeHtml = poll.isNew ? `<div class="poll-badge new">New</div>` : '';
-            const locationTagHtml = poll.location !== "All" ? `<span class="poll-badge" style="background:var(--clr-navy-light); color:var(--clr-navy); margin-left: 8px;">📍 ${poll.location}</span>` : '';
+            // Determine if New (e.g. created in last 2 days)
+            const msIn2Days = 2 * 24 * 60 * 60 * 1000;
+            const createdMs = poll.createdAt?.toMillis ? poll.createdAt.toMillis() : Date.now();
+            const isNew = (Date.now() - createdMs) < msIn2Days;
+
+            const badgeHtml = isNew ? `<div class="poll-badge new">New</div>` : '';
+            const locationTagHtml = (!poll.location || poll.location.toLowerCase() === "all") ?
+                '' :
+                `<span class="poll-badge" style="background:var(--clr-navy-light); color:var(--clr-navy); margin-left: 8px;">📍 ${poll.location}</span>`;
+
+            const closesIn = getClosesInStr(poll.createdAt, poll.durationDays || 7);
+            const votesLabel = (totalVotes === 1) ? "1 vote" : `${totalVotes} votes`;
 
             const article = document.createElement('article');
             article.className = 'poll-card';
             article.setAttribute('data-poll-id', poll.id);
             article.innerHTML = `
-        ${badgeHtml} ${locationTagHtml}
-        <h3 class="poll-question">${poll.question}</h3>
-        <p class="poll-meta">Closes in ${poll.closesIn} &bull; ${poll.votes} votes</p>
-        
-        <div class="poll-voting-area">
-          <div class="radio-options column">
-            ${optionsHtml}
-          </div>
-          <button class="btn btn-primary btn-vote" disabled>Cast Vote</button>
-        </div>
-        
-        <div class="poll-results hidden">
-          <p class="results-title">Current Results</p>
-          ${resultsHtml}
-          <p class="success-text">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg> Your vote has been recorded
-          </p>
-        </div>
-      `;
+                ${badgeHtml} ${locationTagHtml}
+                <h3 class="poll-question">${poll.question}</h3>
+                <p class="poll-meta">Closes in ${closesIn} &bull; ${votesLabel}</p>
+                
+                <div class="poll-voting-area">
+                  <div class="radio-options column">
+                    ${optionsHtml}
+                  </div>
+                  <button class="btn btn-primary btn-vote" disabled>Cast Vote</button>
+                </div>
+                
+                <div class="poll-results hidden">
+                  <p class="results-title">Current Results</p>
+                  ${resultsHtml}
+                  <p class="success-text">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg> Your vote has been recorded
+                  </p>
+                </div>
+            `;
             pollsContainer.appendChild(article);
         });
 
-        // Re-bind listeners for the newly added polls
         bindPollCardEvents();
     }
 
@@ -250,8 +214,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Handle vote cast
             voteBtn.addEventListener('click', async () => {
-                const selectedOption = Array.from(radioInputs).find(input => input.checked)?.value;
-                if (!selectedOption) return;
+                const selectedInput = Array.from(radioInputs).find(input => input.checked);
+                if (!selectedInput) return;
+
+                const selectedOption = selectedInput.value;
+                const selectedIndex = parseInt(selectedInput.getAttribute('data-index'), 10);
 
                 votingArea.classList.add('hidden');
                 resultsArea.classList.remove('hidden');
@@ -267,16 +234,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 const pollId = card.getAttribute('data-poll-id');
                 const pollQuestion = card.querySelector('.poll-question').textContent;
 
-                const pollData = {
-                    type: "poll_answer",
-                    pollId: pollId,
-                    question: pollQuestion,
-                    answer: selectedOption,
-                    timestamp: serverTimestamp()
-                };
-
                 try {
-                    await addDoc(collection(db, "feedbacks"), pollData);
+                    // 1. Update the actual poll document in 'polls' collection
+                    const pollRef = doc(db, "polls", pollId);
+
+                    // We need to fetch the current document first to update the specific option in the array
+                    const pollDoc = await getDocs(collection(db, "polls"));
+                    let currentOptions = [];
+                    let currentTotal = 0;
+                    pollDoc.forEach(d => {
+                        if (d.id === pollId) {
+                            currentOptions = d.data().options || [];
+                            currentTotal = d.data().totalVotes || 0;
+                        }
+                    });
+
+                    if (currentOptions.length > selectedIndex) {
+                        currentOptions[selectedIndex].votes = (currentOptions[selectedIndex].votes || 0) + 1;
+
+                        // We use updateDoc (imported dynamically if needed, or structured differently, but here we just re-fetch using standard v9)
+                        // Note: import { doc, updateDoc } from ... is needed, but for this basic setup we rely on the ones available or standard methods.
+                        // Assuming updateDoc is not imported by default in this file's header, let's use a workaround if needed or assume we can import it.
+                        // Wait, the header only imports: { getFirestore, collection, addDoc, serverTimestamp, getDocs }
+                        // I will need to update the imports at the top of the file as well! Let's do that next.
+                    }
+
+                    // Let's assume we update the document via a standard method
+                    // For now, since we only have `addDoc` imported natively, we'll need to update the import in a subsequent change, 
+                    // or I'll just write the full v9 syntax here and update imports immediately after.
+                    import("https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js").then(async ({ doc, updateDoc }) => {
+                        const pRef = doc(db, "polls", pollId);
+                        await updateDoc(pRef, {
+                            options: currentOptions,
+                            totalVotes: currentTotal + 1
+                        });
+                    });
+
+                    // 2. Also log the feedback action as before (optional, but good for tracking who voted)
+                    const pollDataLog = {
+                        type: "poll_answer",
+                        pollId: pollId,
+                        question: pollQuestion,
+                        answer: selectedOption,
+                        timestamp: serverTimestamp()
+                    };
+                    await addDoc(collection(db, "feedbacks"), pollDataLog);
+
                     showToast("Vote successfully recorded! Thank you.");
                 } catch (error) {
                     console.error("Error saving vote:", error);
@@ -298,8 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initial render of all polls
-    renderPolls("");
+    // Initial render of all polls from Firebase
+    fetchPolls();
 
 
     // --- FEEDBACK FORM LOGIC ---
