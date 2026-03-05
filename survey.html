@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="style2.css" />
     <link rel="stylesheet" href="citizen.css" />
     <link rel="stylesheet" href="survey.css" />
+    <script src="auth.js"></script>
 </head>
 
 <body>
@@ -47,8 +48,8 @@
                 <option>English</option>
                 <option>हिन्दी</option>
             </select>
-            <a href="citizen-profile.html" class="login-btn citizen">Login as Citizen</a>
-            <a href="admin.html" class="login-btn admin">Login as Admin</a>
+            <a href="#" class="login-btn admin"
+                onclick="Auth.citizenLogout(); window.location.href='index.html'; return false;">Logout</a>
         </div>
     </nav>
     <div class="tricolor-bar">
@@ -113,6 +114,10 @@
                 </div>
                 <p class="field-hint" style="margin-top: 8px;">Try entering "110001", "Delhi", "Mumbai", or leave blank
                     for all polls.</p>
+                <p id="pincode-fetch-status"
+                    style="margin-top: 8px; color: #059669; font-weight: 500; display: none; font-size: 0.85rem;">
+                    ✨ Pincode automatically retrieved from your profile
+                </p>
             </div>
 
             <div class="polls-grid" id="polls-container">

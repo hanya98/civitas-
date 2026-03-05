@@ -9,69 +9,69 @@
    1. DATA: Districts per State
 ================================================================ */
 const DISTRICTS = {
-  AN: ['South Andaman','North and Middle Andaman','Nicobar'],
-  AP: ['Visakhapatnam','Vijayawada','Guntur','Tirupati','Kurnool','Nellore','Kakinada','Rajahmundry'],
-  AR: ['Itanagar','Naharlagun','Tawang','Bomdila','Pasighat','Ziro'],
-  AS: ['Guwahati','Dibrugarh','Silchar','Jorhat','Tezpur','Nagaon','Tinsukia'],
-  BR: ['Patna','Gaya','Muzaffarpur','Bhagalpur','Purnia','Darbhanga','Nalanda'],
+  AN: ['South Andaman', 'North and Middle Andaman', 'Nicobar'],
+  AP: ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Tirupati', 'Kurnool', 'Nellore', 'Kakinada', 'Rajahmundry'],
+  AR: ['Itanagar', 'Naharlagun', 'Tawang', 'Bomdila', 'Pasighat', 'Ziro'],
+  AS: ['Guwahati', 'Dibrugarh', 'Silchar', 'Jorhat', 'Tezpur', 'Nagaon', 'Tinsukia'],
+  BR: ['Patna', 'Gaya', 'Muzaffarpur', 'Bhagalpur', 'Purnia', 'Darbhanga', 'Nalanda'],
   CH: ['Chandigarh'],
-  CT: ['Raipur','Bilaspur','Durg','Rajnandgaon','Korba','Jagdalpur'],
-  DH: ['Dadra and Nagar Haveli','Daman','Diu'],
-  DL: ['Central Delhi','East Delhi','New Delhi','North Delhi','North East Delhi','North West Delhi','Shahdara','South Delhi','South East Delhi','South West Delhi','West Delhi'],
-  GA: ['North Goa','South Goa'],
-  GJ: ['Ahmedabad','Surat','Vadodara','Rajkot','Gandhinagar','Junagadh','Bhavnagar','Jamnagar','Anand'],
-  HR: ['Gurugram','Faridabad','Hisar','Rohtak','Ambala','Karnal','Panipat','Sonipat'],
-  HP: ['Shimla','Dharamsala','Mandi','Solan','Kullu','Una','Hamirpur'],
-  JK: ['Jammu','Srinagar','Anantnag','Baramulla','Kupwara','Kathua','Udhampur'],
-  JH: ['Ranchi','Jamshedpur','Dhanbad','Bokaro','Deoghar','Hazaribagh','Giridih'],
-  KA: ['Bengaluru Urban','Mysuru','Mangaluru','Hubballi-Dharwad','Belagavi','Kalaburagi','Davangere'],
-  KL: ['Thiruvananthapuram','Kochi','Kozhikode','Thrissur','Malappuram','Alappuzha','Kannur'],
-  LA: ['Leh','Kargil'],
+  CT: ['Raipur', 'Bilaspur', 'Durg', 'Rajnandgaon', 'Korba', 'Jagdalpur'],
+  DH: ['Dadra and Nagar Haveli', 'Daman', 'Diu'],
+  DL: ['Central Delhi', 'East Delhi', 'New Delhi', 'North Delhi', 'North East Delhi', 'North West Delhi', 'Shahdara', 'South Delhi', 'South East Delhi', 'South West Delhi', 'West Delhi'],
+  GA: ['North Goa', 'South Goa'],
+  GJ: ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Gandhinagar', 'Junagadh', 'Bhavnagar', 'Jamnagar', 'Anand'],
+  HR: ['Gurugram', 'Faridabad', 'Hisar', 'Rohtak', 'Ambala', 'Karnal', 'Panipat', 'Sonipat'],
+  HP: ['Shimla', 'Dharamsala', 'Mandi', 'Solan', 'Kullu', 'Una', 'Hamirpur'],
+  JK: ['Jammu', 'Srinagar', 'Anantnag', 'Baramulla', 'Kupwara', 'Kathua', 'Udhampur'],
+  JH: ['Ranchi', 'Jamshedpur', 'Dhanbad', 'Bokaro', 'Deoghar', 'Hazaribagh', 'Giridih'],
+  KA: ['Bengaluru Urban', 'Mysuru', 'Mangaluru', 'Hubballi-Dharwad', 'Belagavi', 'Kalaburagi', 'Davangere'],
+  KL: ['Thiruvananthapuram', 'Kochi', 'Kozhikode', 'Thrissur', 'Malappuram', 'Alappuzha', 'Kannur'],
+  LA: ['Leh', 'Kargil'],
   LD: ['Lakshadweep'],
-  MP: ['Bhopal','Indore','Jabalpur','Gwalior','Ujjain','Rewa','Sagar','Satna'],
-  MH: ['Mumbai City','Mumbai Suburban','Pune','Nagpur','Thane','Nashik','Aurangabad','Solapur','Kolhapur'],
-  MN: ['Imphal West','Imphal East','Thoubal','Bishnupur','Churachandpur'],
-  ML: ['East Khasi Hills','Ri Bhoi','West Khasi Hills','East Jaintia Hills','East Garo Hills'],
-  MZ: ['Aizawl','Lunglei','Champhai','Serchhip','Kolasib'],
-  NL: ['Kohima','Dimapur','Mokokchung','Tuensang','Mon'],
-  OD: ['Bhubaneswar','Cuttack','Berhampur','Rourkela','Sambalpur','Puri','Balasore'],
-  PY: ['Puducherry','Karaikal','Yanam','Mahe'],
-  PB: ['Amritsar','Ludhiana','Jalandhar','Patiala','Bathinda','Mohali','Gurdaspur'],
-  RJ: ['Jaipur','Jodhpur','Udaipur','Kota','Bikaner','Ajmer','Alwar','Bharatpur'],
-  SK: ['East Sikkim','West Sikkim','North Sikkim','South Sikkim'],
-  TN: ['Chennai','Coimbatore','Madurai','Tiruchirappalli','Salem','Tirunelveli','Erode','Vellore'],
-  TG: ['Hyderabad','Warangal','Nizamabad','Karimnagar','Khammam','Mahbubnagar','Nalgonda'],
-  TR: ['West Tripura','South Tripura','Gomati','Dhalai','North Tripura'],
-  UP: ['Lucknow','Kanpur','Agra','Varanasi','Prayagraj','Noida','Meerut','Ghaziabad','Mathura','Bareilly'],
-  UK: ['Dehradun','Haridwar','Nainital','Almora','Pauri Garhwal','Tehri Garhwal','Uttarkashi'],
-  WB: ['Kolkata','Howrah','Hooghly','North 24 Parganas','South 24 Parganas','Darjeeling','Malda','Murshidabad'],
+  MP: ['Bhopal', 'Indore', 'Jabalpur', 'Gwalior', 'Ujjain', 'Rewa', 'Sagar', 'Satna'],
+  MH: ['Mumbai City', 'Mumbai Suburban', 'Pune', 'Nagpur', 'Thane', 'Nashik', 'Aurangabad', 'Solapur', 'Kolhapur'],
+  MN: ['Imphal West', 'Imphal East', 'Thoubal', 'Bishnupur', 'Churachandpur'],
+  ML: ['East Khasi Hills', 'Ri Bhoi', 'West Khasi Hills', 'East Jaintia Hills', 'East Garo Hills'],
+  MZ: ['Aizawl', 'Lunglei', 'Champhai', 'Serchhip', 'Kolasib'],
+  NL: ['Kohima', 'Dimapur', 'Mokokchung', 'Tuensang', 'Mon'],
+  OD: ['Bhubaneswar', 'Cuttack', 'Berhampur', 'Rourkela', 'Sambalpur', 'Puri', 'Balasore'],
+  PY: ['Puducherry', 'Karaikal', 'Yanam', 'Mahe'],
+  PB: ['Amritsar', 'Ludhiana', 'Jalandhar', 'Patiala', 'Bathinda', 'Mohali', 'Gurdaspur'],
+  RJ: ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Bikaner', 'Ajmer', 'Alwar', 'Bharatpur'],
+  SK: ['East Sikkim', 'West Sikkim', 'North Sikkim', 'South Sikkim'],
+  TN: ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem', 'Tirunelveli', 'Erode', 'Vellore'],
+  TG: ['Hyderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Khammam', 'Mahbubnagar', 'Nalgonda'],
+  TR: ['West Tripura', 'South Tripura', 'Gomati', 'Dhalai', 'North Tripura'],
+  UP: ['Lucknow', 'Kanpur', 'Agra', 'Varanasi', 'Prayagraj', 'Noida', 'Meerut', 'Ghaziabad', 'Mathura', 'Bareilly'],
+  UK: ['Dehradun', 'Haridwar', 'Nainital', 'Almora', 'Pauri Garhwal', 'Tehri Garhwal', 'Uttarkashi'],
+  WB: ['Kolkata', 'Howrah', 'Hooghly', 'North 24 Parganas', 'South 24 Parganas', 'Darjeeling', 'Malda', 'Murshidabad'],
 };
 
 const DEPARTMENTS = {
-  roads:       ['Public Works Department (PWD)','National Highways Authority of India (NHAI)','Municipal Corporation – Roads Division','Urban Local Body (ULB)'],
-  water:       ['Water Supply & Sanitation Department','Jal Jeevan Mission','Municipal Water Works','Ground Water Authority'],
-  electricity: ['State Electricity Distribution Company','Central Electricity Authority','DISCOMS / Power Distribution Unit'],
-  sanitation:  ['Municipal Corporation – Sanitation Wing','Swachh Bharat Mission (Urban/Rural)','Urban Local Body – Waste Management'],
-  healthcare:  ['State Health Department','District Hospital Administration','National Health Mission (NHM)','Primary Health Centre (PHC)'],
-  education:   ['State School Education Department','District Education Office','Samagra Shiksha Abhiyan','Higher Education Department'],
-  police:      ['State Police Headquarters','District Superintendent of Police (SP)','Commissioner of Police (Urban)','Internal Complaints Committee'],
-  corruption:  ['Central Vigilance Commission (CVC)','Lokayukta / Jan Lokpal','Central Bureau of Investigation (CBI)','State Anti-Corruption Bureau (ACB)'],
-  other:       ["District Collector / DM Office","Chief Minister's Helpline (State)","Prime Minister's Office (PMO)",'Concerned Line Department'],
+  roads: ['Public Works Department (PWD)', 'National Highways Authority of India (NHAI)', 'Municipal Corporation – Roads Division', 'Urban Local Body (ULB)'],
+  water: ['Water Supply & Sanitation Department', 'Jal Jeevan Mission', 'Municipal Water Works', 'Ground Water Authority'],
+  electricity: ['State Electricity Distribution Company', 'Central Electricity Authority', 'DISCOMS / Power Distribution Unit'],
+  sanitation: ['Municipal Corporation – Sanitation Wing', 'Swachh Bharat Mission (Urban/Rural)', 'Urban Local Body – Waste Management'],
+  healthcare: ['State Health Department', 'District Hospital Administration', 'National Health Mission (NHM)', 'Primary Health Centre (PHC)'],
+  education: ['State School Education Department', 'District Education Office', 'Samagra Shiksha Abhiyan', 'Higher Education Department'],
+  police: ['State Police Headquarters', 'District Superintendent of Police (SP)', 'Commissioner of Police (Urban)', 'Internal Complaints Committee'],
+  corruption: ['Central Vigilance Commission (CVC)', 'Lokayukta / Jan Lokpal', 'Central Bureau of Investigation (CBI)', 'State Anti-Corruption Bureau (ACB)'],
+  other: ["District Collector / DM Office", "Chief Minister's Helpline (State)", "Prime Minister's Office (PMO)", 'Concerned Line Department'],
 };
 
 /* ================================================================
    PRIORITY MAP — category-based baseline (always used as fallback)
 ================================================================ */
 const PRIORITY_MAP = {
-  corruption:  'High',
-  police:      'High',
-  healthcare:  'High',
+  corruption: 'High',
+  police: 'High',
+  healthcare: 'High',
   electricity: 'Medium',
-  water:       'Medium',
-  roads:       'Medium',
-  sanitation:  'Low',
-  education:   'Low',
-  other:       'Low'
+  water: 'Medium',
+  roads: 'Medium',
+  sanitation: 'Low',
+  education: 'Low',
+  other: 'Low'
 };
 
 /* ================================================================
@@ -85,13 +85,13 @@ async function getAIPriority(category, categoryName, title, description, stillUn
   const baseline = PRIORITY_MAP[category] || 'Medium';
   try {
     const response = await fetch('/api/priority', {
-      method:  'POST',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ category: categoryName, title, description, stillUnresolved, reportedBefore, timesReported })
     });
     if (!response.ok) throw new Error(`Proxy ${response.status}`);
-    const data     = await response.json();
-    const priority = ['High','Medium','Low'].includes(data.priority) ? data.priority : baseline;
+    const data = await response.json();
+    const priority = ['High', 'Medium', 'Low'].includes(data.priority) ? data.priority : baseline;
     return { priority, reason: data.reason || '', setBy: 'AI' };
   } catch (err) {
     console.warn('AI priority unavailable, using category baseline:', err.message);
@@ -102,8 +102,8 @@ async function getAIPriority(category, categoryName, title, description, stillUn
 /* ================================================================
    2. STATE
 ================================================================ */
-let currentStep    = 1;
-const TOTAL_STEPS  = 4;
+let currentStep = 1;
+const TOTAL_STEPS = 4;
 let uploadedPhotos = [];
 
 /* ================================================================
@@ -120,7 +120,7 @@ function showToast(msg, duration = 3500) {
 }
 
 function setError(inputId, message) {
-  const input   = el(inputId);
+  const input = el(inputId);
   const errSpan = el(inputId + '-err');
   if (!input) return;
   if (message) {
@@ -155,7 +155,7 @@ function showErrorBanner(stepNum, errors) {
   banner.setAttribute('role', 'alert');
   banner.innerHTML =
     `<div class="err-banner-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="7" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-     <div class="err-banner-body"><strong>Please fix the following before continuing:</strong><ul>${errors.map(e=>`<li>${e}</li>`).join('')}</ul></div>
+     <div class="err-banner-body"><strong>Please fix the following before continuing:</strong><ul>${errors.map(e => `<li>${e}</li>`).join('')}</ul></div>
      <button type="button" class="err-banner-close" aria-label="Dismiss">&times;</button>`;
 
   const heading = section.querySelector('.section-heading');
@@ -179,67 +179,67 @@ function clearBanner(stepNum) {
 function validateStep1() {
   const errors = [];
   const name = el('full-name').value.trim();
-  if (!name) { setError('full-name','Full name is required.'); errors.push('Full name is required.'); }
-  else if (name.length < 3) { setError('full-name','Name must be at least 3 characters.'); errors.push('Full name must be at least 3 characters.'); }
-  else if (!/^[a-zA-Z\s.,''`-]+$/.test(name)) { setError('full-name','Name may only contain letters and spaces.'); errors.push('Full name contains invalid characters.'); }
-  else { setError('full-name',''); }
+  if (!name) { setError('full-name', 'Full name is required.'); errors.push('Full name is required.'); }
+  else if (name.length < 3) { setError('full-name', 'Name must be at least 3 characters.'); errors.push('Full name must be at least 3 characters.'); }
+  else if (!/^[a-zA-Z\s.,''`-]+$/.test(name)) { setError('full-name', 'Name may only contain letters and spaces.'); errors.push('Full name contains invalid characters.'); }
+  else { setError('full-name', ''); }
 
   const mobile = el('mobile').value.trim();
-  if (!mobile) { setError('mobile','Mobile number is required.'); errors.push('Mobile number is required.'); }
-  else if (!/^[6-9]\d{9}$/.test(mobile)) { setError('mobile','Must be 10 digits starting with 6, 7, 8 or 9.'); errors.push('Mobile number must be 10 digits starting with 6–9.'); }
-  else { setError('mobile',''); }
+  if (!mobile) { setError('mobile', 'Mobile number is required.'); errors.push('Mobile number is required.'); }
+  else if (!/^[6-9]\d{9}$/.test(mobile)) { setError('mobile', 'Must be 10 digits starting with 6, 7, 8 or 9.'); errors.push('Mobile number must be 10 digits starting with 6–9.'); }
+  else { setError('mobile', ''); }
 
   const email = el('email').value.trim();
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { setError('email','Enter a valid email address.'); errors.push('Email address is invalid.'); }
-  else { setError('email',''); }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { setError('email', 'Enter a valid email address.'); errors.push('Email address is invalid.'); }
+  else { setError('email', ''); }
 
-  const aadhaarEl  = el('aadhaar');
-  const aadhaarRaw = aadhaarEl.dataset.raw || aadhaarEl.value.replace(/[\sX]/gi,'');
-  if (aadhaarRaw && !/^\d{12}$/.test(aadhaarRaw)) { setError('aadhaar','Aadhaar must be exactly 12 digits.'); errors.push('Aadhaar number must be 12 digits.'); }
-  else { setError('aadhaar',''); }
+  const aadhaarEl = el('aadhaar');
+  const aadhaarRaw = aadhaarEl.dataset.raw || aadhaarEl.value.replace(/[\sX]/gi, '');
+  if (aadhaarRaw && !/^\d{12}$/.test(aadhaarRaw)) { setError('aadhaar', 'Aadhaar must be exactly 12 digits.'); errors.push('Aadhaar number must be 12 digits.'); }
+  else { setError('aadhaar', ''); }
   return errors;
 }
 
 function validateStep2() {
   const errors = [];
-  if (!el('state').value)          { setError('state','Please select your state.');    errors.push('State is required.'); }    else { setError('state',''); }
-  if (!el('district').value)       { setError('district','Please select district.');   errors.push('District is required.'); } else { setError('district',''); }
-  if (!el('city').value.trim())    { setError('city','City / Town is required.');      errors.push('City / Town is required.'); } else { setError('city',''); }
+  if (!el('state').value) { setError('state', 'Please select your state.'); errors.push('State is required.'); } else { setError('state', ''); }
+  if (!el('district').value) { setError('district', 'Please select district.'); errors.push('District is required.'); } else { setError('district', ''); }
+  if (!el('city').value.trim()) { setError('city', 'City / Town is required.'); errors.push('City / Town is required.'); } else { setError('city', ''); }
   const pin = el('pincode').value.trim();
-  if (!pin)                        { setError('pincode','Pincode is required.');       errors.push('Pincode is required.'); }
-  else if (!/^\d{6}$/.test(pin))   { setError('pincode','Pincode must be 6 digits.'); errors.push('Pincode must be 6 digits.'); }
-  else { setError('pincode',''); }
-  if (!el('locality').value.trim()) { setError('locality','Area / Locality is required.'); errors.push('Area / Locality is required.'); } else { setError('locality',''); }
+  if (!pin) { setError('pincode', 'Pincode is required.'); errors.push('Pincode is required.'); }
+  else if (!/^\d{6}$/.test(pin)) { setError('pincode', 'Pincode must be 6 digits.'); errors.push('Pincode must be 6 digits.'); }
+  else { setError('pincode', ''); }
+  if (!el('locality').value.trim()) { setError('locality', 'Area / Locality is required.'); errors.push('Area / Locality is required.'); } else { setError('locality', ''); }
   return errors;
 }
 
 function validateStep3() {
   const errors = [];
-  if (!el('category').value)   { setError('category','Please select a grievance category.'); errors.push('Grievance category is required.'); } else { setError('category',''); }
-  if (!el('department').value) { setError('department','Please select the department.');     errors.push('Department is required.'); }          else { setError('department',''); }
+  if (!el('category').value) { setError('category', 'Please select a grievance category.'); errors.push('Grievance category is required.'); } else { setError('category', ''); }
+  if (!el('department').value) { setError('department', 'Please select the department.'); errors.push('Department is required.'); } else { setError('department', ''); }
   const title = el('title').value.trim();
-  if (!title)            { setError('title','Grievance title is required.');          errors.push('Grievance title is required.'); }
-  else if (title.length < 10) { setError('title','Title must be at least 10 characters.'); errors.push('Grievance title needs at least 10 characters.'); }
-  else { setError('title',''); }
+  if (!title) { setError('title', 'Grievance title is required.'); errors.push('Grievance title is required.'); }
+  else if (title.length < 10) { setError('title', 'Title must be at least 10 characters.'); errors.push('Grievance title needs at least 10 characters.'); }
+  else { setError('title', ''); }
   const desc = el('description').value.trim();
-  if (!desc)              { setError('description','Detailed description is required.'); errors.push('Description is required.'); }
-  else if (desc.length < 50) { setError('description',`Minimum 50 characters required. Currently: ${desc.length}.`); errors.push(`Description is too short (${desc.length}/50 chars min).`); }
-  else { setError('description',''); }
+  if (!desc) { setError('description', 'Detailed description is required.'); errors.push('Description is required.'); }
+  else if (desc.length < 50) { setError('description', `Minimum 50 characters required. Currently: ${desc.length}.`); errors.push(`Description is too short (${desc.length}/50 chars min).`); }
+  else { setError('description', ''); }
   const dateVal = el('incident-date').value;
-  if (!dateVal)              { setError('incident-date','Date of incident is required.'); errors.push('Date of incident is required.'); }
-  else if (new Date(dateVal) > new Date()) { setError('incident-date','Date cannot be in the future.'); errors.push('Date of incident cannot be in the future.'); }
-  else { setError('incident-date',''); }
+  if (!dateVal) { setError('incident-date', 'Date of incident is required.'); errors.push('Date of incident is required.'); }
+  else if (new Date(dateVal) > new Date()) { setError('incident-date', 'Date cannot be in the future.'); errors.push('Date of incident cannot be in the future.'); }
+  else { setError('incident-date', ''); }
   const stillUnresolved = document.querySelector('input[name="stillUnresolved"]:checked');
-  if (!stillUnresolved) { setSpanError('unresolved-err','Please select Yes or No.'); errors.push('Please indicate if the issue is still unresolved.'); } else { setSpanError('unresolved-err',''); }
+  if (!stillUnresolved) { setSpanError('unresolved-err', 'Please select Yes or No.'); errors.push('Please indicate if the issue is still unresolved.'); } else { setSpanError('unresolved-err', ''); }
   const reportedBefore = document.querySelector('input[name="reportedBefore"]:checked');
-  if (!reportedBefore)  { setSpanError('reported-err','Please select Yes or No.');   errors.push('Please indicate if you have reported this before.'); } else { setSpanError('reported-err',''); }
+  if (!reportedBefore) { setSpanError('reported-err', 'Please select Yes or No.'); errors.push('Please indicate if you have reported this before.'); } else { setSpanError('reported-err', ''); }
   return errors;
 }
 
 function validateStep4() {
   const errors = [];
-  if (!el('consent-truth').checked)   { setSpanError('consent-truth-err','You must confirm the declaration.'); errors.push('Please confirm the declaration of truth.'); } else { setSpanError('consent-truth-err',''); }
-  if (!el('consent-contact').checked) { setSpanError('consent-contact-err','You must consent to be contacted.'); errors.push('Please consent to being contacted.'); }      else { setSpanError('consent-contact-err',''); }
+  if (!el('consent-truth').checked) { setSpanError('consent-truth-err', 'You must confirm the declaration.'); errors.push('Please confirm the declaration of truth.'); } else { setSpanError('consent-truth-err', ''); }
+  if (!el('consent-contact').checked) { setSpanError('consent-contact-err', 'You must consent to be contacted.'); errors.push('Please consent to being contacted.'); } else { setSpanError('consent-contact-err', ''); }
   return errors;
 }
 
@@ -271,11 +271,11 @@ function updateProgressUI(activeStep) {
     const stepEl = el('step-nav-' + i);
     if (!stepEl) continue;
     const numEl = stepEl.querySelector('.step-num');
-    stepEl.classList.remove('active','completed');
+    stepEl.classList.remove('active', 'completed');
     stepEl.removeAttribute('aria-current');
     if (i === activeStep) {
       stepEl.classList.add('active');
-      stepEl.setAttribute('aria-current','step');
+      stepEl.setAttribute('aria-current', 'step');
       if (numEl) numEl.textContent = i;
     } else if (i < activeStep) {
       stepEl.classList.add('completed');
@@ -286,10 +286,10 @@ function updateProgressUI(activeStep) {
   }
 }
 
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
   const nextBtn = e.target.closest('[data-next]');
   if (nextBtn) {
-    const toStep   = parseInt(nextBtn.dataset.next, 10);
+    const toStep = parseInt(nextBtn.dataset.next, 10);
     const fromStep = toStep - 1;
     handleNext(fromStep, toStep);
     return;
@@ -309,7 +309,7 @@ function handleNext(fromStep, toStep) {
 
   if (errors.length > 0) {
     showErrorBanner(fromStep, errors);
-    const section  = el('form-step-' + fromStep);
+    const section = el('form-step-' + fromStep);
     if (section) {
       const firstBad = section.querySelector('input.error, select.error, textarea.error');
       if (firstBad) setTimeout(() => firstBad.focus(), 300);
@@ -323,9 +323,9 @@ function handleNext(fromStep, toStep) {
 /* ================================================================
    7. STATE → DISTRICT
 ================================================================ */
-el('state').addEventListener('change', function() {
-  const code    = this.value;
-  const distEl  = el('district');
+el('state').addEventListener('change', function () {
+  const code = this.value;
+  const distEl = el('district');
   distEl.innerHTML = '<option value="">-- Select District --</option>';
   if (code && DISTRICTS[code]) {
     DISTRICTS[code].forEach(d => {
@@ -337,15 +337,15 @@ el('state').addEventListener('change', function() {
   } else {
     distEl.disabled = true;
   }
-  setError('state','');
-  setError('district','');
+  setError('state', '');
+  setError('district', '');
 });
 
 /* ================================================================
    8. CATEGORY → DEPARTMENT
 ================================================================ */
-el('category').addEventListener('change', function() {
-  const cat    = this.value;
+el('category').addEventListener('change', function () {
+  const cat = this.value;
   const deptEl = el('department');
   if (cat && DEPARTMENTS[cat]) {
     deptEl.innerHTML = '<option value="">-- Select Department --</option>';
@@ -357,8 +357,8 @@ el('category').addEventListener('change', function() {
   } else {
     deptEl.innerHTML = '<option value="">-- Select category first --</option>';
   }
-  setError('category','');
-  setError('department','');
+  setError('category', '');
+  setError('department', '');
 });
 
 /* ================================================================
@@ -367,48 +367,48 @@ el('category').addEventListener('change', function() {
 function updateCounter(inputEl, counterEl, max) {
   const len = inputEl.value.length;
   counterEl.textContent = len + ' / ' + max;
-  counterEl.classList.remove('warning','limit');
+  counterEl.classList.remove('warning', 'limit');
   if (len >= max) counterEl.classList.add('limit');
   else if (len >= Math.floor(max * 0.85)) counterEl.classList.add('warning');
 }
-el('title').addEventListener('input', function() { updateCounter(this, el('title-count'), 100); });
-el('description').addEventListener('input', function() {
+el('title').addEventListener('input', function () { updateCounter(this, el('title-count'), 100); });
+el('description').addEventListener('input', function () {
   updateCounter(this, el('description-count'), 2000);
-  if (this.value.trim().length >= 50) setError('description','');
+  if (this.value.trim().length >= 50) setError('description', '');
 });
 
 /* ================================================================
    10. MOBILE INPUT
 ================================================================ */
-el('mobile').addEventListener('input', function() { this.value = this.value.replace(/\D/g,'').slice(0,10); });
-el('mobile').addEventListener('blur', function() {
+el('mobile').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 10); });
+el('mobile').addEventListener('blur', function () {
   const v = this.value.trim();
   if (!v) return;
-  if (!/^[6-9]\d{9}$/.test(v)) setError('mobile','Must be 10 digits starting with 6, 7, 8 or 9.');
-  else setError('mobile','');
+  if (!/^[6-9]\d{9}$/.test(v)) setError('mobile', 'Must be 10 digits starting with 6, 7, 8 or 9.');
+  else setError('mobile', '');
 });
 
 /* ================================================================
    11. PINCODE
 ================================================================ */
-el('pincode').addEventListener('input', function() { this.value = this.value.replace(/\D/g,'').slice(0,6); });
+el('pincode').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 6); });
 
 /* ================================================================
    12. AADHAAR MASK
 ================================================================ */
 const aadhaarEl = el('aadhaar');
-aadhaarEl.addEventListener('input', function() {
-  const digits = this.value.replace(/\D/g,'').slice(0,12);
+aadhaarEl.addEventListener('input', function () {
+  const digits = this.value.replace(/\D/g, '').slice(0, 12);
   this.dataset.raw = digits;
-  this.value = digits.replace(/(\d{4})(?=\d)/g,'$1 ').trim();
+  this.value = digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
 });
-aadhaarEl.addEventListener('blur', function() {
+aadhaarEl.addEventListener('blur', function () {
   const raw = this.dataset.raw || '';
   if (raw.length === 12) this.value = 'XXXX XXXX ' + raw.slice(8);
 });
-aadhaarEl.addEventListener('focus', function() {
+aadhaarEl.addEventListener('focus', function () {
   const raw = this.dataset.raw || '';
-  if (raw) this.value = raw.replace(/(\d{4})(?=\d)/g,'$1 ').trim();
+  if (raw) this.value = raw.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
 });
 
 /* ================================================================
@@ -416,18 +416,18 @@ aadhaarEl.addEventListener('focus', function() {
 ================================================================ */
 const MAX_PHOTOS = 3, MAX_PHOTO_MB = 5;
 el('photo-drop-zone').addEventListener('click', () => el('photo-upload').click());
-el('photo-drop-zone').addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); el('photo-upload').click(); } });
+el('photo-drop-zone').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el('photo-upload').click(); } });
 el('photo-drop-zone').addEventListener('dragover', e => { e.preventDefault(); e.currentTarget.classList.add('drag-over'); });
 el('photo-drop-zone').addEventListener('dragleave', e => e.currentTarget.classList.remove('drag-over'));
 el('photo-drop-zone').addEventListener('drop', e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); handlePhotoFiles(e.dataTransfer.files); });
-el('photo-upload').addEventListener('change', function() { handlePhotoFiles(this.files); this.value = ''; });
+el('photo-upload').addEventListener('change', function () { handlePhotoFiles(this.files); this.value = ''; });
 
 function handlePhotoFiles(files) {
   const errEl = el('photo-err');
-  const msgs  = [];
+  const msgs = [];
   Array.from(files).forEach(file => {
     if (uploadedPhotos.length >= MAX_PHOTOS) { msgs.push(`Max ${MAX_PHOTOS} photos allowed.`); return; }
-    if (!['image/jpeg','image/png'].includes(file.type)) { msgs.push(`"${file.name}" must be JPG or PNG.`); return; }
+    if (!['image/jpeg', 'image/png'].includes(file.type)) { msgs.push(`"${file.name}" must be JPG or PNG.`); return; }
     if (file.size > MAX_PHOTO_MB * 1024 * 1024) { msgs.push(`"${file.name}" exceeds ${MAX_PHOTO_MB}MB.`); return; }
     uploadedPhotos.push(file);
     addPhotoPreview(file, uploadedPhotos.length - 1);
@@ -446,8 +446,8 @@ function addPhotoPreview(file, index) {
     img.alt = 'Photo ' + (index + 1);
     const btn = document.createElement('button');
     btn.type = 'button'; btn.className = 'remove-btn'; btn.innerHTML = '&times;';
-    btn.setAttribute('aria-label','Remove photo');
-    btn.addEventListener('click', () => { uploadedPhotos.splice(index,1); wrap.remove(); el('photo-err').textContent=''; });
+    btn.setAttribute('aria-label', 'Remove photo');
+    btn.addEventListener('click', () => { uploadedPhotos.splice(index, 1); wrap.remove(); el('photo-err').textContent = ''; });
     wrap.appendChild(img); wrap.appendChild(btn);
     el('image-previews').appendChild(wrap);
   };
@@ -459,14 +459,14 @@ function addPhotoPreview(file, index) {
 ================================================================ */
 const MAX_VIDEO_MB = 50;
 el('video-drop-zone').addEventListener('click', () => el('video-upload').click());
-el('video-drop-zone').addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); el('video-upload').click(); } });
+el('video-drop-zone').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el('video-upload').click(); } });
 el('video-drop-zone').addEventListener('dragover', e => { e.preventDefault(); e.currentTarget.classList.add('drag-over'); });
 el('video-drop-zone').addEventListener('dragleave', e => e.currentTarget.classList.remove('drag-over'));
 el('video-drop-zone').addEventListener('drop', e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if (e.dataTransfer.files[0]) processVideoFile(e.dataTransfer.files[0]); });
-el('video-upload').addEventListener('change', function() { if (this.files[0]) processVideoFile(this.files[0]); });
+el('video-upload').addEventListener('change', function () { if (this.files[0]) processVideoFile(this.files[0]); });
 
 function processVideoFile(file) {
-  const errEl  = el('video-err');
+  const errEl = el('video-err');
   const nameEl = el('video-name-display');
   errEl.textContent = '';
   if (file.size > MAX_VIDEO_MB * 1024 * 1024) {
@@ -487,39 +487,39 @@ function buildReview() {
   if (!grid) return;
   grid.innerHTML = '';
 
-  const aEl      = el('aadhaar');
-  const aRaw     = aEl.dataset.raw || '';
+  const aEl = el('aadhaar');
+  const aRaw = aEl.dataset.raw || '';
   const aDisplay = aRaw.length === 12 ? 'XXXX XXXX ' + aRaw.slice(8) : (aRaw ? aEl.value : '— Not provided');
-  const stateEl  = el('state');
-  const stateName= stateEl.selectedIndex > 0 ? stateEl.options[stateEl.selectedIndex].text : '—';
-  const catEl    = el('category');
-  const catName  = catEl.selectedIndex > 0 ? catEl.options[catEl.selectedIndex].text : '—';
-  const dateRaw  = el('incident-date').value;
-  const dateFmt  = dateRaw ? new Date(dateRaw+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) : '—';
-  const uEl      = document.querySelector('input[name="stillUnresolved"]:checked');
-  const rEl      = document.querySelector('input[name="reportedBefore"]:checked');
+  const stateEl = el('state');
+  const stateName = stateEl.selectedIndex > 0 ? stateEl.options[stateEl.selectedIndex].text : '—';
+  const catEl = el('category');
+  const catName = catEl.selectedIndex > 0 ? catEl.options[catEl.selectedIndex].text : '—';
+  const dateRaw = el('incident-date').value;
+  const dateFmt = dateRaw ? new Date(dateRaw + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) : '—';
+  const uEl = document.querySelector('input[name="stillUnresolved"]:checked');
+  const rEl = document.querySelector('input[name="reportedBefore"]:checked');
 
   const pairs = [
-    ['Full Name',       el('full-name').value.trim()||'—'],
-    ['Mobile Number',   '+91 '+(el('mobile').value.trim()||'—')],
-    ['Email',           el('email').value.trim()||'— Not provided'],
-    ['Aadhaar',         aDisplay],
-    ['State',           stateName],
-    ['District',        el('district').value||'—'],
-    ['City / Town',     el('city').value.trim()||'—'],
-    ['Pincode',         el('pincode').value.trim()||'—'],
-    ['Locality',        el('locality').value.trim()||'—'],
-    ['Landmark',        el('landmark').value.trim()||'— Not provided'],
-    ['Category',        catName],
-    ['Department',      el('department').value||'—'],
-    ['Date of Incident',dateFmt],
-    ['Still Unresolved?', uEl?(uEl.value==='yes'?'Yes':'No'):'—'],
-    ['Reported Before?',  rEl?(rEl.value==='yes'?'Yes':'No'):'—'],
-    ['Photos Attached', uploadedPhotos.length>0 ? uploadedPhotos.length+' photo(s)' : 'None'],
+    ['Full Name', el('full-name').value.trim() || '—'],
+    ['Mobile Number', '+91 ' + (el('mobile').value.trim() || '—')],
+    ['Email', el('email').value.trim() || '— Not provided'],
+    ['Aadhaar', aDisplay],
+    ['State', stateName],
+    ['District', el('district').value || '—'],
+    ['City / Town', el('city').value.trim() || '—'],
+    ['Pincode', el('pincode').value.trim() || '—'],
+    ['Locality', el('locality').value.trim() || '—'],
+    ['Landmark', el('landmark').value.trim() || '— Not provided'],
+    ['Category', catName],
+    ['Department', el('department').value || '—'],
+    ['Date of Incident', dateFmt],
+    ['Still Unresolved?', uEl ? (uEl.value === 'yes' ? 'Yes' : 'No') : '—'],
+    ['Reported Before?', rEl ? (rEl.value === 'yes' ? 'Yes' : 'No') : '—'],
+    ['Photos Attached', uploadedPhotos.length > 0 ? uploadedPhotos.length + ' photo(s)' : 'None'],
   ];
   const fullSpan = [
-    ['Grievance Title', el('title').value.trim()||'—'],
-    ['Description',     el('description').value.trim()||'—'],
+    ['Grievance Title', el('title').value.trim() || '—'],
+    ['Description', el('description').value.trim() || '—'],
   ];
   pairs.forEach(p => addReviewItem(grid, p[0], p[1], false));
   fullSpan.forEach(p => addReviewItem(grid, p[0], p[1], true));
@@ -546,7 +546,7 @@ el('consent-contact').addEventListener('change', checkConsent);
 /* ================================================================
    17. FORM SUBMIT → FIREBASE
 ================================================================ */
-el('grievance-form').addEventListener('submit', async function(e) {
+el('grievance-form').addEventListener('submit', async function (e) {
   e.preventDefault();
   const errors = validateStep4();
   if (errors.length > 0) { showErrorBanner(4, errors); return; }
@@ -575,36 +575,36 @@ el('grievance-form').addEventListener('submit', async function(e) {
 });
 
 async function submitToFirebase(btn, spinnerSVG) {
-  const now       = new Date();
+  const now = new Date();
   const stateCode = el('state').value || 'XX';
-  const catVal    = el('category').value || 'other';
-  const catCode   = catVal.slice(0,3).toUpperCase();
-  const rnd       = Math.floor(10000000 + Math.random() * 90000000);
-  const refId     = `PGMS/${now.getFullYear()}/${stateCode}/${catCode}/${rnd}`;
+  const catVal = el('category').value || 'other';
+  const catCode = catVal.slice(0, 3).toUpperCase();
+  const rnd = Math.floor(10000000 + Math.random() * 90000000);
+  const refId = `PGMS/${now.getFullYear()}/${stateCode}/${catCode}/${rnd}`;
 
-  const stateEl   = el('state');
+  const stateEl = el('state');
   const stateName = stateEl.selectedIndex > 0 ? stateEl.options[stateEl.selectedIndex].text : stateCode;
-  const catEl     = el('category');
-  const catName   = catEl.selectedIndex > 0 ? catEl.options[catEl.selectedIndex].text : catVal;
+  const catEl = el('category');
+  const catName = catEl.selectedIndex > 0 ? catEl.options[catEl.selectedIndex].text : catVal;
 
-  const title           = el('title').value.trim();
-  const description     = el('description').value.trim();
-  const mobile          = '+91 ' + el('mobile').value.trim();
-  const uEl             = document.querySelector('input[name="stillUnresolved"]:checked');
-  const rEl             = document.querySelector('input[name="reportedBefore"]:checked');
+  const title = el('title').value.trim();
+  const description = el('description').value.trim();
+  const mobile = '+91 ' + el('mobile').value.trim();
+  const uEl = document.querySelector('input[name="stillUnresolved"]:checked');
+  const rEl = document.querySelector('input[name="reportedBefore"]:checked');
   const stillUnresolved = uEl ? (uEl.value === 'yes' ? 'Yes' : 'No') : 'Unknown';
-  const reportedBefore  = rEl ? (rEl.value === 'yes' ? 'Yes' : 'No') : 'Unknown';
+  const reportedBefore = rEl ? (rEl.value === 'yes' ? 'Yes' : 'No') : 'Unknown';
 
   // ── COUNT HOW MANY TIMES THIS MOBILE NUMBER HAS REPORTED THIS CATEGORY BEFORE ──
   // This gives AI the "times reported" signal to escalate repeat complaints
   let timesReported = 0;
   try {
     const prevSnap = await window.db.collection('complaints')
-      .where('mobile',   '==', mobile)
+      .where('mobile', '==', mobile)
       .where('category', '==', catVal)
       .get();
     timesReported = prevSnap.size; // existing docs before this one
-  } catch(e) {
+  } catch (e) {
     // non-fatal — AI will still work, just without repeat count
     console.warn('Could not fetch repeat count:', e.message);
   }
@@ -615,52 +615,53 @@ async function submitToFirebase(btn, spinnerSVG) {
   );
 
   const complaint = {
-    id:              refId,
-    submittedAt:     now.toISOString(),
-    status:          'Pending',
-    priority:        priority,
-    priorityReason:  priorityReason,
-    prioritySetBy:   prioritySetBy,
-    timesReported:   timesReported,
-    fullName:        el('full-name').value.trim(),
-    mobile:          mobile,
-    email:           el('email').value.trim() || '—',
-    state:           stateName,
-    stateCode:       stateCode,
-    district:        el('district').value || '—',
-    city:            el('city').value.trim(),
-    pincode:         el('pincode').value.trim(),
-    locality:        el('locality').value.trim(),
-    landmark:        el('landmark').value.trim() || '—',
-    category:        catVal,
-    categoryName:    catName,
-    department:      el('department').value || '—',
-    title:           title,
-    description:     description,
-    incidentDate:    el('incident-date').value,
+    id: refId,
+    aadhaar: el('aadhaar').dataset.raw || el('aadhaar').value.replace(/[\sX]/gi, ''),
+    submittedAt: now.toISOString(),
+    status: 'Pending',
+    priority: priority,
+    priorityReason: priorityReason,
+    prioritySetBy: prioritySetBy,
+    timesReported: timesReported,
+    fullName: el('full-name').value.trim(),
+    mobile: mobile,
+    email: el('email').value.trim() || '—',
+    state: stateName,
+    stateCode: stateCode,
+    district: el('district').value || '—',
+    city: el('city').value.trim(),
+    pincode: el('pincode').value.trim(),
+    locality: el('locality').value.trim(),
+    landmark: el('landmark').value.trim() || '—',
+    category: catVal,
+    categoryName: catName,
+    department: el('department').value || '—',
+    title: title,
+    description: description,
+    incidentDate: el('incident-date').value,
     stillUnresolved: stillUnresolved,
-    reportedBefore:  reportedBefore,
-    photoCount:      uploadedPhotos.length,
+    reportedBefore: reportedBefore,
+    photoCount: uploadedPhotos.length,
   };
 
-  const docId = refId.replace(/\//g,'_');
+  const docId = refId.replace(/\//g, '_');
   await window.db.collection('complaints').doc(docId).set(complaint);
 
   // ── SILENT AI ASSIGNMENT (runs in background, never shown to citizen) ──
   try {
     console.log('[ASSIGN] Calling /api/assign for', refId);
     const assignRes = await fetch('/api/assign', {
-      method:  'POST',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        complaintId:  refId,
-        category:     catVal,
+        complaintId: refId,
+        category: catVal,
         categoryName: catName,
         title,
         description,
-        priority:     complaint.priority,
-        district:     complaint.district,
-        state:        complaint.state,
+        priority: complaint.priority,
+        district: complaint.district,
+        state: complaint.state,
       }),
     });
     if (!assignRes.ok) throw new Error('Server returned ' + assignRes.status);
@@ -712,7 +713,7 @@ el('incident-date').setAttribute('max', new Date().toISOString().split('T')[0]);
 /* ================================================================
    20. INIT
 ================================================================ */
-(function() {
+(function () {
   for (let i = 1; i <= TOTAL_STEPS; i++) {
     const sec = el('form-step-' + i);
     if (sec) sec.style.display = (i === 1) ? 'block' : 'none';

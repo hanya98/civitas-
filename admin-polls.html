@@ -10,6 +10,9 @@
         rel="stylesheet" />
     <link rel="stylesheet" href="style2.css" />
     <link rel="stylesheet" href="admin-polls.css" />
+    <link rel="stylesheet" href="admin.css" />
+    <script src="auth.js"></script>
+
 
     <!-- ═══ FIREBASE SDK v9 COMPAT ═══ -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -65,8 +68,8 @@
                 <option>English</option>
                 <option>हिन्दी</option>
             </select>
-            <a href="citizen-profile.html" class="login-btn citizen">Login as Citizen</a>
-            <a href="admin.html" class="login-btn admin">Login as Admin</a>
+            <a href="#" class="login-btn admin"
+                onclick="Auth.adminLogout(); window.location.href='index.html'; return false;">Logout</a>
         </div>
     </nav>
     <div class="tricolor-bar">
@@ -78,24 +81,26 @@
     <!-- ── HEADER ── -->
     <div id="app-header">
         <div class="header-inner">
-            <div class="header-left">
-                <span class="header-icon">📊</span>
-                <div>
-                    <div class="header-sub">Government of India</div>
-                    <div class="header-title">PGMS 2.0 — Poll Management</div>
-                </div>
-            </div>
-            <div class="header-right">
-                <span class="admin-badge">Admin Panel</span>
-                <a href="admin.html" class="nav-link">← Back to Dashboard</a>
-            </div>
-        </div>
-        <div class="tricolour">
-            <div style="background:#FF6200"></div>
-            <div style="background:#fff"></div>
-            <div style="background:#006937"></div>
+            <button class="refresh-btn" style="margin-right: 15px;" onclick="window.location.href='admin.html'">
+                Complaints
+            </button>
+
+            <button class="refresh-btn" style="margin-right: 15px;" onclick="window.location.href='admin-profile.html'">
+                👤 Officer Profiles
+            </button>
+
+            <button class="refresh-btn" id="refresh-btn">
+                ⟳ Refresh
+            </button>
+
+            <button class="refresh-btn" id="backfill-btn"
+                style="background:rgba(255,164,0,0.2);border-color:rgba(255,164,0,0.4)"
+                title="Assign AI officers to all complaints that have no assignments yet">
+                ⚡ Assign Unassigned
+            </button>
         </div>
     </div>
+
 
     <!-- ── MAIN ── -->
     <div id="main">

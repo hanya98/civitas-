@@ -3,7 +3,7 @@
  */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
-import { getFirestore, collection, addDoc, getDocs, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, query, where, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyARUCovi6he0lYE6pikBB_doz72Nae2-h0",
@@ -52,6 +52,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let livePolls = [];
 
+    // Fetch User Pincode from Firebase based on Aadhaar
+    async function fetchUserPincode() {
+        const aadhaar = localStorage.getItem('Aadhaar');
+        if (!aadhaar) return;
+
+        try {
+            // Find the most recent complaint by this citizen to get their pincode
+            const q = query(
+                collection(db, "complaints"),
+                where("aadhaar", "==", aadhaar),
+                orderBy("submittedAt", "desc"),
+                limit(1)
+            );
+            const snapshot = await getDocs(q);
+
+            if (!snapshot.empty) {
+                const latestComplaint = snapshot.docs[0].data();
+                const userPincode = latestComplaint.pincode;
+                if (userPincode && searchInput) {
+                    searchInput.value = userPincode;
+                    const statusEl = document.getElementById('pincode-fetch-status');
+                    if (statusEl) statusEl.style.display = 'block';
+                    console.log("Auto-fetched pincode from Firebase:", userPincode);
+                    // Initial render with the fetched pincode
+                    renderPolls(userPincode);
+                } else {
+                    renderPolls("");
+                }
+            } else {
+                console.log("No previous complaints found for this Aadhaar. Defaulting to all polls.");
+                renderPolls("");
+            }
+        } catch (err) {
+            console.error("Error fetching user pincode:", err);
+            renderPolls("");
+        }
+    }
+
     // Fetch Polls from Firestore
     async function fetchPolls() {
         if (!pollsContainer) return;
@@ -69,8 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Sort by newest first
             livePolls.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
 
-            // Initial render
-            renderPolls("");
+            // Initial render - fetch user pincode first
+            await fetchUserPincode();
         } catch (err) {
             console.error("Error fetching polls:", err);
             pollsContainer.innerHTML = `<p style="padding: 20px; text-align: center; color: #ef4444;">Failed to load polls. Please try again later.</p>`;
