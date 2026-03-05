@@ -11,52 +11,51 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Serif:wght@600;700&display=swap"
         rel="stylesheet" />
+    <link rel="stylesheet" href="style2.css" />
     <link rel="stylesheet" href="citizen.css" />
     <link rel="stylesheet" href="survey.css" />
 </head>
 
 <body>
-    <!-- HEADER -->
-    <header class="site-header" role="banner">
-        <div class="header-inner">
-            <div class="header-emblem" aria-hidden="true">
-                <svg width="52" height="52" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="28" cy="28" r="26" stroke="#1a3a6b" stroke-width="2.5" />
-                    <circle cx="28" cy="28" r="10" stroke="#1a3a6b" stroke-width="2" />
-                    <circle cx="28" cy="28" r="3" fill="#1a3a6b" />
-                    <g stroke="#1a3a6b" stroke-width="1.2">
-                        <line x1="28" y1="18" x2="28" y2="2" />
-                        <line x1="28" y1="38" x2="28" y2="54" />
-                        <line x1="18" y1="28" x2="2" y2="28" />
-                        <line x1="38" y1="28" x2="54" y2="28" />
-                        <line x1="21.17" y1="21.17" x2="9.51" y2="9.51" />
-                        <line x1="34.83" y1="34.83" x2="46.49" y2="46.49" />
-                        <line x1="34.83" y1="21.17" x2="46.49" y2="9.51" />
-                        <line x1="21.17" y1="34.83" x2="9.51" y2="46.49" />
-                        <line x1="24.52" y1="18.43" x2="20.52" y2="3.06" />
-                        <line x1="31.48" y1="37.57" x2="35.48" y2="52.94" />
-                        <line x1="18.43" y1="24.52" x2="3.06" y2="20.52" />
-                        <line x1="37.57" y1="31.48" x2="52.94" y2="35.48" />
-                        <line x1="18.43" y1="31.48" x2="3.06" y2="35.48" />
-                        <line x1="37.57" y1="24.52" x2="52.94" y2="20.52" />
-                        <line x1="24.52" y1="37.57" x2="20.52" y2="52.94" />
-                        <line x1="31.48" y1="18.43" x2="35.48" y2="3.06" />
-                    </g>
-                </svg>
+    <!-- ── CIVITAS NAVBAR ── -->
+    <nav class="navbar">
+        <ul class="nav-right">
+            <li><a href="index2.html">Home</a></li>
+            <li class="dropdown">
+                <a href="services.html" class="dropbtn">Services</a>
+                <div class="dropdown-content">
+                    <a href="citizen.html">Complaint Registration</a>
+                    <a href="tracking.html">Complaint Status</a>
+                    <a href="happiness.html">Happiness Index Feedback</a>
+                    <a href="development.html">Development Near Me</a>
+                    <a href="#">RTI</a>
+                </div>
+            </li>
+            <li><a href="https://newsroom-seedtosuccess.onrender.com/">Newsroom</a></li>
+            <li><a href="#">Contact</a></li>
+            <div class="nav-center">
+                <div class="logo">CIVITAS</div>
             </div>
-            <div class="header-titles">
-                <p class="header-sup">भारत सरकार | Government of India</p>
-                <h1 class="header-main">Citizen Grievance Redressal Portal</h1>
-                <p class="header-sub">Public Grievance Management System &mdash; PGMS 2.0</p>
+            <div class="tricolor-bar">
+                <span class="stripe saffron"></span>
+                <span class="stripe white"></span>
+                <span class="stripe green"></span>
             </div>
-            <div class="header-badge" aria-label="Official Government Website">
-                <span class="badge-dot"></span>Official
-            </div>
+        </ul>
+        <div class="nav-left">
+            <select class="language-switch">
+                <option>English</option>
+                <option>हिन्दी</option>
+            </select>
+            <a href="citizen-profile.html" class="login-btn citizen">Login as Citizen</a>
+            <a href="admin.html" class="login-btn admin">Login as Admin</a>
         </div>
-        <div class="tricolour" aria-hidden="true">
-            <span class="tc-orange"></span><span class="tc-white"></span><span class="tc-green"></span>
-        </div>
-    </header>
+    </nav>
+    <div class="tricolor-bar">
+        <span class="stripe saffron"></span>
+        <span class="stripe white"></span>
+        <span class="stripe green"></span>
+    </div>
 
     <!-- MAIN CONTENT -->
     <main class="main-content" id="main">
@@ -263,6 +262,17 @@
 
     <!-- TOAST NOTIFICATION -->
     <div id="toast"></div>
+
+    <script>
+        // --- GUARD FOR SURVEY PAGE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const aadhaar = localStorage.getItem('Aadhaar') || sessionStorage.getItem('citizen_mobile');
+            if (!aadhaar || !/^\d{12}$/.test(aadhaar)) {
+                alert("Please login with your 12-digit Aadhaar number to participate in surveys.");
+                window.location.href = 'citizen-profile.html';
+            }
+        });
+    </script>
 
     <!-- FOOTER -->
     <footer class="site-footer" role="contentinfo">

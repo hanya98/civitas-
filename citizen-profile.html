@@ -4,20 +4,17 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Citizen Profile | PGMS 2.0</title>
+    <title>Citizen Portal | CIVITAS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
         href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Serif:wght@600;700&display=swap"
         rel="stylesheet" />
+    <link rel="stylesheet" href="style2.css" />
     <link rel="stylesheet" href="citizen-profile.css" />
 
     <!-- ═══ FIREBASE SDK v9 COMPAT ═══ -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-    <!-- ═══════════════════════════════════════════════════════════
-       🔧 FIREBASE CONFIGURATION
-  ════════════════════════════════════════════════════════════ -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyARUCovi6he0lYE6pikBB_doz72Nae2-h0",
@@ -31,141 +28,324 @@
         firebase.initializeApp(firebaseConfig);
         window.db = firebase.firestore();
     </script>
+
+    <style>
+        /* ── HUB PAGE STYLES ── */
+        .hub-hero {
+            background: linear-gradient(135deg, #1a3a6b 0%, #0f2347 100%);
+            color: white;
+            padding: 60px 8%;
+            text-align: center;
+        }
+
+        .hub-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .hub-hero p {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            max-width: 600px;
+            margin: 0 auto 32px;
+        }
+
+        .hub-hero .mobile-login-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hub-hero .mobile-login-row input {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            width: 260px;
+            outline: none;
+        }
+
+        .hub-hero .mobile-login-row button {
+            padding: 12px 28px;
+            background: #FF6200;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .hub-hero .mobile-login-row button:hover {
+            background: #d95200;
+        }
+
+        .hub-greeting {
+            font-size: 1rem;
+            opacity: 0.75;
+            margin-top: 16px;
+        }
+
+        .hub-greeting span {
+            font-weight: 700;
+            color: #fbbf24;
+        }
+
+        /* ── Services grid ── */
+        .services-hub {
+            padding: 64px 8%;
+            background: #f4f6f8;
+        }
+
+        .services-hub-title {
+            text-align: center;
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #1a3a6b;
+            margin-bottom: 8px;
+        }
+
+        .services-hub-sub {
+            text-align: center;
+            color: #5e6b7c;
+            margin-bottom: 48px;
+            font-size: 1.05rem;
+        }
+
+        .services-hub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 28px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .service-hub-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 28px;
+            box-shadow: 0 4px 16px rgba(26, 58, 107, 0.08);
+            border: 1px solid #e2e8f0;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .service-hub-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(26, 58, 107, 0.14);
+            border-color: #1a3a6b;
+        }
+
+        .card-icon-wrap {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .service-hub-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1d2b3a;
+        }
+
+        .service-hub-card p {
+            font-size: 0.92rem;
+            color: #5e6b7c;
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .card-arrow {
+            color: #1a3a6b;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-arrow::after {
+            content: '→';
+        }
+
+        /* ── Quick stats strip ── */
+        .quick-strip {
+            background: #1a3a6b;
+            color: white;
+            padding: 32px 8%;
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            flex-wrap: wrap;
+        }
+
+        .quick-stat {
+            text-align: center;
+        }
+
+        .quick-stat .number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .quick-stat .label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- ============================================================
-       SITE HEADER
-  ============================================================ -->
-    <header class="site-header" role="banner">
-        <div class="header-inner">
-            <div class="header-emblem" aria-hidden="true">
-                <svg width="52" height="52" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="28" cy="28" r="26" stroke="#1a3a6b" stroke-width="2.5" />
-                    <circle cx="28" cy="28" r="10" stroke="#1a3a6b" stroke-width="2" />
-                    <circle cx="28" cy="28" r="3" fill="#1a3a6b" />
-                    <g stroke="#1a3a6b" stroke-width="1.2">
-                        <line x1="28" y1="18" x2="28" y2="2" />
-                        <line x1="28" y1="38" x2="28" y2="54" />
-                        <line x1="18" y1="28" x2="2" y2="28" />
-                        <line x1="38" y1="28" x2="54" y2="28" />
-                        <line x1="21.17" y1="21.17" x2="9.51" y2="9.51" />
-                        <line x1="34.83" y1="34.83" x2="46.49" y2="46.49" />
-                        <line x1="34.83" y1="21.17" x2="46.49" y2="9.51" />
-                        <line x1="21.17" y1="34.83" x2="9.51" y2="46.49" />
-                        <line x1="24.52" y1="18.43" x2="20.52" y2="3.06" />
-                        <line x1="31.48" y1="37.57" x2="35.48" y2="52.94" />
-                        <line x1="18.43" y1="24.52" x2="3.06" y2="20.52" />
-                        <line x1="37.57" y1="31.48" x2="52.94" y2="35.48" />
-                        <line x1="18.43" y1="31.48" x2="3.06" y2="35.48" />
-                        <line x1="37.57" y1="24.52" x2="52.94" y2="20.52" />
-                        <line x1="24.52" y1="37.57" x2="20.52" y2="52.94" />
-                        <line x1="31.48" y1="18.43" x2="35.48" y2="3.06" />
-                    </g>
-                </svg>
+    <!-- ── CIVITAS NAVBAR ── -->
+    <nav class="navbar">
+        <ul class="nav-right">
+            <li><a href="index2.html">Home</a></li>
+            <li class="dropdown">
+                <a href="services.html" class="dropbtn">Services</a>
+                <div class="dropdown-content">
+                    <a href="citizen.html">Complaint Registration</a>
+                    <a href="tracking.html">Complaint Status</a>
+                    <a href="survey.html">Happiness Index Feedback</a>
+                    <a href="development.html">Development Near Me</a>
+                    <a href="#">RTI</a>
+                </div>
+            </li>
+            <li><a href="https://newsroom-seedtosuccess.onrender.com/">Newsroom</a></li>
+            <li><a href="#site-footer">Contact</a></li>
+            <div class="nav-center">
+                <div class="logo">CIVITAS</div>
             </div>
-            <div class="header-titles">
-                <p class="header-sup">भारत सरकार | Government of India</p>
-                <h1 class="header-main">Citizen Grievance Redressal Portal</h1>
-                <p class="header-sub">Public Grievance Management System &mdash; PGMS 2.0</p>
+            <div class="tricolor-bar">
+                <span class="stripe saffron"></span>
+                <span class="stripe white"></span>
+                <span class="stripe green"></span>
             </div>
-            <div class="header-badge" aria-label="Official Government Website">
-                <span class="badge-dot"></span>Official
-            </div>
+        </ul>
+        <div class="nav-left">
+            <select class="language-switch">
+                <option>English</option>
+                <option>हिन्दी</option>
+            </select>
+            <a href="citizen-profile.html" class="login-btn citizen">Citizen Portal</a>
+            <a href="admin.html" class="login-btn admin">Admin Login</a>
         </div>
-        <div class="tricolour" aria-hidden="true">
-            <span class="tc-orange"></span><span class="tc-white"></span><span class="tc-green"></span>
+    </nav>
+    <div class="tricolor-bar">
+        <span class="stripe saffron"></span>
+        <span class="stripe white"></span>
+        <span class="stripe green"></span>
+    </div>
+
+    <!-- ── HERO / LOGIN ── -->
+    <div class="hub-hero">
+        <h1>🏛️ Citizen Services Portal</h1>
+        <p>Access all government services in one place — submit grievances, track issues, explore schemes, and
+            participate in your community.</p>
+        <div class="mobile-login-row">
+            <input type="text" id="mobile-input" placeholder="Enter 12-digit Aadhaar number" maxlength="12"
+                inputmode="numeric" />
+            <button id="login-btn" onclick="handleLogin()">Access My Profile</button>
         </div>
-    </header>
+        <p class="hub-greeting" id="greeting-text">Enter your Aadhaar number to view your submitted grievances &amp;
+            profile</p>
+    </div>
 
-    <!-- ============================================================
-       MAIN CONTENT
-  ============================================================ -->
-    <main class="main-content" id="main">
-        <div class="page-header">
-            <h2>My Citizen Profile</h2>
-            <p>Access your submitted grievances and profile information.</p>
+    <!-- ── QUICK STATS ── -->
+    <div class="quick-strip">
+        <div class="quick-stat">
+            <span class="number">1,24,000+</span>
+            <span class="label">Grievances Resolved</span>
         </div>
+        <div class="quick-stat">
+            <span class="number">98+</span>
+            <span class="label">Government Schemes Listed</span>
+        </div>
+        <div class="quick-stat">
+            <span class="number">30 Days</span>
+            <span class="label">Average Resolution Time</span>
+        </div>
+        <div class="quick-stat">
+            <span class="number">28 States</span>
+            <span class="label">Coverage Across India</span>
+        </div>
+    </div>
 
-        <!-- LOGIN SCREEN -->
-        <section class="login-section" id="login-section">
-            <div class="login-card">
-                <h3>View Your Profile</h3>
-                <p>Enter your 10-digit mobile number to view your past grievances and track their status.</p>
-                <form id="login-form">
-                    <div class="input-prefix-wrap">
-                        <span class="input-prefix">+91</span>
-                        <input type="tel" id="login-mobile" class="field-input has-prefix" placeholder="9XXXXXXXXX"
-                            maxlength="10" inputmode="numeric" required />
-                    </div>
-                    <span class="field-error" id="login-error"></span>
-                    <button type="submit" class="btn btn-primary" id="login-btn">
-                        Load Profile
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <polyline points="9 18 15 12 9 6" />
-                        </svg>
-                    </button>
-                </form>
-            </div>
-        </section>
+    <!-- ── SERVICES HUB GRID ── -->
+    <section class="services-hub">
+        <h2 class="services-hub-title">All Citizen Services</h2>
+        <p class="services-hub-sub">Select a service to get started</p>
 
-        <!-- DASHBOARD SCREEN -->
-        <section class="dashboard-section hidden" id="dashboard-section">
-            <div class="profile-header">
-                <div class="profile-avatar">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                </div>
-                <div class="profile-info">
-                    <h3 id="profile-name">Citizen User</h3>
-                    <p id="profile-mobile" class="mobile-badge">+91 —</p>
-                </div>
-                <button class="btn btn-secondary logout-btn" id="logout-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    Sign Out
-                </button>
-            </div>
+        <div class="services-hub-grid">
 
-            <div class="dashboard-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-total">0</div>
-                    <div class="stat-label">Total Grievances</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-pending">0</div>
-                    <div class="stat-label">Pending / In Review</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-resolved">0</div>
-                    <div class="stat-label">Resolved</div>
-                </div>
-            </div>
+            <a href="citizen.html" class="service-hub-card">
+                <div class="card-icon-wrap" style="background:#e8eef8;">📝</div>
+                <h3>Submit a Grievance</h3>
+                <p>Register a complaint about public services, infrastructure, sanitation, electricity, or any civic
+                    issue. Track it in real-time.</p>
+                <span class="card-arrow">Register Now</span>
+            </a>
 
-            <div class="grievance-history">
-                <h3>Grievance History</h3>
-                <div class="history-list" id="history-list">
-                    <div class="loading-state">
-                        <div class="spinner"></div>
-                        <p>Loading your grievances...</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+            <a href="tracking.html" class="service-hub-card">
+                <div class="card-icon-wrap" style="background:#e6f4ed;">🔍</div>
+                <h3>Track Complaint Status</h3>
+                <p>Check the current status of your submitted complaints, view updates from the assigned officer, and
+                    see resolution timelines.</p>
+                <span class="card-arrow">Track Now</span>
+            </a>
 
-    </main>
+            <a href="development.html" class="service-hub-card">
+                <div class="card-icon-wrap" style="background:#fff3ec;">🏗️</div>
+                <h3>Development Near Me</h3>
+                <p>View ongoing construction, infrastructure, and government development projects happening near your
+                    location on a live map.</p>
+                <span class="card-arrow">Explore Map</span>
+            </a>
+
+            <a href="schemes.html" class="service-hub-card">
+                <div class="card-icon-wrap" style="background:#f0e8f8;">📋</div>
+                <h3>Policies &amp; Schemes</h3>
+                <p>Discover government welfare schemes and local policies you may be eligible for – filtered by age,
+                    income, and occupation.</p>
+                <span class="card-arrow">Browse Schemes</span>
+            </a>
+
+            <a href="survey.html" class="service-hub-card">
+                <div class="card-icon-wrap" style="background:#fef3c7;">📊</div>
+                <h3>Surveys &amp; Polls</h3>
+                <p>Participate in community polls on local governance topics and provide suggestions to help authorities
+                    make better decisions.</p>
+                <span class="card-arrow">Vote &amp; Suggest</span>
+            </a>
+
+            <a href="survey.html#panel-feedback" class="service-hub-card">
+                <div class="card-icon-wrap" style="background:#fdf2f2;">😊</div>
+                <h3>Happiness Index</h3>
+                <p>Rate public services in your area and share your overall satisfaction score to help the government
+                    improve quality of life.</p>
+                <span class="card-arrow">Share Feedback</span>
+            </a>
+
+        </div>
+    </section>
 
     <!-- FOOTER -->
-    <footer class="site-footer" role="contentinfo">
+    <footer class="site-footer" id="site-footer" role="contentinfo">
         <div class="footer-inner">
             <div class="footer-col">
                 <p class="footer-title">Citizen Grievance Redressal Portal</p>
@@ -177,20 +357,42 @@
                 <p>Mon–Sat: 9:00 AM – 6:00 PM</p>
             </div>
             <div class="footer-col">
-                <p class="footer-title">Links</p>
+                <p class="footer-title">Quick Links</p>
                 <ul class="footer-links">
-                    <li><a href="citizen.html">Submit New Grievance</a></li>
-                    <li><a href="tracking.html">Track Grievance By ID</a></li>
-                    <li><a href="index.html">Home</a></li>
+                    <li><a href="citizen.html">Submit Grievance</a></li>
+                    <li><a href="my-complaints.html">My Complaints</a></li>
+                    <li><a href="schemes.html">Schemes &amp; Policies</a></li>
+                    <li><a href="index2.html">Home</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 Government of India. All Rights Reserved. | WCAG 2.1 AA compliant.</p>
+            <p>&copy; 2026 Civitas | Made by Team SeedtoScale</p>
         </div>
     </footer>
 
-    <script src="citizen-profile.js"></script>
+    <script>
+        function handleLogin() {
+            const aadhaar = document.getElementById('mobile-input').value.trim();
+            if (!/^\d{12}$/.test(aadhaar)) {
+                document.getElementById('greeting-text').innerHTML = '⚠ Please enter a valid 12-digit Aadhaar number.';
+                return;
+            }
+            // Store Aadhaar and redirect to My Complaints page
+            localStorage.setItem('Aadhaar', aadhaar);
+            sessionStorage.setItem('citizen_mobile', aadhaar); // Keep fallback if tracking page uses it
+            document.getElementById('greeting-text').innerHTML = 'Welcome back! Redirecting to your profile…';
+            setTimeout(() => {
+                window.location.href = 'my-complaints.html';
+            }, 1000);
+        }
+
+        // Allow Enter key on mobile input
+        document.getElementById('mobile-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') handleLogin();
+        });
+    </script>
+
 </body>
 
 </html>

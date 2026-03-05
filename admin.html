@@ -7,7 +7,11 @@
   <title>PGMS 2.0 — Admin Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style2.css" />
   <link rel="stylesheet" href="admin.css" />
+
+  <!-- Auth -->
+  <script src="auth.js"></script>
 
   <!-- ═══ FIREBASE SDK v9 COMPAT ═══ -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -38,6 +42,47 @@
 </head>
 
 <body>
+  <script>Auth.requireAdminLogin();</script>
+
+  <!-- ── CIVITAS NAVBAR ── -->
+  <nav class="navbar">
+    <ul class="nav-right">
+      <li><a href="index2.html">Home</a></li>
+      <li class="dropdown">
+        <a href="services.html" class="dropbtn">Services</a>
+        <div class="dropdown-content">
+          <a href="citizen.html">Complaint Registration</a>
+          <a href="tracking.html">Complaint Status</a>
+          <a href="happiness.html">Happiness Index Feedback</a>
+          <a href="development.html">Development Near Me</a>
+          <a href="#">RTI</a>
+        </div>
+      </li>
+      <li><a href="https://newsroom-seedtosuccess.onrender.com/">Newsroom</a></li>
+      <li><a href="#">Contact</a></li>
+      <div class="nav-center">
+        <div class="logo">CIVITAS</div>
+      </div>
+      <div class="tricolor-bar">
+        <span class="stripe saffron"></span>
+        <span class="stripe white"></span>
+        <span class="stripe green"></span>
+      </div>
+    </ul>
+    <div class="nav-left">
+      <select class="language-switch">
+        <option>English</option>
+        <option>हिन्दी</option>
+      </select>
+      <a href="citizen-profile.html" class="login-btn citizen">Login as Citizen</a>
+      <a href="admin.html" class="login-btn admin">Login as Admin</a>
+    </div>
+  </nav>
+  <div class="tricolor-bar">
+    <span class="stripe saffron"></span>
+    <span class="stripe white"></span>
+    <span class="stripe green"></span>
+  </div>
 
   <!-- ── HEADER ── -->
   <div id="app-header">
@@ -55,16 +100,12 @@
         </span>
         <span class="admin-badge">Admin Panel</span>
         <a href="admin-polls.html" class="nav-link" style="margin-right: 15px;">📊 Manage Polls</a>
+        <a href="admin-profile.html" class="nav-link" style="margin-right: 15px;">👤 Officer Profiles</a>
         <button class="refresh-btn" id="refresh-btn">⟳ Refresh</button>
         <button class="refresh-btn" id="backfill-btn"
           style="background:rgba(255,164,0,0.2);border-color:rgba(255,164,0,0.4)"
           title="Assign AI officers to all complaints that have no assignments yet">⚡ Assign Unassigned</button>
       </div>
-    </div>
-    <div class="tricolour">
-      <div style="background:#FF6200"></div>
-      <div style="background:#fff"></div>
-      <div style="background:#006937"></div>
     </div>
   </div>
 
