@@ -650,6 +650,110 @@ html, body {
     grid-template-columns: 1fr;
   }
 }
+
+
+.contact-section {
+    padding: 60px 10%;
+    background-color: #f9f9f9;
+}
+
+.contact-container {
+    display: flex;
+    gap: 50px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.contact-info {
+    flex: 1;
+    min-width: 300px;
+}
+
+.contact-info h2 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 25px;
+    gap: 15px;
+}
+
+.rti-highlight {
+    background: #fff8e1; 
+    padding: 15px;
+    border-left: 4px solid #ff9933;
+    border-radius: 4px;
+}
+
+.info-icon {
+    font-size: 1.5rem;
+    background: #fff;
+    padding: 10px;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.contact-form-container {
+    flex: 1;
+    min-width: 300px;
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.contact-form .form-group {
+    margin-bottom: 20px;
+}
+
+.contact-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
+}
+
+.contact-form input, 
+.contact-form select, 
+.contact-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.contact-form textarea {
+    resize: vertical;
+}
+
+.submit-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    width: 100%;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+    .contact-container {
+        flex-direction: column;
+    }
+}
 /* ── FOOTER ── */
 .site-footer { background: var(--primary); color: rgba(255,255,255,0.75); padding: var(--sp-xl) 0 0; margin-top: auto; }
 .footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 var(--sp-lg) var(--sp-xl); display: grid; grid-template-columns: 1fr; gap: var(--sp-xl); }
@@ -660,3 +764,4 @@ html, body {
 .footer-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.82rem; }
 .footer-links a:hover { color: #fff; text-decoration: underline; }
 .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding: var(--sp-md) var(--sp-lg); text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.5); }
+
