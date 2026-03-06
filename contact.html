@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Contact & RTI - Civitas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style2.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <ul class="nav-right">
+            <li><a href="index.html">Home</a></li>
+            <li class="dropdown">
+                <a href="services.html" class="dropbtn">Services</a>
+                <div class="dropdown-content">
+                    <a href="citizen.html">Complaint Registration</a>
+                    <a href="tracking.html">Complaint Status</a>
+                    <a href="happiness.html">Happiness Index Feedback</a>
+                    <a href="development.html">Development Near Me</a>
+                    <a href="#">RTI</a>
+                </div>
+            </li>
+            <li><a href="https://newsroom-seedtosuccess.onrender.com/">Newsroom</a></li>
+            <li><a href="contact.html">Contact</a></li>
+
+            <div class="nav-center">
+                <div class="logo">CIVITAS</div>
+            </div>
+
+            <div class="tricolor-bar">
+                <span class="stripe saffron"></span>
+                <span class="stripe white"></span>
+                <span class="stripe green"></span>
+            </div>
+        </ul>
+
+        <div class="nav-left">
+            <select class="language-switch">
+                <option>English</option>
+                <option>हिन्दी</option>
+            </select>
+            <a href="citizen-profile.html" class="login-btn citizen">Login as Citizen</a>
+            <a href="admin.html" class="login-btn admin">Login as Admin</a>
+        </div>
+    </nav>
+
+    <section class="services-hero">
+        <div class="services-hero-content">
+            <h1>Contact & RTI Services</h1>
+        </div>
+    </section>
+
+    <section class="contact-section">
+        <div class="contact-container">
+            <div class="contact-info">
+                <h2>Get in Touch</h2>
+                <p>Have questions or need to file a formal Information Request (RTI)? Use the channels below.</p>
+                
+                <div class="info-item">
+                    <div class="info-icon">📍</div>
+                    <div>
+                        <strong>Headquarters</strong>
+                        <p>Digital India Bhawan, CGO Complex, New Delhi - 110003</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon">📞</div>
+                    <div>
+                        <strong>Toll-Free Helpline</strong>
+                        <p>1800-111-555 (9 AM - 6 PM)</p>
+                    </div>
+                </div>
+
+                <div class="info-item rti-highlight">
+                    <div class="info-icon">⚖️</div>
+                    <div>
+                        <strong>RTI Cell</strong>
+                        <p>For formal requests under the RTI Act 2005, please select 'RTI Application' in the form or visit our nodal office.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-form-container">
+                <form class="contact-form">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Type of Inquiry</label>
+                        <select id="subject">
+                            <option value="tech">Technical Issue</option>
+                            <option value="feedback">General Feedback</option>
+                            <option value="rti">RTI Application / Inquiry</option>
+                            <option value="partner">Partnership Inquiry</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message / RTI Details</label>
+                        <textarea id="message" rows="5" placeholder="Please describe your request or RTI query in detail..." required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Submit Request</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-inner">
+            <div class="footer-col">
+                <p class="footer-title">Citizen Grievance Redressal Portal</p>
+                <p>A Government of India Initiative under the Right to Public Services Act</p>
+            </div>
+            <div class="footer-col">
+                <p class="footer-title">Helpline</p>
+                <p>Toll-Free: <strong>1800-111-555</strong></p>
+                <p>Mon–Sat: 9:00 AM – 6:00 PM</p>
+            </div>
+            <div class="footer-col">
+                <p class="footer-title">Links</p>
+                <ul class="footer-links">
+                    <li><a href="citizen.html">Register Grievance</a></li>
+                    <li><a href="services.html">FAQ</a></li>
+                    <li><a href="tracking.html">Track Raised Tickets</a></li>
+                    <li><a href="index.html">Home page</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Civitas | Made by Team SeedtoScale</p>
+        </div>
+    </footer>
+</body>
+
+</html>
