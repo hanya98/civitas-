@@ -29,36 +29,30 @@ recognition.onerror = () => {
 };
 
 function handleVoiceCommand(cmd) {
-    let targetId = null;
-    let instruction = "";
+    const isHindi = recognition.lang === 'hi-IN';
 
-    if (cmd.includes("about") || cmd.includes("civitas") || cmd.includes("who are you")) {
-        targetId = "about-gov"; // We need to add this ID to the section
-        instruction = "Civitas is a digital platform for grievance redressal and transparency.";
-    } 
-    else if (cmd.includes("complaint") || cmd.includes("register") || cmd.includes("grievance")) {
-        targetId = "services-dropdown"; // We will add an ID to the services link
-        instruction = "You can register complaints under the Services menu.";
-    }
-    else if (cmd.includes("news") || cmd.includes("what's new") || cmd.includes("update")) {
-        targetId = "whats-new-section"; 
-        instruction = "Here are the latest civic infrastructure updates.";
-    }
-    else if (cmd.includes("impact") || cmd.includes("work") || cmd.includes("result")) {
-        targetId = "impact-section";
-        instruction = "Explore our civic impact and infrastructure monitoring.";
-    }
-    else if (cmd.includes("login") || cmd.includes("admin") || cmd.includes("citizen")) {
-        targetId = "login-area";
-        instruction = "You can login as a Citizen or Admin in the top right.";
-    }
+    // 1. Define keyword to URL mapping
+    const routes = [
+        { keys: ["contact", "address", "phone", "reach", "संपर्क"], url: "contact.html", text: "Opening the contact page." },
+        { keys: ["home", "main", "start", "मुख्य"], url: "index.html", text: "Going back to home." },
+        { keys: ["service", "register", "complaint", "grievance", "शिकायत"], url: "citizen.html", text: "Redirecting to complaint registration." },
+        { keys: ["status", "track", "check", "स्थिति"], url: "tracking.html", text: "Opening complaint tracking." },
+        { keys: ["news", "update", "bulletin", "समाचार"], url: "https://newsroom-seedtosuccess.onrender.com/", text: "Opening the newsroom." },
+        { keys: ["happy", "feedback", "index", "खुशी"], url: "happiness.html", text: "Opening happiness index feedback." }
+    ];
 
-    // EXECUTE VISUAL HIGHLIGHT
-    if (targetId && document.getElementById(targetId)) {
-        showSpotlight(targetId, instruction);
-        speak(instruction);
+    // 2. Find matching route
+    let matched = routes.find(route => route.keys.some(k => cmd.includes(k)));
+
+    if (matched) {
+        speak(matched.text);
+        // Small delay to let the voice finish before the page changes
+        setTimeout(() => {
+            window.location.href = matched.url;
+        }, 1500);
     } else {
-        speak("I heard " + cmd + ". Try asking about 'Impact', 'News', or 'About Civitas'.");
+        const fallback = "I'm sorry, I couldn't find that page. Try saying 'Contact' or 'Services'.";
+        speak(fallback);
     }
 }
 
@@ -97,4 +91,5 @@ function speak(text) {
 
 window.onscroll = () => { 
     if(voiceOverlay) voiceOverlay.style.display = 'none'; 
+
 };
