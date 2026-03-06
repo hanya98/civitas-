@@ -31,7 +31,6 @@ recognition.onerror = () => {
 function handleVoiceCommand(cmd) {
     const isHindi = recognition.lang === 'hi-IN';
 
-    // 1. Define keyword to URL mapping
     const routes = [
         { keys: ["contact", "address", "phone", "reach", "संपर्क"], url: "contact.html", text: "Opening the contact page." },
         { keys: ["home", "main", "start", "मुख्य"], url: "index.html", text: "Going back to home." },
@@ -41,12 +40,10 @@ function handleVoiceCommand(cmd) {
         { keys: ["happy", "feedback", "index", "खुशी"], url: "happiness.html", text: "Opening happiness index feedback." }
     ];
 
-    // 2. Find matching route
     let matched = routes.find(route => route.keys.some(k => cmd.includes(k)));
 
     if (matched) {
         speak(matched.text);
-        // Small delay to let the voice finish before the page changes
         setTimeout(() => {
             window.location.href = matched.url;
         }, 1500);
@@ -93,3 +90,4 @@ window.onscroll = () => {
     if(voiceOverlay) voiceOverlay.style.display = 'none'; 
 
 };
+
