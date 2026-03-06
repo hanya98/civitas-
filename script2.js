@@ -66,3 +66,4 @@ gsap.utils.toArray(".impact-block").forEach((block) => {
     }
   );
 });
+
