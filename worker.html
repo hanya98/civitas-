@@ -728,56 +728,58 @@
             toast('✅ Attendance marked for today!');
         });
 
-        /* ── LOAD TASKS ── */
         function loadTasks() {
-            // Load from localStorage (manager.js saves here)
-            const stored = localStorage.getItem('civitas_tasks');
+            // Always try to load from localStorage first for immediate display (offline support)
+            const stored = localStorage.getItem('civitas_tasks_' + workerMobile);
             if (stored) {
-                allTasks = JSON.parse(stored).filter(t => t.workerMobile === workerMobile);
+                allTasks = JSON.parse(stored);
+                renderTasks();
             }
-            renderTasks();
 
-            // Also try Firebase
+            // Sync from Firebase if online
             if (isOnline && window.db) {
                 window.db.collection('tasks').where('workerMobile', '==', workerMobile)
                     .onSnapshot(snap => {
-                        const fbTasks = snap.docs.map(d => d.data());
-                        if (fbTasks.length > 0) {
-                            // Merge with localStorage tasks
-                            const ids = new Set(fbTasks.map(t => t.id));
-                            allTasks = [...fbTasks, ...allTasks.filter(t => !ids.has(t.id))];
-                            renderTasks();
-                        }
-                    }, () => { });
+                        allTasks = snap.docs.map(d => d.data());
+                        // Sort by createdAt desc
+                        allTasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                        // Save local backup for this specific worker
+                        localStorage.setItem('civitas_tasks_' + workerMobile, JSON.stringify(allTasks));
+                        renderTasks();
+                        renderHistory();
+                        renderAlerts();
+                    }, err => console.warn('Worker tasks load error:', err));
             }
         }
 
         function updateTaskStatus(taskId, newStatus) {
-            // Update in localStorage
-            const all = JSON.parse(localStorage.getItem('civitas_tasks') || '[]');
-            const idx = all.findIndex(t => t.id === taskId);
-            if (idx !== -1) { all[idx].status = newStatus; localStorage.setItem('civitas_tasks', JSON.stringify(all)); }
-
-            // Update local state
+            // Update local state immediately for snappy UI
             const localIdx = allTasks.findIndex(t => t.id === taskId);
-            if (localIdx !== -1) { allTasks[localIdx].status = newStatus; }
-
-            // Queue for offline sync
-            const pending = JSON.parse(localStorage.getItem('civitas_pending_sync') || '[]');
-            pending.push({ type: 'task_status', taskId, newStatus, workerMobile, at: new Date().toISOString() });
-            localStorage.setItem('civitas_pending_sync', JSON.stringify(pending));
-
-            // Sync if online
-            if (isOnline && window.db) {
-                window.db.collection('tasks').doc(taskId).update({ status: newStatus, updatedAt: new Date().toISOString() })
-                    .then(() => {
-                        // Remove from pending
-                        const p = JSON.parse(localStorage.getItem('civitas_pending_sync') || '[]');
-                        localStorage.setItem('civitas_pending_sync', JSON.stringify(p.filter(x => !(x.type === 'task_status' && x.taskId === taskId))));
-                    }).catch(e => console.warn('Task sync:', e));
+            if (localIdx !== -1) {
+                allTasks[localIdx].status = newStatus;
+                localStorage.setItem('civitas_tasks_' + workerMobile, JSON.stringify(allTasks));
             }
 
+            // Sync if online, otherwise queue it
+            if (isOnline && window.db) {
+                window.db.collection('tasks').doc(taskId).update({ status: newStatus, updatedAt: new Date().toISOString() })
+                    .catch(e => {
+                        console.warn('Task sync failed, queuing:', e);
+                        queueOfflineTaskUpdate(taskId, newStatus);
+                    });
+            } else {
+                queueOfflineTaskUpdate(taskId, newStatus);
+            }
             renderTasks();
+            renderHistory();
+        }
+
+        function queueOfflineTaskUpdate(taskId, newStatus) {
+            const pending = JSON.parse(localStorage.getItem('civitas_pending_sync_' + workerMobile) || '[]');
+            // Remove previous updates for same task to prevent redundant queues
+            const cleaned = pending.filter(x => x.taskId !== taskId);
+            cleaned.push({ type: 'task_status', taskId, newStatus, at: new Date().toISOString() });
+            localStorage.setItem('civitas_pending_sync_' + workerMobile, JSON.stringify(cleaned));
         }
 
         function renderTasks() {
@@ -869,14 +871,16 @@
 
         /* ── OFFLINE SYNC ── */
         window.addEventListener('online', () => {
-            const pending = JSON.parse(localStorage.getItem('civitas_pending_sync') || '[]');
+            updateOnlineStatus();
+            const pendingKey = 'civitas_pending_sync_' + workerMobile;
+            const pending = JSON.parse(localStorage.getItem(pendingKey) || '[]');
             if (pending.length > 0 && window.db) {
                 pending.forEach(item => {
                     if (item.type === 'task_status') {
                         window.db.collection('tasks').doc(item.taskId).update({ status: item.newStatus, updatedAt: item.at }).catch(() => { });
                     }
                 });
-                localStorage.removeItem('civitas_pending_sync');
+                localStorage.removeItem(pendingKey);
                 toast('📶 Synced ' + pending.length + ' offline update(s)!');
             }
         });

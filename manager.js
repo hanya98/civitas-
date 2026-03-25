@@ -49,21 +49,27 @@ function initials(name) {
     return (name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 }
 
-/* ── LOAD TASKS from localStorage (with sample data) ── */
+/* ── LOAD TASKS from Firebase ── */
 function loadTasks() {
-    const stored = localStorage.getItem('civitas_tasks');
-    if (stored) {
-        allTasks = JSON.parse(stored);
-    } else {
-        // Sample tasks for demo
-        allTasks = [
-            { id: 'TASK001', title: 'Repair broken road near Market Gate', description: 'Pothole causing accidents', category: 'roads', priority: 'High', status: 'In Progress', workerMobile: '9000000001', workerName: 'Ramesh Kumar', area: 'Ward 5', dueDate: '2026-03-26', createdAt: '2026-03-22T10:00:00Z', complaintId: '' },
-            { id: 'TASK002', title: 'Fix water pipeline leakage on MG Road', description: 'Major leak since 3 days', category: 'water', priority: 'High', status: 'Assigned', workerMobile: '9000000002', workerName: 'Sunita Devi', area: 'Sector 12', dueDate: '2026-03-27', createdAt: '2026-03-23T08:30:00Z', complaintId: '' },
-            { id: 'TASK003', title: 'Clear garbage dump near School', description: 'Overflowing bins', category: 'sanitation', priority: 'Medium', status: 'Completed', workerMobile: '9000000003', workerName: 'Amit Sharma', area: 'Zone B', dueDate: '2026-03-24', createdAt: '2026-03-20T12:00:00Z', complaintId: '' },
-            { id: 'TASK004', title: 'Restore power to Sector 3 residential blocks', description: '12hr outage', category: 'electricity', priority: 'High', status: 'Assigned', workerMobile: '9000000005', workerName: 'Vijay Rao', area: 'Sector 3', dueDate: '2026-03-24', createdAt: '2026-03-24T07:00:00Z', complaintId: '' },
-        ];
-        saveTasks();
-    }
+    if (!window.db) return;
+
+    // Listen for live updates from Firestore
+    window.db.collection('tasks').orderBy('createdAt', 'desc')
+        .onSnapshot(snap => {
+            allTasks = snap.docs.map(d => d.data());
+            saveTasks(); // Sync to localStorage so offline workers have a baseline
+            renderTasks();
+            renderStats();
+        }, err => {
+            console.warn('Tasks load error:', err.message);
+            // Fallback to local storage if Firebase fails or offline
+            const stored = localStorage.getItem('civitas_tasks');
+            if (stored) {
+                allTasks = JSON.parse(stored);
+                renderTasks();
+                renderStats();
+            }
+        });
 }
 
 function saveTasks() {

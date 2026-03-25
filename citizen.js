@@ -678,20 +678,33 @@ async function submitToFirebase(btn, spinnerSVG) {
     if (!assignRes.ok) throw new Error('Server returned ' + assignRes.status);
     const data = await assignRes.json();
     console.log('[ASSIGN] Server response:', data);
-    const { assignments } = data;
+    const { assignments, workerTask } = data;
+    const batch = window.db.batch();
+    let hasAssignments = false;
+
     if (assignments && assignments.length) {
       console.log('[ASSIGN] Saving', assignments.length, 'assignments to Firestore…');
-      const batch = window.db.batch();
       assignments.forEach(a => {
         const aRef = window.db
           .collection('complaints').doc(docId)
           .collection('assignments').doc(a.id);
         batch.set(aRef, a);
       });
+      hasAssignments = true;
+    }
+
+    if (workerTask) {
+      console.log('[ASSIGN] Saving AI-assigned workerTask to Firestore tasks collection...');
+      const tRef = window.db.collection('tasks').doc(workerTask.id);
+      batch.set(tRef, workerTask);
+      hasAssignments = true;
+    }
+
+    if (hasAssignments) {
       await batch.commit();
-      console.log('[ASSIGN] SUCCESS - assignments saved');
+      console.log('[ASSIGN] SUCCESS - assignments and tasks saved');
     } else {
-      console.warn('[ASSIGN] No assignments in response');
+      console.warn('[ASSIGN] No assignments or tasks in response');
     }
   } catch (e) {
     console.error('[ASSIGN] FAILED:', e.message);

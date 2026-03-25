@@ -9,12 +9,12 @@
  */
 
 require('dotenv').config();
-const http  = require('http');
-const fs    = require('fs');
-const path  = require('path');
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 const https = require('https');
 
-const PORT           = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 /* ── VALIDATE KEYS ON STARTUP ── */
@@ -28,14 +28,14 @@ if (!GEMINI_API_KEY) {
 /* ── MIME TYPES ── */
 const MIME = {
   '.html': 'text/html; charset=utf-8',
-  '.css':  'text/css; charset=utf-8',
-  '.js':   'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
   '.json': 'application/json',
-  '.ico':  'image/x-icon',
-  '.png':  'image/png',
-  '.jpg':  'image/jpeg',
-  '.svg':  'image/svg+xml',
-  '.woff2':'font/woff2',
+  '.ico': 'image/x-icon',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.svg': 'image/svg+xml',
+  '.woff2': 'font/woff2',
 };
 
 /* ── COLLECT JSON BODY ── */
@@ -46,7 +46,7 @@ function readBody(req) {
       body += chunk;
       if (body.length > 20000) reject(new Error('Body too large'));
     });
-    req.on('end',   () => { try { resolve(JSON.parse(body)); } catch (e) { reject(e); } });
+    req.on('end', () => { try { resolve(JSON.parse(body)); } catch (e) { reject(e); } });
     req.on('error', reject);
   });
 }
@@ -55,16 +55,16 @@ function readBody(req) {
 function callGemini(promptText, maxTokens = 150) {
   return new Promise((resolve, reject) => {
     const payload = JSON.stringify({
-      contents:         [{ parts: [{ text: promptText }] }],
+      contents: [{ parts: [{ text: promptText }] }],
       generationConfig: { temperature: 0.1, maxOutputTokens: maxTokens },
     });
 
     const options = {
       hostname: 'generativelanguage.googleapis.com',
-      path:     `/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-      method:   'POST',
-      headers:  {
-        'Content-Type':   'application/json',
+      path: `/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(payload),
       },
     };
@@ -72,7 +72,7 @@ function callGemini(promptText, maxTokens = 150) {
     const req = https.request(options, res => {
       let data = '';
       res.on('data', chunk => data += chunk);
-      res.on('end',  () => { try { resolve(JSON.parse(data)); } catch (e) { reject(e); } });
+      res.on('end', () => { try { resolve(JSON.parse(data)); } catch (e) { reject(e); } });
     });
     req.on('error', reject);
     req.write(payload);
@@ -84,7 +84,7 @@ function callGemini(promptText, maxTokens = 150) {
 const server = http.createServer(async (req, res) => {
 
   /* CORS — allow any origin during development */
-  res.setHeader('Access-Control-Allow-Origin',  '*');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
@@ -116,10 +116,10 @@ Respond with ONLY valid JSON, no markdown, no extra text:
 {"priority":"High","reason":"One concise sentence explaining the priority decision."}`;
 
       const geminiRes = await callGemini(prompt);
-      const raw       = geminiRes?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      const clean     = raw.replace(/```json|```/gi, '').trim();
-      const parsed    = JSON.parse(clean);
-      const priority  = ['High','Medium','Low'].includes(parsed.priority) ? parsed.priority : 'Medium';
+      const raw = geminiRes?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const clean = raw.replace(/```json|```/gi, '').trim();
+      const parsed = JSON.parse(clean);
+      const priority = ['High', 'Medium', 'Low'].includes(parsed.priority) ? parsed.priority : 'Medium';
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ priority, reason: parsed.reason || '' }));
@@ -146,53 +146,91 @@ Respond with ONLY valid JSON, no markdown, no extra text:
       // Truncate description to keep prompt short (avoid token overflow)
       const shortDesc = (description || '').slice(0, 200);
 
-      const prompt = `Assign Indian govt officials to this ${priority} priority ${categoryName} complaint in ${district}, ${state}: "${title}". ${shortDesc}
-Return ONLY JSON array (exactly 3 items, no markdown, no extra text):
-[{"role":"Department Head","department":"dept name","name":"Sh. Name","responsibility":"task in 10 words","deadline":${days},"contactEmail":"x@gov.in","assignPriority":"Primary"},{"role":"Field Inspector","department":"dept","name":"Sh. Name","responsibility":"task","deadline":${days},"contactEmail":"x@gov.in","assignPriority":"Secondary"},{"role":"Engineer","department":"dept","name":"Sh. Name","responsibility":"task","deadline":${days},"contactEmail":"x@gov.in","assignPriority":"Secondary"}]`;
+      const prompt = `Assign a govt team to this ${priority} priority "${categoryName}" complaint in ${district}, ${state}: "${title}". ${shortDesc}
+Available Field Workers:
+- Ramesh Kumar (Mobile: 9000000001, Category: roads)
+- Sunita Devi (Mobile: 9000000002, Category: water)
+- Amit Sharma (Mobile: 9000000003, Category: sanitation)
+- Vijay Rao (Mobile: 9000000005, Category: electricity)
+- Raju Bhai (Mobile: 9000000006, Category: other)
 
-      const gRes   = await callGemini(prompt, 600);
-      const raw    = gRes?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+Select the BEST worker based on category.
+Return exactly this JSON format (no markdown, no extra text):
+{
+  "assignments": [
+    {"role":"Department Head","department":"dept name","name":"Sh. Name","responsibility":"task","deadline":${days},"contactEmail":"x@gov.in","assignPriority":"Primary"},
+    {"role":"Engineer","department":"dept","name":"Sh. Name","responsibility":"task","deadline":${days},"contactEmail":"x@gov.in","assignPriority":"Secondary"}
+  ],
+  "workerTask": {
+    "workerMobile": "900000000x",
+    "workerName": "Name",
+    "title": "Short directive to worker",
+    "description": "What the worker needs to do"
+  }
+}`;
+
+      const gRes = await callGemini(prompt, 600);
+      const raw = gRes?.candidates?.[0]?.content?.parts?.[0]?.text || '';
       console.log('[ASSIGN] Gemini raw response:', raw.slice(0, 300));
       if (!raw) throw new Error('Empty response from Gemini');
-      // Extract JSON array robustly — find first [ to last ]
-      const start  = raw.indexOf('[');
-      const end    = raw.lastIndexOf(']');
-      if (start === -1 || end === -1) throw new Error('No JSON array found in response');
-      const clean  = raw.slice(start, end + 1);
+
+      const clean = raw.replace(/```json|```/gi, '').trim();
       const parsed = JSON.parse(clean);
-      if (!Array.isArray(parsed)) throw new Error('not array');
 
       const now = new Date();
-      const assignments = parsed.map((a, i) => ({
-        id:             `assign_${Date.now()}_${i}`,
-        role:           a.role           || 'Department Head',
-        department:     a.department     || 'Concerned Department',
-        name:           a.name           || 'Officer In-Charge',
+      const assignments = (parsed.assignments || []).map((a, i) => ({
+        id: `assign_${Date.now()}_${i}`,
+        role: a.role || 'Department Head',
+        department: a.department || 'Concerned Department',
+        name: a.name || 'Officer In-Charge',
         responsibility: a.responsibility || 'Investigate and resolve',
-        deadline:       parseInt(a.deadline) || days,
-        deadlineDate:   new Date(now.getTime() + ((parseInt(a.deadline)||days)*86400000)).toISOString(),
-        contactEmail:   a.contactEmail   || 'grievance@gov.in',
-        assignPriority: a.assignPriority || (i===0?'Primary':'Secondary'),
-        status:         'Assigned',
-        progress:       0,
-        assignedAt:     now.toISOString(),
-        assignedBy:     'AI',
-        history: [{ action:'Assigned', by:'AI System', at:now.toISOString(), note:'Auto-assigned on complaint submission' }],
+        deadline: parseInt(a.deadline) || days,
+        deadlineDate: new Date(now.getTime() + ((parseInt(a.deadline) || days) * 86400000)).toISOString(),
+        contactEmail: a.contactEmail || 'grievance@gov.in',
+        assignPriority: a.assignPriority || (i === 0 ? 'Primary' : 'Secondary'),
+        status: 'Assigned',
+        progress: 0,
+        assignedAt: now.toISOString(),
+        assignedBy: 'AI',
+        history: [{ action: 'Assigned', by: 'AI System', at: now.toISOString(), note: 'Auto-assigned on complaint submission' }],
       }));
 
+      let workerTask = null;
+      if (parsed.workerTask && parsed.workerTask.workerMobile) {
+        workerTask = {
+          id: 'TASK' + Date.now(),
+          title: parsed.workerTask.title || 'Investigate and resolve grievance',
+          description: parsed.workerTask.description || title,
+          category: category || 'other',
+          priority: priority || 'Medium',
+          status: 'Assigned',
+          workerMobile: parsed.workerTask.workerMobile,
+          workerName: parsed.workerTask.workerName || 'Worker',
+          area: district || 'Pending Area',
+          dueDate: new Date(now.getTime() + (days * 86400000)).toISOString(),
+          createdAt: now.toISOString(),
+          complaintId: complaintId || ''
+        };
+      }
+
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ assignments }));
+      res.end(JSON.stringify({ assignments, workerTask }));
 
     } catch (err) {
       console.error('Assign API error:', err.message);
-      const now  = new Date();
+      const now = new Date();
       const days = body2?.priority === 'High' ? 3 : body2?.priority === 'Medium' ? 7 : 14;
-      const dl   = new Date(now.getTime() + days*86400000).toISOString();
+      const dl = new Date(now.getTime() + days * 86400000).toISOString();
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ assignments: [
-        { id:`asgn_${Date.now()}_0`, role:'Department Head', department:'Concerned Department', name:'Officer In-Charge', responsibility:'Review and coordinate resolution', deadline:days, deadlineDate:dl, contactEmail:'grievance@gov.in', assignPriority:'Primary', status:'Assigned', progress:0, assignedAt:now.toISOString(), assignedBy:'System', history:[{action:'Assigned',by:'System',at:now.toISOString(),note:'Fallback assignment'}] },
-        { id:`asgn_${Date.now()}_1`, role:'Field Inspector', department:'Field Operations', name:'Field Inspector', responsibility:'Visit site and submit ground report', deadline:days, deadlineDate:dl, contactEmail:'field@gov.in', assignPriority:'Secondary', status:'Assigned', progress:0, assignedAt:now.toISOString(), assignedBy:'System', history:[{action:'Assigned',by:'System',at:now.toISOString(),note:'Fallback assignment'}] },
-      ], fallback:true }));
+      res.end(JSON.stringify({
+        assignments: [
+          { id: `asgn_${Date.now()}_0`, role: 'Department Head', department: 'Concerned Department', name: 'Officer In-Charge', responsibility: 'Review', deadline: days, deadlineDate: dl, contactEmail: 'x@gov.in', assignPriority: 'Primary', status: 'Assigned', progress: 0, assignedAt: now.toISOString(), assignedBy: 'System', history: [] },
+        ],
+        workerTask: {
+          id: 'TASK' + Date.now(), title: 'Automated fallback task', description: 'Address ' + (body2.category || 'issue'), category: body2.category || 'other', priority: 'Medium', status: 'Assigned', workerMobile: '9000000001', workerName: 'Ramesh Kumar', area: body2.district || '', dueDate: dl, createdAt: now.toISOString(), complaintId: body2.complaintId || ''
+        },
+        fallback: true
+      }));
     }
     return;
   }
@@ -201,7 +239,7 @@ Return ONLY JSON array (exactly 3 items, no markdown, no extra text):
   let filePath = '.' + url;
   if (filePath === './' || filePath === '.') filePath = './citizen.html';
 
-  const ext      = path.extname(filePath);
+  const ext = path.extname(filePath);
   const mimeType = MIME[ext] || 'application/octet-stream';
 
   fs.readFile(filePath, (err, data) => {
