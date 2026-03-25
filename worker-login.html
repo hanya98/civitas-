@@ -163,7 +163,14 @@
             <button class="btn-login" id="login-btn">Login to Worker Portal</button>
             <div class="err-msg" id="err-msg">❌ Invalid credentials. Please try again.</div>
 
-            <div class="hint">Demo: Mobile <strong>9000000001</strong> / Password <strong>worker123</strong></div>
+            <div class="hint">Demo credentials — Password: <strong>worker123</strong><br>
+                <strong>9000000001</strong> Ramesh Kumar (Roads) &nbsp;|&nbsp; <strong>9000000002</strong> Sunita Devi
+                (Water)<br>
+                <strong>9000000003</strong> Amit Sharma (Sanitation) &nbsp;|&nbsp; <strong>9000000005</strong> Vijay Rao
+                (Electricity)<br>
+                <strong>9000000006</strong> Raju Bhai (Other)
+            </div>
+
             <div class="back-link"><a href="index.html">← Back to Home</a></div>
         </div>
     </div>
@@ -174,8 +181,15 @@
             window.location.href = redir ? decodeURIComponent(redir) : 'worker.html';
         }
 
-        // Demo workers
-        const WORKERS = { '9000000001': 'worker123', '9000000002': 'worker123', '9000000003': 'worker123' };
+        // Demo workers — all workers that AI can assign tasks to
+        const WORKERS = {
+            '9000000001': 'worker123',  // Ramesh Kumar — roads
+            '9000000002': 'worker123',  // Sunita Devi — water
+            '9000000003': 'worker123',  // Amit Sharma — sanitation
+            '9000000005': 'worker123',  // Vijay Rao — electricity
+            '9000000006': 'worker123',  // Raju Bhai — other
+        };
+
 
         document.getElementById('login-btn').addEventListener('click', doLogin);
         document.getElementById('worker-pwd').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });

@@ -146,36 +146,39 @@ Respond with ONLY valid JSON, no markdown, no extra text:
       // Truncate description to keep prompt short (avoid token overflow)
       const shortDesc = (description || '').slice(0, 200);
 
-      const prompt = `Assign a govt team to this ${priority} priority "${categoryName}" complaint in ${district}, ${state}: "${title}". ${shortDesc}
-Available Field Workers:
-- Ramesh Kumar (Mobile: 9000000001, Category: roads)
-- Sunita Devi (Mobile: 9000000002, Category: water)
-- Amit Sharma (Mobile: 9000000003, Category: sanitation)
-- Vijay Rao (Mobile: 9000000005, Category: electricity)
-- Raju Bhai (Mobile: 9000000006, Category: other)
+      const prompt = `You are a government task assignment system. Assign officials and a field worker to resolve this complaint.
 
-Select the BEST worker based on category.
-Return exactly this JSON format (no markdown, no extra text):
-{
-  "assignments": [
-    {"role":"Department Head","department":"dept name","name":"Sh. Name","responsibility":"task","deadline":${days},"contactEmail":"x@gov.in","assignPriority":"Primary"},
-    {"role":"Engineer","department":"dept","name":"Sh. Name","responsibility":"task","deadline":${days},"contactEmail":"x@gov.in","assignPriority":"Secondary"}
-  ],
-  "workerTask": {
-    "workerMobile": "900000000x",
-    "workerName": "Name",
-    "title": "Short directive to worker",
-    "description": "What the worker needs to do"
-  }
-}`;
+Complaint:
+- Priority: ${priority}
+- Category: ${categoryName}
+- Location: ${district}, ${state}
+- Title: ${title}
+- Details: ${shortDesc}
 
-      const gRes = await callGemini(prompt, 600);
+Field Workers available (pick the BEST match for category):
+- Ramesh Kumar, Mobile 9000000001, specializes in: roads
+- Sunita Devi, Mobile 9000000002, specializes in: water
+- Amit Sharma, Mobile 9000000003, specializes in: sanitation
+- Vijay Rao, Mobile 9000000005, specializes in: electricity
+- Raju Bhai, Mobile 9000000006, specializes in: other
+
+Deadline for ${priority} priority: ${days} days.
+
+Respond ONLY with raw JSON. No markdown. No explanation. No code fences. Just the JSON object:
+{"assignments":[{"role":"Department Head","department":"Name of department","name":"Sh. Officer Name","responsibility":"What they must do","deadline":${days},"contactEmail":"officer@gov.in","assignPriority":"Primary"},{"role":"Field Engineer","department":"Name of department","name":"Sh. Engineer Name","responsibility":"Field inspection task","deadline":${days},"contactEmail":"eng@gov.in","assignPriority":"Secondary"}],"workerTask":{"workerMobile":"9000000001","workerName":"Ramesh Kumar","title":"Fix the reported issue at site","description":"Detailed instructions for the field worker"}}`;
+
+      const gRes = await callGemini(prompt, 700);
       const raw = gRes?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      console.log('[ASSIGN] Gemini raw response:', raw.slice(0, 300));
+      console.log('[ASSIGN] Gemini raw response:', raw.slice(0, 400));
       if (!raw) throw new Error('Empty response from Gemini');
 
-      const clean = raw.replace(/```json|```/gi, '').trim();
+      // Robust JSON extraction: strip markdown fences, then try to extract JSON object
+      let clean = raw.replace(/```json|```/gi, '').trim();
+      // If Gemini added prose before/after JSON, extract the JSON block
+      const jsonMatch = clean.match(/\{[\s\S]*\}/);
+      if (jsonMatch) clean = jsonMatch[0];
       const parsed = JSON.parse(clean);
+
 
       const now = new Date();
       const assignments = (parsed.assignments || []).map((a, i) => ({

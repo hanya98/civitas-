@@ -79,26 +79,42 @@ function renderStats() {
   document.getElementById('cs-amount').textContent = '₹' + (total / 1000).toFixed(0) + 'K';
 }
 
-/* ── LOAD PROJECTS ── */
 let projects = [];
 function loadProjects() {
   if (window.db) {
     window.db.collection('projects').onSnapshot(snap => {
       if (!snap.empty) {
         projects = snap.docs.map(d => d.data());
-        renderStats();
-        renderProjects();
+        console.log('[CONTRACTOR] Loaded', projects.length, 'projects from Firestore');
       } else {
-        projects = [];
-        renderStats();
-        renderProjects();
+        // FIX: Firestore `projects` collection is empty — seed DEMO_PROJECTS and use them
+        console.log('[CONTRACTOR] projects collection empty — seeding demo projects to Firestore');
+        projects = DEMO_PROJECTS;
+        // Seed demo data to Firestore so future visits and other portals see it
+        const batch = window.db.batch();
+        DEMO_PROJECTS.forEach(p => {
+          batch.set(window.db.collection('projects').doc(p.id), p);
+        });
+        batch.commit()
+          .then(() => console.log('[CONTRACTOR] ✅ Demo projects seeded to Firestore'))
+          .catch(e => console.warn('[CONTRACTOR] Could not seed projects:', e.message));
       }
+      renderStats();
+      renderProjects();
+    }, err => {
+      // Firestore not available — use demo data in memory
+      console.warn('[CONTRACTOR] Firestore error, using demo projects:', err.message);
+      projects = DEMO_PROJECTS;
+      renderStats();
+      renderProjects();
     });
   } else {
-    projects = [];
+    // No db — use demo data
+    projects = DEMO_PROJECTS;
     renderProjects();
   }
 }
+
 
 /* ── RENDER PROJECTS ── */
 function renderProjects() {

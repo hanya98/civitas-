@@ -315,23 +315,50 @@ document.getElementById('tasks-grid').addEventListener('click', e => {
     if (!task) return;
 
     if (action === 'complete') {
+        console.log('[MGR] Marking task complete:', taskId);
         task.status = 'Completed';
+        // FIX: persist to Firestore so status survives page refresh
+        if (window.db) {
+            window.db.collection('tasks').doc(taskId)
+                .update({ status: 'Completed' })
+                .then(() => console.log('[MGR] ✅ Task completed in Firestore:', taskId))
+                .catch(e => console.error('[MGR] Firestore complete error:', e.message));
+        }
         saveTasks();
         renderTasks();
         renderStats();
         toast('✅ Task marked as completed!');
+
     } else if (action === 'progress') {
         const statuses = ['Assigned', 'In Progress', 'Completed'];
         const idx = statuses.indexOf(task.status);
         task.status = statuses[Math.min(idx + 1, statuses.length - 1)];
+        console.log('[MGR] Task progress update → ', task.status, ':', taskId);
+        // FIX: persist to Firestore
+        if (window.db) {
+            window.db.collection('tasks').doc(taskId)
+                .update({ status: task.status })
+                .then(() => console.log('[MGR] ✅ Task status updated in Firestore:', task.status))
+                .catch(e => console.error('[MGR] Firestore progress error:', e.message));
+        }
         saveTasks();
         renderTasks();
         renderStats();
         toast(`📊 Task status → ${task.status}`);
+
     } else if (action === 'escalate') {
         toast(`🔺 Task "${task.title}" escalated to senior authority!`);
+
     } else if (action === 'delete') {
         if (confirm(`Delete task "${task.title}"?`)) {
+            console.log('[MGR] Deleting task:', taskId);
+            // FIX: delete from Firestore
+            if (window.db) {
+                window.db.collection('tasks').doc(taskId)
+                    .delete()
+                    .then(() => console.log('[MGR] ✅ Task deleted from Firestore:', taskId))
+                    .catch(e => console.error('[MGR] Firestore delete error:', e.message));
+            }
             allTasks = allTasks.filter(t => t.id !== taskId);
             saveTasks();
             renderTasks();
@@ -385,7 +412,22 @@ document.getElementById('block-modal-overlay').addEventListener('click', e => { 
 document.getElementById('grievances-list').addEventListener('click', e => {
     const btn = e.target.closest('.griev-assign-btn');
     if (!btn) return;
-    toast('🔧 Task creation from complaint — switch to Tasks → New Task with this Complaint ID.');
+    const complaintId = btn.dataset.complaintId || '';
+    const shortId = complaintId.split('/').pop();
+    console.log('[MGR] Assign Worker clicked for complaint:', complaintId);
+
+    // FIX: Find the AI-created task for this complaint and navigate to it
+    const existingTask = allTasks.find(t => t.complaintId === complaintId);
+    if (existingTask) {
+        // Switch to Tasks tab and filter by complaint ID context
+        switchTab('tasks');
+        document.getElementById('task-search').value = existingTask.workerName || shortId;
+        renderTasks();
+        toast(`📋 Showing task for complaint ${shortId} — assigned to ${existingTask.workerName || 'worker'}`);
+    } else {
+        // No AI task yet — tell manager to use Assign Unassigned in admin
+        toast(`⚠️ No AI task yet for ${shortId}. Ask Admin to click ⚡ Assign Unassigned.`);
+    }
 });
 
 /* ── NEW TASK MODAL ── */

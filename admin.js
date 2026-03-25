@@ -737,6 +737,7 @@ async function backfillAssignments() {
   const btn = document.getElementById('backfill-btn');
   btn.disabled = true;
   btn.textContent = '⏳ Assigning…';
+  console.log('[BACKFILL] ⚡ Assign Unassigned clicked — starting backfill');
   showToast('Finding unassigned complaints…');
 
   let assigned = 0;
@@ -744,10 +745,9 @@ async function backfillAssignments() {
   let failed = 0;
 
   try {
-    // Check each complaint for existing assignments
     for (const complaint of complaints) {
       const docId = (complaint.id || '').replace(/\//g, '_');
-      if (!docId) continue;
+      if (!docId) { console.warn('[BACKFILL] Skipped complaint with no ID'); continue; }
 
       // Check if assignments subcollection already exists
       const existing = await window.db
@@ -755,13 +755,13 @@ async function backfillAssignments() {
         .collection('assignments').limit(1).get();
 
       if (!existing.empty) {
+        console.log('[BACKFILL] Already assigned, skipping:', complaint.id);
         skipped++;
-        continue; // already assigned
+        continue;
       }
 
-      // Call /api/assign for this complaint
       try {
-        console.log('[BACKFILL] Assigning:', complaint.id);
+        console.log('[BACKFILL] 📡 Calling /api/assign for:', complaint.id);
         const res = await fetch('/api/assign', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -777,46 +777,131 @@ async function backfillAssignments() {
           }),
         });
 
-        if (!res.ok) throw new Error('Server ' + res.status);
+        if (!res.ok) throw new Error('Server returned ' + res.status);
         const data = await res.json();
-        console.log('[BACKFILL] Response:', data);
+        console.log('[BACKFILL] ✅ API response for', complaint.id, ':', data);
 
-        const { assignments } = data;
+        const { assignments, workerTask } = data;
+        const batch = window.db.batch();
+        let batchHasData = false;
+
+        // Write assignment subcollection entries
         if (assignments && assignments.length) {
-          const batch = window.db.batch();
+          console.log('[BACKFILL] Writing', assignments.length, 'assignments…');
           assignments.forEach(a => {
             const aRef = window.db
               .collection('complaints').doc(docId)
               .collection('assignments').doc(a.id);
             batch.set(aRef, a);
           });
-          await batch.commit();
-          assigned++;
-          showToast(`✅ Assigned ${assigned} complaint(s)… (${complaints.length - skipped - assigned} remaining)`);
+          batchHasData = true;
         }
+
+        // FIX: Write workerTask to top-level `tasks` collection so manager sees it
+        if (workerTask && workerTask.id) {
+          console.log('[BACKFILL] Writing workerTask to tasks collection:', workerTask.id);
+          const tRef = window.db.collection('tasks').doc(workerTask.id);
+          batch.set(tRef, workerTask);
+          batchHasData = true;
+        }
+
+        // FIX: Use set with merge:true — batch.update() throws if doc doesn't exist
+        const complaintRef = window.db.collection('complaints').doc(docId);
+        batch.set(complaintRef, { status: 'In Review', assignedAt: new Date().toISOString() }, { merge: true });
+
+
+        await batch.commit();
+        console.log('[BACKFILL] ✅ Firestore batch commit success for', complaint.id);
+        // Update in-memory status so table reflects change immediately
+        const local = complaints.find(c => c.id === complaint.id);
+        if (local) local.status = 'In Review';
+        assigned++;
+        showToast(`✅ Assigned ${assigned}… (${complaints.length - skipped - assigned} remaining)`);
+
       } catch (err) {
-        console.error('[BACKFILL] Failed for', complaint.id, ':', err.message);
+        console.error('[BACKFILL] ❌ Failed for', complaint.id, ':', err.message);
+        // Fallback: flag complaint as needing manual review
+        try {
+          await window.db.collection('complaints').doc(docId).update({
+            aiError: 'needs_manual_review',
+            aiErrorMsg: err.message,
+          });
+          console.log('[BACKFILL] Flagged as needs_manual_review:', complaint.id);
+        } catch (fbErr) {
+          console.error('[BACKFILL] Could not write fallback flag:', fbErr.message);
+        }
         failed++;
       }
 
-      // Small delay to avoid hammering Gemini rate limits
+      // Small delay to avoid hitting Gemini rate limits
       await new Promise(r => setTimeout(r, 800));
     }
 
-    showToast(`✅ Done! Assigned: ${assigned} | Already had assignments: ${skipped} | Failed: ${failed}`);
+    console.log(`[BACKFILL] Done. Assigned: ${assigned} | Skipped: ${skipped} | Failed: ${failed}`);
+    showToast(`✅ Done! Assigned: ${assigned} | Already assigned: ${skipped} | Failed: ${failed}`);
 
-    // Reload assignments tab
+    renderAll(); // update table to show new "In Review" statuses
     await loadAllAssignments();
     if (activeTab !== 'assignments') switchTab('assignments');
 
   } catch (err) {
-    console.error('[BACKFILL] Fatal error:', err);
+    console.error('[BACKFILL] ❌ Fatal error:', err);
     showToast('❌ Backfill failed: ' + err.message);
   } finally {
     btn.disabled = false;
     btn.textContent = '⚡ Assign Unassigned';
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   GRIEVANCE TRACKER — real-time onSnapshot on tasks collection
+   Displayed in admin.html under the complaints tab
+══════════════════════════════════════════════════════════════ */
+let trackerUnsub = null;
+
+function startGrievanceTracker() {
+  const listEl = document.getElementById('grievance-tracker-list');
+  if (!listEl) return;
+
+  if (trackerUnsub) trackerUnsub(); // cleanup old listener
+
+  listEl.innerHTML = '<tr><td colspan="5" style="padding:12px;color:#718096;font-size:0.83rem">⟳ Connecting…</td></tr>';
+
+  trackerUnsub = window.db.collection('tasks')
+    .orderBy('createdAt', 'desc')
+    .limit(30)
+    .onSnapshot(snap => {
+      if (snap.empty) {
+        listEl.innerHTML = '<tr><td colspan="5" style="padding:12px;color:#718096;font-size:0.83rem">No AI-assigned tasks yet. Submit a complaint or click ⚡ Assign Unassigned.</td></tr>';
+        return;
+      }
+      const statusColors = {
+        'Assigned': { bg: '#fff8ec', color: '#c05c00' },
+        'In Progress': { bg: '#e8eef8', color: '#1a3a6b' },
+        'Completed': { bg: '#e6f4ed', color: '#006937' },
+        'Overdue': { bg: '#fdf2f2', color: '#c0392b' },
+      };
+      const priColors = { High: '#c0392b', Medium: '#d4770b', Low: '#006937' };
+      listEl.innerHTML = snap.docs.map(doc => {
+        const t = doc.data();
+        const sc = statusColors[t.status] || { bg: '#f0f0f0', color: '#555' };
+        const shortId = (t.complaintId || '—').split('/').pop();
+        return `<tr>
+          <td style="font-size:0.78rem;color:#718096;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.complaintId || ''}">📋 ${shortId}</td>
+          <td style="font-size:0.82rem;font-weight:600">${t.title || '—'}</td>
+          <td><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600;background:${sc.bg};color:${sc.color}">${t.status || '—'}</span></td>
+          <td style="font-size:0.82rem">${t.workerName || '—'}</td>
+          <td style="font-weight:700;color:${priColors[t.priority] || '#555'};font-size:0.82rem">${t.priority || '—'}</td>
+        </tr>`;
+      }).join('');
+    }, err => {
+      console.error('[TRACKER] Firestore error:', err);
+      listEl.innerHTML = '<tr><td colspan="5" style="color:#c0392b;font-size:0.83rem;padding:8px">⚠️ Could not load tracker.</td></tr>';
+    });
+}
+
+// Start the grievance tracker automatically with the page
+startGrievanceTracker();
 
 document.getElementById('backfill-btn').addEventListener('click', backfillAssignments);
 
