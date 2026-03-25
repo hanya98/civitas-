@@ -52,11 +52,13 @@
       <li class="dropdown">
         <a href="services.html" class="dropbtn">Services</a>
         <div class="dropdown-content">
-          <a href="citizen.html">Complaint Registration</a>
-          <a href="tracking.html">Complaint Status</a>
-          <a href="happiness.html">Happiness Index Feedback</a>
+          <a href="citizen.html">Citizen Rating & Registration</a>
+          <a href="tracking.html">Track Complaint</a>
+          <a href="admin.html">Admin Dashboard</a>
+          <a href="manager-login.html">Manager Portal</a>
+          <a href="worker-login.html">Worker Portal</a>
+          <a href="contractor-login.html">Contractor Portal</a>
           <a href="development.html">Development Near Me</a>
-          <a href="#">RTI</a>
         </div>
       </li>
       <li><a href="https://newsroom-seedtosuccess.onrender.com/">Newsroom</a></li>
@@ -375,59 +377,75 @@
               aria-describedby="incident-date-err" />
             <span class="field-error" id="incident-date-err" role="alert"></span>
           </div>
-          <div class="field-group">
-            <label class="field-label" for="photo-upload">Upload Photos <span
-                class="optional-tag">Optional</span></label>
-            <div class="upload-box" id="photo-drop-zone" tabindex="0" role="button">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <polyline points="21 15 16 10 5 21" />
-              </svg>
-              <p>Click or drag images here</p>
-              <p class="upload-sub">JPG / PNG &bull; Max 3 images &bull; 5MB each</p>
-              <input type="file" id="photo-upload" multiple accept="image/jpeg,image/png" class="visually-hidden" />
-            </div>
-            <span class="field-error" id="photo-err" role="alert"></span>
-            <div class="image-previews" id="image-previews"></div>
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="video-upload">Upload Video <span
-                class="optional-tag">Optional</span></label>
-            <div class="upload-box" id="video-drop-zone" tabindex="0" role="button">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <polygon points="23 7 16 12 23 17 23 7" />
-                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-              </svg>
-              <p>Click or drag video here</p>
-              <p class="upload-sub">MP4, MOV &bull; Max 50MB</p>
-              <input type="file" id="video-upload" accept="video/mp4,video/quicktime,video/*" class="visually-hidden" />
-            </div>
-            <span class="field-error" id="video-err" role="alert"></span>
-            <div id="video-name-display" class="video-name-display hidden"></div>
-          </div>
-          <div class="field-group">
-            <fieldset class="radio-group">
-              <legend class="field-label">Is this issue still unresolved? <span class="required-star">*</span></legend>
-              <div class="radio-options">
-                <label class="radio-label"><input type="radio" name="stillUnresolved" value="yes" /> Yes, it is still
-                  ongoing</label>
-                <label class="radio-label"><input type="radio" name="stillUnresolved" value="no" /> No, it was
-                  resolved</label>
+
+          <!-- URGENT FLAG -->
+          <div class="field-group" id="urgent-field-group">
+            <div class="urgent-toggle-card" id="urgent-toggle-card">
+              <div class="urgent-toggle-left">
+                <span class="urgent-toggle-icon">🔴</span>
+                <div>
+                  <div class="urgent-toggle-title">Mark as URGENT</div>
+                  <div class="urgent-toggle-desc">Immediate risk to life, safety, or public infrastructure. Urgent
+                    complaints are given highest priority and escalated instantly.</div>
+                </div>
               </div>
-              <span class="field-error" id="unresolved-err" role="alert"></span>
-            </fieldset>
+              <label class="toggle-switch" for="is-urgent">
+                <input type="checkbox" id="is-urgent" name="isUrgent" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
           </div>
-          <div class="field-group">
-            <fieldset class="radio-group">
-              <legend class="field-label">Have you reported this before? <span class="required-star">*</span></legend>
-              <div class="radio-options">
-                <label class="radio-label"><input type="radio" name="reportedBefore" value="yes" /> Yes</label>
-                <label class="radio-label"><input type="radio" name="reportedBefore" value="no" /> No</label>
-              </div>
-              <span class="field-error" id="reported-err" role="alert"></span>
-            </fieldset>
+
+          <label class="field-label" for="photo-upload">Upload Photos <span class="optional-tag">Optional</span></label>
+          <div class="upload-box" id="photo-drop-zone" tabindex="0" role="button">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
+            </svg>
+            <p>Click or drag images here</p>
+            <p class="upload-sub">JPG / PNG &bull; Max 3 images &bull; 5MB each</p>
+            <input type="file" id="photo-upload" multiple accept="image/jpeg,image/png" class="visually-hidden" />
           </div>
+          <span class="field-error" id="photo-err" role="alert"></span>
+          <div class="image-previews" id="image-previews"></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="video-upload">Upload Video <span class="optional-tag">Optional</span></label>
+          <div class="upload-box" id="video-drop-zone" tabindex="0" role="button">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polygon points="23 7 16 12 23 17 23 7" />
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+            </svg>
+            <p>Click or drag video here</p>
+            <p class="upload-sub">MP4, MOV &bull; Max 50MB</p>
+            <input type="file" id="video-upload" accept="video/mp4,video/quicktime,video/*" class="visually-hidden" />
+          </div>
+          <span class="field-error" id="video-err" role="alert"></span>
+          <div id="video-name-display" class="video-name-display hidden"></div>
+        </div>
+        <div class="field-group">
+          <fieldset class="radio-group">
+            <legend class="field-label">Is this issue still unresolved? <span class="required-star">*</span></legend>
+            <div class="radio-options">
+              <label class="radio-label"><input type="radio" name="stillUnresolved" value="yes" /> Yes, it is still
+                ongoing</label>
+              <label class="radio-label"><input type="radio" name="stillUnresolved" value="no" /> No, it was
+                resolved</label>
+            </div>
+            <span class="field-error" id="unresolved-err" role="alert"></span>
+          </fieldset>
+        </div>
+        <div class="field-group">
+          <fieldset class="radio-group">
+            <legend class="field-label">Have you reported this before? <span class="required-star">*</span></legend>
+            <div class="radio-options">
+              <label class="radio-label"><input type="radio" name="reportedBefore" value="yes" /> Yes</label>
+              <label class="radio-label"><input type="radio" name="reportedBefore" value="no" /> No</label>
+            </div>
+            <span class="field-error" id="reported-err" role="alert"></span>
+          </fieldset>
+        </div>
         </div>
         <div class="step-actions">
           <button type="button" class="btn btn-secondary" data-prev="2"><svg width="18" height="18" viewBox="0 0 24 24"

@@ -609,10 +609,20 @@ async function submitToFirebase(btn, spinnerSVG) {
     console.warn('Could not fetch repeat count:', e.message);
   }
 
+  // ── URGENT FLAG ──
+  const isUrgent = document.getElementById('is-urgent')?.checked || false;
+
   // ── AI PRIORITY (silent — citizen sees nothing) ──
-  const { priority, reason: priorityReason, setBy: prioritySetBy } = await getAIPriority(
+  let { priority, reason: priorityReason, setBy: prioritySetBy } = await getAIPriority(
     catVal, catName, title, description, stillUnresolved, reportedBefore, timesReported
   );
+
+  // Override AI priority if citizen manually marks as urgent
+  if (isUrgent) {
+    priority = 'High';
+    priorityReason = 'Citizen manually marked this grievance as URGENT (immediate risk to life/safety/infrastructure). ' + (priorityReason ? `[AI originally noted: ${priorityReason}]` : '');
+    prioritySetBy = 'Citizen (Urgent Flag) + AI Override';
+  }
 
   const complaint = {
     id: refId,
@@ -623,6 +633,7 @@ async function submitToFirebase(btn, spinnerSVG) {
     priorityReason: priorityReason,
     prioritySetBy: prioritySetBy,
     timesReported: timesReported,
+    isUrgent: isUrgent,
     fullName: el('full-name').value.trim(),
     mobile: mobile,
     email: el('email').value.trim() || '—',

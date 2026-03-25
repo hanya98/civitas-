@@ -51,11 +51,13 @@
       <li class="dropdown">
         <a href="services.html" class="dropbtn">Services</a>
         <div class="dropdown-content">
-          <a href="citizen.html">Complaint Registration</a>
-          <a href="tracking.html">Complaint Status</a>
-          <a href="happiness.html">Happiness Index Feedback</a>
+          <a href="citizen.html">Citizen Rating & Registration</a>
+          <a href="tracking.html">Track Complaint</a>
+          <a href="admin.html">Admin Dashboard</a>
+          <a href="manager-login.html">Manager Portal</a>
+          <a href="worker-login.html">Worker Portal</a>
+          <a href="contractor-login.html">Contractor Portal</a>
           <a href="development.html">Development Near Me</a>
-          <a href="#">RTI</a>
         </div>
       </li>
       <li><a href="https://newsroom-seedtosuccess.onrender.com/">Newsroom</a></li>
@@ -117,6 +119,9 @@
       </button>
       <button class="main-tab" data-tab="assignments">
         👥 Assignments <span class="tab-count" id="tab-assignments-count">0</span>
+      </button>
+      <button class="main-tab" data-tab="analytics">
+        📊 Analytics
       </button>
     </div>
 
@@ -313,6 +318,40 @@
 
     </div><!-- /#tab-assignments -->
 
+    <!-- ══ TAB: ANALYTICS ══ -->
+    <div class="tab-panel" id="tab-analytics">
+
+      <!-- ESCALATION ALERTS -->
+      <div id="analytics-escalation" style="margin-bottom:20px"></div>
+
+      <!-- CHART GRID -->
+      <div id="analytics-grid">
+        <div class="analytics-card">
+          <div class="analytics-card-title">📊 Complaint Status Overview</div>
+          <div class="analytics-chart-wrap"><canvas id="chart-status"></canvas></div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-card-title">🏷️ Complaints by Category</div>
+          <div class="analytics-chart-wrap"><canvas id="chart-category"></canvas></div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-card-title">📈 Priority Distribution</div>
+          <div class="analytics-chart-wrap"><canvas id="chart-priority"></canvas></div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-card-title">📍 Top Districts</div>
+          <div id="top-districts-list" class="top-districts-list"></div>
+        </div>
+      </div>
+
+      <!-- WORKER PERFORMANCE -->
+      <div class="analytics-card" style="margin-top:16px">
+        <div class="analytics-card-title">👷 Worker Performance (Assignments)</div>
+        <div id="worker-perf-list" class="worker-perf-list"></div>
+      </div>
+
+    </div><!-- /#tab-analytics -->
+
   </div><!-- /#main -->
 
   <!-- ── AUDIT TRAIL MODAL ── -->
@@ -414,6 +453,7 @@
   <!-- TOAST -->
   <div id="toast"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="admin.js"></script>
 </body>
 
