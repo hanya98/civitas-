@@ -89,17 +89,13 @@ function loadProjects() {
         renderStats();
         renderProjects();
       } else {
-        // Seed initial projects into Firestore for demo
-        const batch = window.db.batch();
-        DEMO_PROJECTS.forEach(p => {
-          const ref = window.db.collection('projects').doc(p.id);
-          batch.set(ref, p);
-        });
-        batch.commit().catch(e => console.warn('Seed projects err:', e));
+        projects = [];
+        renderStats();
+        renderProjects();
       }
     });
   } else {
-    projects = DEMO_PROJECTS;
+    projects = [];
     renderProjects();
   }
 }

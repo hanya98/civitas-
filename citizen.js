@@ -249,7 +249,11 @@ function validateStep4() {
 function showStep(stepNum) {
   for (let i = 1; i <= TOTAL_STEPS; i++) {
     const sec = el('form-step-' + i);
-    if (sec) sec.style.display = (i === stepNum) ? 'block' : 'none';
+    if (sec) {
+      sec.style.display = (i === stepNum) ? 'block' : 'none';
+      if (i === stepNum) sec.classList.remove('hidden');
+      else sec.classList.add('hidden');
+    }
   }
   currentStep = stepNum;
   updateProgressUI(stepNum);
