@@ -1,7 +1,7 @@
 {
-  "name": "indian-newsroom",
+  "name": "civitas",
   "version": "1.0.0",
-  "description": "Indian Newsroom App",
+  "description": "Civitas App",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
