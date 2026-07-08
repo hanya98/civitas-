@@ -36,7 +36,6 @@ function handleVoiceCommand(cmd) {
         { keys: ["home", "main", "start", "मुख्य"], url: "index.html", text: "Going back to home." },
         { keys: ["service", "register", "complaint", "grievance", "शिकायत"], url: "citizen.html", text: "Redirecting to complaint registration." },
         { keys: ["status", "track", "check", "स्थिति"], url: "tracking.html", text: "Opening complaint tracking." },
-        { keys: ["news", "update", "bulletin", "समाचार"], url: "https://newsroom-seedtosuccess.onrender.com/", text: "Opening the newsroom." },
         { keys: ["happy", "feedback", "index", "खुशी"], url: "happiness.html", text: "Opening happiness index feedback." }
     ];
 
