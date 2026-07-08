@@ -46,45 +46,8 @@ Civitas leverages Google’s **Gemini 2.0 Flash** to automate complex administra
 └── happiness.html / .js        # Feedback & Sentiment Collection
 ```
 
-## ⚙️ Setup & Installation
 
-### Prerequisites
-- Node.js (v18+)
-- Firebase Project (Firestore enabled)
-- Gemini API Key
-
-### Installation Steps
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd seedtoscale
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Configure Environment Variables:**
-   Create a `.env` file in the root directory:
-   ```env
-   PORT=3000
-   GEMINI_API_KEY=your_gemini_api_key_here
-   ```
-
-4. **Firebase Configuration:**
-   - Update the Firebase config object in `citizen.html`, `admin.html`, and `tracking.html` with your project credentials.
-
-5. **Start the server:**
-   ```bash
-   npm start
-   ```
-
-6. **Access the App:**
-   - Citizen Portal: `http://localhost:3000/citizen.html`
-   - Admin Dashboard: `http://localhost:3000/admin.html`
-
----
 
 ## 👥 Authors
-Developed by **Team SeedtoScale** for the next generation of digital governance.
+Developed by **Team HR** for Ship and sketch
+.
