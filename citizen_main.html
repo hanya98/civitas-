@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Civitas Citizen Portal</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Icons -->
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+    <div class="header-bar">
+        <div class="header-left"></div>
+
+        <div class="portal-heading">
+            Civitas | Citizen Portal
+        </div>
+
+        <div class="header-right">
+            <span id="liveTime"></span>
+        </div>
+    </div>
+
+    <div class="tricolor-line">
+        <span class="color-saffron"></span>
+        <span class="color-white"></span>
+        <span class="color-green"></span>
+    </div>
+</header>
+
+
+<!-- ================= MAIN ================= -->
+<main class="page-content">
+
+        <section class="welcome-block">
+            <h1>Welcome User!</h1>
+            <p>Access city services, raise issues and stay informed about your area.</p>
+            <br>
+        </section>
+
+    <div class="content-layout">
+
+        <!-- LEFT : Image Slider -->
+        <div class="left-part">
+            <section class="banner-section">
+                <div class="slider">
+                    <div class="slide active">
+                        <img src="https://sbmurban.org/storage/app/uploads/public/66f/287/7fb/66f2877fb9a2f443379630.jpeg" alt="City Cleanliness">
+                        <div class="slide-caption">Keep Your City Clean & Safe</div>
+                    </div>
+
+                    <div class="slide">
+                        <img src="https://hitachimgrmnet.com/wp-content/uploads/2025/11/person-interacting-with-digital-interface-displaying-access-control-icons-representing-modern-security-technologies-data-protection-scaled.jpg" alt="Infrastructure">
+                        <div class="slide-caption">Track Local Development Projects</div>
+                    </div>
+                    
+                    <div class="slide">
+                        <img src="https://www.speridian.com/wp-content/uploads/2024/06/Transforming-Citizen-Government-Interaction_need.jpg" alt="Citizen Engagement">
+                        <div class="slide-caption">Your Voice Improves the City</div>
+                    </div>
+                    
+                    <button class="slider-arrow arrow-left" onclick="changeSlide(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    
+                    <button class="slider-arrow arrow-right" onclick="changeSlide(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <section class="banner-info">
+                <h3>About Civitas</h3>
+                <p> Civitas is a unified digital platform designed to make city services more accessible, transparent and responsive for citizens. Through this portal, you can quickly report civic issues, monitor their resolution status and stay informed about important developments happening in your area. </p>
+                <p> The platform helps bridge the gap between citizens and city administration by ensuring that grievances are tracked efficiently and addressed in a timely manner. You can also explore ongoing infrastructure projects, government policies, public welfare schemes and participate in surveys to share your valuable feedback. </p>
+                
+                <ul class="info-points">
+                    <li>Report civic problems anytime, from anywhere</li>
+                    <li>Track complaint progress in real-time</li>
+                    <li>Discover development work near your location</li>
+                    <li>Access government policies and welfare schemes</li>
+                    <li>Share suggestions to improve city services</li>
+                </ul>
+                
+                <p class="info-note">
+                    Together, we can build a cleaner, safer and more efficient city for everyone.
+                </p>
+            </section>
+        </div>
+
+
+        <section class="services-section">
+            <div class="features-container">
+
+                <div class="feature-row">
+                  <a href="citizen.html" class="feature-link">
+                    <div class="feature-card">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        </div>
+                        <h3>Raise a Complaint</h3>
+                        <p>Submit a new grievance to the administration.</p>
+                    </div>
+                  </a>
+
+                    <div class="feature-image">
+                        <img src="https://www.shutterstock.com/image-photo/concept-complaints-customer-complaint-dissatisfaction-600nw-2190262027.jpg" alt="Raise Complaint">
+                    </div>
+                </div>
+            
+      
+                <div class="feature-row reverse">
+                    <a href="#" class="feature-link">
+                        <div class="feature-card">
+                            <div class="card-icon"><i class="fas fa-magnifying-glass-location"></i></div>
+                            <h3>Track Issue</h3>
+                            <p>Check complaint status</p>
+                        </div>
+                    </a>
+                    
+                    <div class="feature-image">
+                        <img src="https://quasa.io/storage/images/news/P2jTlroDlyB7F4qA6VWLkPAPHs2AUpHVox3lx2TO.png" alt="Raise Complaint">
+                    </div>
+                  
+                </div>
+            
+
+                <div class="feature-row">
+                  <a href="#" class="feature-link">
+                    <div class="feature-card">
+                        <div class="card-icon"><i class="fas fa-map-location-dot"></i></div>
+                        
+                        <h3>Development Near Me</h3>
+                        <p>View nearby projects</p>
+                    </div>
+                   </a>
+                    
+                    <div class="feature-image">
+                        <img src="http://il3.picdn.net/shutterstock/videos/13739159/thumb/7.jpg" alt="Raise Complaint">
+                    </div>
+                  
+                </div>
+
+                <div class="feature-row reverse">
+                  <a href="#" class="feature-link">
+                    <div class="feature-card">
+                        <div class="card-icon"><i class="fas fa-file-lines"></i></div>
+                        
+                        <h3>Policies & Schemes</h3>
+                        <p>Explore government programs</p>
+                    </div>
+                  </a>
+                    
+                    <div class="feature-image">
+                        <img src="https://static.vecteezy.com/system/resources/previews/027/764/792/non_2x/2d-gradient-government-policies-thin-line-icon-concept-isolated-blue-illustration-representing-unretirement-vector.jpg" alt="Raise Complaint">
+                    </div>
+                  
+                </div>
+
+                <div class="feature-row">
+                  <a href="#" class="feature-link">
+                    <div class="feature-card">
+                        <div class="card-icon"><i class="fas fa-comments"></i></div>
+                        
+                        <h3>Survey & Suggestions</h3>
+                        <p>Share your feedback</p>
+                    </div></a>
+                    
+                    <div class="feature-image">
+                        <img src="https://ehq-production-canada.imgix.net/f9b4f06994ee68428fcecd8e6b6537b7ca4ac1fc/original/1626230266/5968792cbddd5b8038a7f751fffa8000_Engage_Terrace_PROJECT_BANNERS_(2).png?auto=compress%2Cformat" alt="Raise Complaint">
+                    </div>
+                  
+                </div>
+            </div>
+
+        </section>
+        
+    </div>
+
+</main>
+
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+    <div class="footer-bar">
+        <div>© 2026 CivicConnect</div>
+        <div>Help | Contact</div>
+    </div>
+</footer>
+
+
+<!-- ================= LIVE TIME ================= -->
+<script>
+function updateClock() {
+    const now = new Date();
+    const date = now.toLocaleDateString('en-IN', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short'
+    });
+    const time = now.toLocaleTimeString();
+    document.getElementById("liveTime").textContent = date + " | " + time;
+}
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+
+
+<!-- ================= SLIDER ================= -->
+<script>
+let slides = document.querySelectorAll(".slide");
+let currentIndex = 0;
+
+// Auto slide
+let sliderTimer = setInterval(nextSlide, 4000);
+
+function showSlide(index) {
+    slides.forEach(slide => slide.classList.remove("active"));
+    slides[index].classList.add("active");
+}
+
+function nextSlide() {
+    currentIndex = (currentIndex + 1) % slides.length;
+    showSlide(currentIndex);
+}
+
+function changeSlide(direction) {
+    clearInterval(sliderTimer); // reset auto timer
+
+    currentIndex = (currentIndex + direction + slides.length) % slides.length;
+    showSlide(currentIndex);
+
+    sliderTimer = setInterval(nextSlide, 4000);
+}
+</script>
+
+</body>
+</html>

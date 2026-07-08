@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Happiness Index | Citizen Portal</title>
+    <meta name="description"
+        content="View the Happiness Index scores for different cities based on public polls and feedback." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Serif:wght@600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <link rel="stylesheet" href="style2.css" />
+    <style>
+        :root {
+            --bg: #f4f5f7;
+            --surface: #ffffff;
+            --card: #ffffff;
+            --border: #d0d5dd;
+            --accent: #1a3a6b;
+            --accent2: #FF6200;
+            --green: #006937;
+            --red: #c0392b;
+            --yellow: #d4770b;
+            --text: #1c1c1e;
+            --muted: #718096;
+            --shadow: 0 4px 12px rgba(26, 58, 107, 0.08);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Noto Sans', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.2rem;
+            color: var(--accent);
+            margin-bottom: 8px;
+            font-family: 'Noto Serif', serif;
+        }
+
+        .page-header p {
+            color: var(--muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .map-container {
+            height: 500px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            position: relative;
+            z-index: 1;
+            /* Keep leaflet controls below navbar */
+        }
+
+        #happiness-map {
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .leaderboard-header h2 {
+            font-size: 1.3rem;
+            color: var(--accent);
+            margin: 0;
+        }
+
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 420px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        /* Custom Scrollbar for Leaderboard */
+        .leaderboard-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .leaderboard-list::-webkit-scrollbar-track {
+            background: var(--bg);
+            border-radius: 4px;
+        }
+
+        .leaderboard-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .city-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .city-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border-color: var(--accent);
+        }
+
+        .rank {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--muted);
+            width: 30px;
+        }
+
+        .rank-1 {
+            color: #FFD700;
+        }
+
+        /* Gold */
+        .rank-2 {
+            color: #C0C0C0;
+        }
+
+        /* Silver */
+        .rank-3 {
+            color: #CD7F32;
+        }
+
+        /* Bronze */
+
+        .city-info {
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .city-name {
+            font-weight: 600;
+            color: var(--text);
+            margin: 0;
+            font-size: 1.05rem;
+        }
+
+        .city-meta {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin: 2px 0 0 0;
+        }
+
+        .score-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-high {
+            background: var(--green);
+        }
+
+        .score-med {
+            background: var(--yellow);
+        }
+
+        .score-low {
+            background: var(--red);
+        }
+
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ── CIVITAS NAVBAR ── -->
+    <nav class="navbar" style="z-index: 100;">
+        <ul class="nav-right">
+            <li><a href="index.html">Home</a></li>
+            <li class="dropdown">
+                <a href="services.html" class="dropbtn">Services</a>
+                <div class="dropdown-content">
+                    <a href="citizen.html">Complaint Registration</a>
+                    <a href="tracking.html">Complaint Status</a>
+                    <a href="happiness.html">Happiness Index Feedback</a>
+                    <a href="development.html">Development Near Me</a>
+                    <a href="#">RTI</a>
+                </div>
+            </li>
+            <li><a href="https://newsroom-seedtosuccess.onrender.com/">Newsroom</a></li>
+            <li><a href="#">Contact</a></li>
+            <div class="nav-center">
+                <div class="logo">CIVITAS</div>
+            </div>
+            <div class="tricolor-bar">
+                <span class="stripe saffron"></span>
+                <span class="stripe white"></span>
+                <span class="stripe green"></span>
+            </div>
+        </ul>
+        <div class="nav-left">
+            <select class="language-switch">
+                <option>English</option>
+                <option>हिन्दी</option>
+            </select>
+            <a href="citizen-profile.html" class="login-btn citizen">Login as Citizen</a>
+            <a href="admin.html" class="login-btn admin">Login as Admin</a>
+        </div>
+    </nav>
+    <div class="tricolor-bar">
+        <span class="stripe saffron"></span>
+        <span class="stripe white"></span>
+        <span class="stripe green"></span>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="container">
+        <div class="page-header">
+            <h1>National Happiness Index</h1>
+            <p>Real-time city rankings based on citizen feedback, survey responses, and public grievance satisfaction
+                rates.</p>
+        </div>
+
+        <div class="content-grid">
+            <!-- Map Card -->
+            <div class="card">
+                <div style="margin-bottom: 16px;">
+                    <h2 style="color: var(--accent); font-size: 1.3rem; margin: 0;">Geographical Distribution</h2>
+                    <p style="color: var(--muted); font-size: 0.9rem; margin: 4px 0 0 0;">Click on any marker to view
+                        the region's detailed happiness score breakdown.</p>
+                </div>
+                <div class="map-container" id="happiness-map">
+                    <!-- Map renders here -->
+                </div>
+            </div>
+
+            <!-- Leaderboard Card -->
+            <div class="card">
+                <div class="leaderboard-header">
+                    <h2>City Leaderboard</h2>
+                    <span
+                        style="font-size: 0.8rem; color: var(--muted); background: var(--bg); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border);">Top
+                        10</span>
+                </div>
+
+                <div class="leaderboard-list" id="leaderboard-container">
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Calculating scores...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer" role="contentinfo" style="margin-top: 60px;">
+        <div class="footer-inner">
+            <div class="footer-col">
+                <p class="footer-title">Citizen Grievance Redressal Portal</p>
+                <p>A Government of India Initiative under the Right to Public Services Act</p>
+            </div>
+            <div class="footer-col">
+                <p class="footer-title">Helpline</p>
+                <p>Toll-Free: <strong>1800-111-555</strong></p>
+                <p>Mon–Sat: 9:00 AM – 6:00 PM</p>
+            </div>
+            <div class="footer-col">
+                <p class="footer-title">Links</p>
+                <ul class="footer-links">
+                    <li><a href="tracking.html">Track Grievance</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Disclaimer</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Government of India. All Rights Reserved. | WCAG 2.1 AA compliant.</p>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <!-- Custom Logic -->
+    <script type="module" src="happiness.js"></script>
+</body>
+
+</html>

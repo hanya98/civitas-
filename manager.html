@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Command Centre — Manager Dashboard | CIVITAS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style2.css" />
+    <link rel="stylesheet" href="manager.css" />
+    <script src="auth.js"></script>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyARUCovi6he0lYE6pikBB_doz72Nae2-h0",
+            authDomain: "grievance-form-39f6a.firebaseapp.com",
+            projectId: "grievance-form-39f6a",
+            storageBucket: "grievance-form-39f6a.firebasestorage.app",
+            messagingSenderId: "149185682282",
+            appId: "1:149185682282:web:785c21c17d3470592ca313"
+        };
+        firebase.initializeApp(firebaseConfig);
+        window.db = firebase.firestore();
+    </script>
+</head>
+
+<body>
+    <script>Auth.requireManagerLogin();</script>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <ul class="nav-right">
+            <li><a href="index.html">Home</a></li>
+            <li class="dropdown">
+                <a href="services.html" class="dropbtn">Services</a>
+                <div class="dropdown-content">
+                    <a href="citizen.html">Complaint Registration</a>
+                    <a href="tracking.html">Complaint Status</a>
+                    <a href="happiness.html">Happiness Index</a>
+                    <a href="development.html">Development Near Me</a>
+                </div>
+            </li>
+            <li><a href="admin.html">Admin</a></li>
+            <div class="nav-center">
+                <div class="logo">🧑‍💼 CIVITAS</div>
+            </div>
+            <div class="tricolor-bar">
+                <span class="stripe saffron"></span>
+                <span class="stripe white"></span>
+                <span class="stripe green"></span>
+            </div>
+        </ul>
+        <div class="nav-left">
+            <a href="#" class="login-btn admin"
+                onclick="Auth.managerLogout(); window.location.href='index.html'; return false;">Logout</a>
+        </div>
+    </nav>
+    <div class="tricolor-bar"><span class="stripe saffron"></span><span class="stripe white"></span><span
+            class="stripe green"></span></div>
+
+    <!-- HEADER -->
+    <div id="mgr-header">
+        <div class="mgr-header-inner">
+            <div>
+                <h1 class="mgr-title">⚡ Command Centre</h1>
+                <p class="mgr-subtitle">Workforce & Grievance Management Dashboard</p>
+            </div>
+            <div class="mgr-header-actions">
+                <button class="mgr-btn mgr-btn-primary" id="new-task-btn">+ New Task</button>
+                <button class="mgr-btn mgr-btn-ghost" id="refresh-all-btn">⟳ Refresh</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ESCALATION BANNER -->
+    <div id="escalation-banner" class="escalation-banner" style="display:none">
+        <span class="escalation-icon">🔺</span>
+        <span id="escalation-msg">Escalation Alert</span>
+        <button id="escalation-close">✕</button>
+    </div>
+
+    <!-- STATS -->
+    <div id="mgr-stats">
+        <div class="mgr-stat-card">
+            <div class="mgr-stat-icon" style="background:#e8eef8">📋</div>
+            <div>
+                <div class="mgr-stat-val" id="s-total-tasks">—</div>
+                <div class="mgr-stat-label">Total Tasks</div>
+            </div>
+        </div>
+        <div class="mgr-stat-card">
+            <div class="mgr-stat-icon" style="background:#fff3ec">⏳</div>
+            <div>
+                <div class="mgr-stat-val" id="s-in-progress">—</div>
+                <div class="mgr-stat-label">In Progress</div>
+            </div>
+        </div>
+        <div class="mgr-stat-card">
+            <div class="mgr-stat-icon" style="background:#fdf2f2">🔺</div>
+            <div>
+                <div class="mgr-stat-val" id="s-overdue">—</div>
+                <div class="mgr-stat-label">Overdue</div>
+            </div>
+        </div>
+        <div class="mgr-stat-card">
+            <div class="mgr-stat-icon" style="background:#e6f4ed">✅</div>
+            <div>
+                <div class="mgr-stat-val" id="s-completed">—</div>
+                <div class="mgr-stat-label">Completed</div>
+            </div>
+        </div>
+        <div class="mgr-stat-card">
+            <div class="mgr-stat-icon" style="background:#f0e8f8">👷</div>
+            <div>
+                <div class="mgr-stat-val" id="s-workers">—</div>
+                <div class="mgr-stat-label">Active Workers</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div id="mgr-main">
+        <div id="mgr-tabs">
+            <button class="mgr-tab active" data-tab="tasks">📋 Tasks <span class="tab-count"
+                    id="tc-tasks">0</span></button>
+            <button class="mgr-tab" data-tab="workers">👷 Workers <span class="tab-count"
+                    id="tc-workers">0</span></button>
+            <button class="mgr-tab" data-tab="grievances">📨 Grievances <span class="tab-count"
+                    id="tc-grievances">0</span></button>
+            <button class="mgr-tab" data-tab="attendance">🗓️ Attendance</button>
+        </div>
+
+        <!-- TASKS TAB -->
+        <div class="mgr-tab-panel active" id="tab-tasks">
+            <div class="mgr-toolbar">
+                <div class="mgr-search-wrap">
+                    <span>🔍</span>
+                    <input type="text" id="task-search" placeholder="Search tasks…" />
+                </div>
+                <select class="mgr-filter" id="tf-priority">
+                    <option value="">All Priorities</option>
+                    <option value="High">🔴 High</option>
+                    <option value="Medium">🟠 Medium</option>
+                    <option value="Low">🟢 Low</option>
+                </select>
+                <select class="mgr-filter" id="tf-status">
+                    <option value="">All Statuses</option>
+                    <option value="Assigned">Assigned</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Overdue">Overdue</option>
+                </select>
+                <select class="mgr-filter" id="tf-area">
+                    <option value="">All Areas</option>
+                </select>
+            </div>
+            <div id="tasks-grid" class="tasks-grid">
+                <div class="mgr-empty">
+                    <div class="mgr-empty-icon">📋</div>
+                    <div class="mgr-empty-title">No tasks yet</div>
+                    <div class="mgr-empty-sub">Click "+ New Task" to create a task for your workers.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WORKERS TAB -->
+        <div class="mgr-tab-panel" id="tab-workers">
+            <div class="mgr-toolbar">
+                <div class="mgr-search-wrap">
+                    <span>🔍</span>
+                    <input type="text" id="worker-search" placeholder="Search workers…" />
+                </div>
+                <select class="mgr-filter" id="wf-status">
+                    <option value="">All</option>
+                    <option value="active">Active</option>
+                    <option value="blocked">Blocked</option>
+                </select>
+            </div>
+            <div id="workers-grid" class="workers-grid"></div>
+        </div>
+
+        <!-- GRIEVANCES TAB -->
+        <div class="mgr-tab-panel" id="tab-grievances">
+            <div class="mgr-toolbar">
+                <div class="mgr-search-wrap">
+                    <span>🔍</span>
+                    <input type="text" id="griev-search" placeholder="Search complaints…" />
+                </div>
+                <select class="mgr-filter" id="gf-priority">
+                    <option value="">All Priorities</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+                <select class="mgr-filter" id="gf-status">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Review">In Review</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
+            </div>
+            <div id="grievances-list" class="grievances-list">
+                <div class="mgr-empty">
+                    <div class="mgr-empty-icon">📨</div>
+                    <div class="mgr-empty-title">Loading complaints…</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ATTENDANCE TAB -->
+        <div class="mgr-tab-panel" id="tab-attendance">
+            <div class="attendance-header">
+                <h3>Today's Attendance Log</h3>
+                <span id="attendance-date" class="attendance-date-label"></span>
+            </div>
+            <div id="attendance-table-wrap">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Worker</th>
+                            <th>Mobile</th>
+                            <th>Area</th>
+                            <th>Check-In</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW TASK MODAL -->
+    <div id="task-modal-overlay" class="mgr-modal-overlay">
+        <div class="mgr-modal" id="task-modal">
+            <div class="mgr-modal-header">
+                <div class="mgr-modal-title">📋 Create Manual Task <span
+                        style="font-size:0.75rem;font-weight:400;color:#718096">(AI creates tasks automatically — use
+                        this to override)</span></div>
+                <button class="mgr-modal-close" id="task-modal-close">×</button>
+            </div>
+            <div class="mgr-modal-body">
+                <div class="mgr-field">
+                    <label>Task Title *</label>
+                    <input type="text" id="t-title" placeholder="Brief task description" maxlength="120" />
+                </div>
+                <div class="mgr-field">
+                    <label>Description</label>
+                    <textarea id="t-desc" rows="3" placeholder="Detailed instructions for the worker…"></textarea>
+                </div>
+                <div class="mgr-field-row">
+                    <div class="mgr-field">
+                        <label>Category</label>
+                        <select id="t-category">
+                            <option value="roads">Roads & Infrastructure</option>
+                            <option value="water">Water Supply</option>
+                            <option value="electricity">Electricity</option>
+                            <option value="sanitation">Sanitation & Waste</option>
+                            <option value="healthcare">Healthcare</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mgr-field">
+                        <label>Priority *</label>
+                        <select id="t-priority">
+                            <option value="High">🔴 High</option>
+                            <option value="Medium" selected>🟠 Medium</option>
+                            <option value="Low">🟢 Low</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mgr-field-row">
+                    <div class="mgr-field">
+                        <label>Assign to Worker *</label>
+                        <select id="t-worker">
+                            <option value="">-- Select Worker --</option>
+                        </select>
+                    </div>
+                    <div class="mgr-field">
+                        <label>Area / Location</label>
+                        <input type="text" id="t-area" placeholder="e.g., Ward 5, Sector 12" />
+                    </div>
+                </div>
+                <div class="mgr-field-row">
+                    <div class="mgr-field">
+                        <label>Due Date *</label>
+                        <input type="date" id="t-due" />
+                    </div>
+                    <div class="mgr-field">
+                        <label>Related Complaint ID</label>
+                        <input type="text" id="t-complaint-id" placeholder="Optional PGMS/…" />
+                    </div>
+                </div>
+            </div>
+            <div class="mgr-modal-footer">
+                <button class="mgr-btn mgr-btn-ghost" id="task-modal-cancel">Cancel</button>
+                <button class="mgr-btn mgr-btn-primary" id="task-modal-save">Create Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOCK CONFIRM MODAL -->
+    <div id="block-modal-overlay" class="mgr-modal-overlay">
+        <div class="mgr-modal" style="max-width:400px" id="block-modal">
+            <div class="mgr-modal-header">
+                <div class="mgr-modal-title" id="block-modal-title">Block Worker</div>
+                <button class="mgr-modal-close" id="block-modal-close">×</button>
+            </div>
+            <div class="mgr-modal-body">
+                <p id="block-modal-msg" style="color:#444;font-size:0.95rem;line-height:1.6"></p>
+            </div>
+            <div class="mgr-modal-footer">
+                <button class="mgr-btn mgr-btn-ghost" id="block-modal-cancel">Cancel</button>
+                <button class="mgr-btn" id="block-modal-confirm" style="background:#c0392b;color:#fff;">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="mgr-toast"></div>
+
+    <script src="manager.js"></script>
+</body>
+
+</html>

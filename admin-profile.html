@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Profile | PGMS 2.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style2.css" />
+    <link rel="stylesheet" href="admin-profile.css" />
+    <link rel="stylesheet" href="admin.css" />
+    <script src="auth.js"></script>
+
+    <!-- ═══ FIREBASE SDK v9 COMPAT ═══ -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- ═══════════════════════════════════════════════════════════
+       🔧 FIREBASE CONFIGURATION
+  ════════════════════════════════════════════════════════════ -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyARUCovi6he0lYE6pikBB_doz72Nae2-h0",
+            authDomain: "grievance-form-39f6a.firebaseapp.com",
+            projectId: "grievance-form-39f6a",
+            storageBucket: "grievance-form-39f6a.firebasestorage.app",
+            messagingSenderId: "149185682282",
+            appId: "1:149185682282:web:785c21c17d3470592ca313",
+            measurementId: "G-9V6SPFXDV0"
+        };
+        firebase.initializeApp(firebaseConfig);
+        window.db = firebase.firestore();
+    </script>
+</head>
+
+<body>
+
+    <!-- ── CIVITAS NAVBAR ── -->
+    <nav class="navbar">
+        <ul class="nav-right">
+            <li><a href="index.html">Home</a></li>
+            <li class="dropdown">
+                <a href="services.html" class="dropbtn">Services</a>
+                <div class="dropdown-content">
+                    <a href="citizen.html">Complaint Registration</a>
+                    <a href="tracking.html">Complaint Status</a>
+                    <a href="happiness.html">Happiness Index Feedback</a>
+                    <a href="development.html">Development Near Me</a>
+                    <a href="#">RTI</a>
+                </div>
+            </li>
+            <li><a href="https://newsroom-seedtosuccess.onrender.com/">Newsroom</a></li>
+            <li><a href="#">Contact</a></li>
+            <div class="nav-center">
+                <div class="logo">CIVITAS</div>
+            </div>
+            <div class="tricolor-bar">
+                <span class="stripe saffron"></span>
+                <span class="stripe white"></span>
+                <span class="stripe green"></span>
+            </div>
+        </ul>
+        <div class="nav-left">
+            <select class="language-switch">
+                <option>English</option>
+                <option>हिन्दी</option>
+            </select>
+            <a href="#" class="login-btn admin"
+                onclick="Auth.adminLogout(); window.location.href='index.html'; return false;">Logout</a>
+        </div>
+    </nav>
+    <div class="tricolor-bar">
+        <span class="stripe saffron"></span>
+        <span class="stripe white"></span>
+        <span class="stripe green"></span>
+    </div>
+
+    <!-- ── HEADER ── -->
+    <div id="app-header">
+        <div class="header-inner">
+            <button class="refresh-btn" style="margin-right: 15px;" onclick="window.location.href='admin-polls.html'">
+                📊 Manage Polls
+            </button>
+
+            <button class="refresh-btn" style="margin-right: 15px;" onclick="window.location.href='admin.html'">
+                Complaints
+            </button>
+
+            <button class="refresh-btn" id="refresh-btn">
+                ⟳ Refresh
+            </button>
+
+            <button class="refresh-btn" id="backfill-btn"
+                style="background:rgba(255,164,0,0.2);border-color:rgba(255,164,0,0.4)"
+                title="Assign AI officers to all complaints that have no assignments yet">
+                ⚡ Assign Unassigned
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ── MAIN ── -->
+    <div id="main">
+
+        <!-- OFFICER SELECTOR (Simulated Login) -->
+        <div class="officer-selector" id="officer-selector">
+            <h3>View Officer Profile</h3>
+            <p>Select or enter an officer's name to view their assignment history and performance statistics.</p>
+            <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="officer-search" placeholder="Enter Officer Name (e.g., Sh. Ramesh Kumar)" />
+                <button class="btn btn-primary" id="load-officer-btn">Load Profile</button>
+            </div>
+            <div class="quick-select">
+                <span class="qs-label">Suggested:</span>
+                <button class="qs-btn" data-name="Sh. RK Sharma">Sh. RK Sharma</button>
+                <button class="qs-btn" data-name="Dr. Anita Desai">Dr. Anita Desai</button>
+                <button class="qs-btn" data-name="Smt. Priya Singh">Smt. Priya Singh</button>
+            </div>
+        </div>
+
+        <!-- PROFILE DASHBOARD -->
+        <div class="profile-dashboard hidden" id="profile-dashboard">
+
+            <div class="profile-header">
+                <div class="profile-avatar" id="avatar-initials">O</div>
+                <div class="profile-info">
+                    <h2 id="profile-name">Officer Name</h2>
+                    <div class="profile-meta">
+                        <span class="meta-tag" id="profile-role">Designation</span>
+                        <span class="meta-tag" id="profile-dept">Department</span>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" id="change-officer-btn">Change Officer</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#e8eef8">📋</div>
+                    <div>
+                        <div class="stat-value" id="stat-total">0</div>
+                        <div class="stat-label">Total Assigned</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#fff8ec">⏳</div>
+                    <div>
+                        <div class="stat-value" id="stat-active">0</div>
+                        <div class="stat-label">Active / In Progress</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#e6f4ed">✅</div>
+                    <div>
+                        <div class="stat-value" id="stat-resolved">0</div>
+                        <div class="stat-label">Resolved</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#fdf2f2">⏱️</div>
+                    <div>
+                        <div class="stat-value" id="stat-avg-time">—</div>
+                        <div class="stat-label">Avg. Resolution Time</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="assignments-section">
+                <div class="section-header">
+                    <h3>Current & Past Assignments</h3>
+                    <div class="filter-group">
+                        <select id="assignment-filter" class="filter-select">
+                            <option value="all">All Assignments</option>
+                            <option value="active">Active (Assigned/In Progress)</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="assignments-list" id="assignments-list">
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Loading officer assignments...</p>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /#profile-dashboard -->
+
+    </div><!-- /#main -->
+
+    <script src="admin-profile.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Field Worker Portal — CIVITAS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <script src="auth.js"></script>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyARUCovi6he0lYE6pikBB_doz72Nae2-h0",
+            authDomain: "grievance-form-39f6a.firebaseapp.com",
+            projectId: "grievance-form-39f6a",
+            storageBucket: "grievance-form-39f6a.firebasestorage.app",
+            messagingSenderId: "149185682282",
+            appId: "1:149185682282:web:785c21c17d3470592ca313"
+        };
+        firebase.initializeApp(firebaseConfig);
+        window.db = firebase.firestore();
+    </script>
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --green: #006937;
+            --green-light: #e6f4ed;
+            --navy: #1a3a6b;
+            --navy-light: #e8eef8;
+            --saffron: #FF6200;
+            --saffron-light: #fff3ec;
+            --red: #c0392b;
+            --red-light: #fdf2f2;
+            --yellow: #d4770b;
+            --yellow-light: #fff3ec;
+            --bg: #f0f4f8;
+            --surface: #fff;
+            --border: #e2e8f0;
+            --text: #1c1c1e;
+            --muted: #718096;
+            --font: 'Noto Sans', sans-serif;
+            --shadow: 0 2px 8px rgba(26, 58, 107, 0.08);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* TOP BAR */
+        .top-bar {
+            background: linear-gradient(135deg, var(--green) 0%, var(--navy) 100%);
+            color: #fff;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .top-bar-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-bar-worker {
+            font-size: 0.78rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .offline-dot {
+            background: #f87171;
+            animation: none;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.4
+            }
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            cursor: pointer;
+            font-family: var(--font);
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* OFFLINE BANNER */
+        .offline-banner {
+            background: var(--yellow-light);
+            border-bottom: 2px solid var(--yellow);
+            color: var(--yellow);
+            padding: 10px 20px;
+            font-size: 0.83rem;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .offline-banner.show {
+            display: flex;
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* ATTENDANCE CARD */
+        .att-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .att-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .att-card-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--navy);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .att-time {
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        .att-status-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .att-status-pill {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .att-marked {
+            background: var(--green-light);
+            color: var(--green);
+        }
+
+        .att-not-marked {
+            background: var(--red-light);
+            color: var(--red);
+        }
+
+        .mark-att-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--green);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: background 0.2s;
+        }
+
+        .mark-att-btn:hover {
+            background: #005029;
+        }
+
+        .mark-att-btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        /* TABS */
+        .tabs-nav {
+            display: flex;
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 4px;
+            gap: 2px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 6px;
+            border: none;
+            background: none;
+            border-radius: 8px;
+            font-family: var(--font);
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--navy);
+            color: #fff;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+            animation: fadeUp 0.2s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(6px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        /* TASK CARD */
+        .task-card {
+            background: var(--surface);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .task-card.pri-High::before {
+            background: var(--red);
+        }
+
+        .task-card.pri-Medium::before {
+            background: var(--saffron);
+        }
+
+        .task-card.pri-Low::before {
+            background: var(--green);
+        }
+
+        .task-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            gap: 8px;
+        }
+
+        .task-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1.35;
+        }
+
+        .task-badge {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            flex-shrink: 0;
+        }
+
+        .badge-High {
+            background: var(--red-light);
+            color: var(--red);
+        }
+
+        .badge-Medium {
+            background: var(--saffron-light);
+            color: var(--yellow);
+        }
+
+        .badge-Low {
+            background: var(--green-light);
+            color: var(--green);
+        }
+
+        .task-desc {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .task-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .task-meta-chip {
+            font-size: 0.72rem;
+            color: var(--muted);
+            background: var(--bg);
+            border-radius: 6px;
+            padding: 3px 9px;
+            border: 1px solid var(--border);
+        }
+
+        .task-status-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .status-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 11px 10px;
+            border-radius: 10px;
+            border: 2px solid;
+            font-family: var(--font);
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .btn-start {
+            border-color: var(--navy);
+            color: var(--navy);
+            background: var(--navy-light);
+        }
+
+        .btn-start:hover {
+            background: var(--navy);
+            color: #fff;
+        }
+
+        .btn-done {
+            border-color: var(--green);
+            color: var(--green);
+            background: var(--green-light);
+        }
+
+        .btn-done:hover {
+            background: var(--green);
+            color: #fff;
+        }
+
+        .btn-issue {
+            border-color: var(--red);
+            color: var(--red);
+            background: var(--red-light);
+        }
+
+        .btn-issue:hover {
+            background: var(--red);
+            color: #fff;
+        }
+
+        .current-status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .status-Assigned {
+            background: var(--navy-light);
+            color: var(--navy);
+        }
+
+        .status-InProgress {
+            background: var(--yellow-light);
+            color: var(--yellow);
+        }
+
+        .status-Completed {
+            background: var(--green-light);
+            color: var(--green);
+        }
+
+        .status-Issue {
+            background: var(--red-light);
+            color: var(--red);
+        }
+
+        /* ALERT CARD */
+        .alert-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            box-shadow: var(--shadow);
+        }
+
+        .alert-card.priority-high {
+            border-color: var(--red);
+        }
+
+        .alert-card.priority-info {
+            border-color: var(--navy);
+        }
+
+        .alert-card.priority-warn {
+            border-color: var(--yellow);
+        }
+
+        .alert-icon {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .alert-title {
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .alert-body {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .alert-time {
+            font-size: 0.72rem;
+            color: #a0aec0;
+            margin-top: 4px;
+        }
+
+        /* SYNC INDICATOR */
+        .sync-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            margin: 8px 0 4px;
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .sync-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+        }
+
+        /* TOAST */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--navy);
+            color: #fff;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            z-index: 9999;
+            transition: transform 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* EMPTY */
+        .empty {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--muted);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-title {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .empty-sub {
+            font-size: 0.82rem;
+        }
+
+        @media (min-width: 600px) {
+            .container {
+                padding: 0 24px;
+            }
+
+            .task-status-buttons {
+                flex-wrap: nowrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>Auth.requireWorkerLogin();</script>
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div>
+            <div class="top-bar-brand">👷 Field Worker Portal</div>
+            <div class="top-bar-worker" id="worker-name-display">Loading…</div>
+        </div>
+        <div class="top-bar-right">
+            <div class="online-dot" id="online-dot" title="Online"></div>
+            <button class="logout-btn" onclick="Auth.workerLogout(); window.location.href='index.html';">Logout</button>
+        </div>
+    </div>
+
+    <!-- OFFLINE BANNER -->
+    <div class="offline-banner" id="offline-banner">
+        📶 You are offline. Changes will sync when connection is restored.
+    </div>
+
+    <div class="container">
+
+        <!-- ATTENDANCE -->
+        <div class="att-card">
+            <div class="att-card-top">
+                <div class="att-card-title">📅 Today's Attendance</div>
+                <div class="att-time" id="att-date"></div>
+            </div>
+            <div class="att-status-row">
+                <span class="att-status-pill att-not-marked" id="att-status-pill">⊘ Not Marked</span>
+                <button class="mark-att-btn" id="mark-att-btn">✓ Mark Attendance</button>
+            </div>
+        </div>
+
+        <div class="sync-row">
+            <div class="sync-dot" id="sync-dot"></div><span id="sync-label">Synced</span>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="my-tasks">📋 My Tasks</button>
+            <button class="tab-btn" data-tab="alerts">🔔 Alerts</button>
+            <button class="tab-btn" data-tab="history">📁 History</button>
+        </div>
+
+        <!-- MY TASKS -->
+        <div class="tab-panel active" id="tab-my-tasks">
+            <div id="tasks-container"></div>
+        </div>
+
+        <!-- ALERTS -->
+        <div class="tab-panel" id="tab-alerts">
+            <div id="alerts-container"></div>
+        </div>
+
+        <!-- HISTORY -->
+        <div class="tab-panel" id="tab-history">
+            <div id="history-container"></div>
+        </div>
+
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        'use strict';
+
+        const workerMobile = Auth.getWorkerMobile();
+        let allTasks = [];
+        let toastTimer = null;
+        let isOnline = navigator.onLine;
+
+        // Demo worker names map
+        const WORKER_NAMES = { '9000000001': 'Ramesh Kumar', '9000000002': 'Sunita Devi', '9000000003': 'Amit Sharma', '9000000005': 'Vijay Rao' };
+        const workerName = WORKER_NAMES[workerMobile] || 'Field Worker';
+        document.getElementById('worker-name-display').textContent = workerName + ' · ' + workerMobile;
+
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        function fmtDate(d) { return d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'; }
+
+        /* ── ONLINE / OFFLINE ── */
+        function updateOnlineStatus() {
+            isOnline = navigator.onLine;
+            document.getElementById('online-dot').className = isOnline ? 'online-dot' : 'online-dot offline-dot';
+            document.getElementById('offline-banner').className = isOnline ? 'offline-banner' : 'offline-banner show';
+            document.getElementById('sync-label').textContent = isOnline ? 'Synced' : 'Offline — will sync later';
+            document.getElementById('sync-dot').style.background = isOnline ? '#006937' : '#d4770b';
+        }
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus();
+
+        /* ── ATTENDANCE ── */
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('att-date').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'long' });
+
+        function checkAttendance() {
+            const stored = JSON.parse(localStorage.getItem('civitas_attendance') || '{}');
+            const marked = stored[today]?.[workerMobile];
+            const pill = document.getElementById('att-status-pill');
+            const btn = document.getElementById('mark-att-btn');
+            if (marked) {
+                pill.className = 'att-status-pill att-marked';
+                pill.textContent = '✓ Marked at ' + marked.time;
+                btn.disabled = true;
+                btn.textContent = 'Already Marked';
+            } else {
+                pill.className = 'att-status-pill att-not-marked';
+                pill.textContent = '⊘ Not Marked';
+                btn.disabled = false;
+                btn.textContent = '✓ Mark Attendance';
+            }
+        }
+
+        document.getElementById('mark-att-btn').addEventListener('click', () => {
+            const stored = JSON.parse(localStorage.getItem('civitas_attendance') || '{}');
+            if (!stored[today]) stored[today] = {};
+            const time = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            stored[today][workerMobile] = { status: 'present', time, name: workerName };
+            localStorage.setItem('civitas_attendance', JSON.stringify(stored));
+
+            // Sync to Firebase if online
+            if (isOnline && window.db) {
+                window.db.collection('attendance').doc(today + '_' + workerMobile)
+                    .set({ date: today, mobile: workerMobile, name: workerName, status: 'present', time, syncedAt: new Date().toISOString() })
+                    .catch(e => console.warn('Attendance sync:', e));
+            }
+            checkAttendance();
+            toast('✅ Attendance marked for today!');
+        });
+
+        function loadTasks() {
+            // Always try to load from localStorage first for immediate display (offline support)
+            const stored = localStorage.getItem('civitas_tasks_' + workerMobile);
+            if (stored) {
+                allTasks = JSON.parse(stored);
+                renderTasks();
+            }
+
+            // Sync from Firebase if online
+            if (isOnline && window.db) {
+                window.db.collection('tasks').where('workerMobile', '==', workerMobile)
+                    .onSnapshot(snap => {
+                        allTasks = snap.docs.map(d => d.data());
+                        // Sort by createdAt desc
+                        allTasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                        // Save local backup for this specific worker
+                        localStorage.setItem('civitas_tasks_' + workerMobile, JSON.stringify(allTasks));
+                        renderTasks();
+                        renderHistory();
+                        renderAlerts();
+                    }, err => console.warn('Worker tasks load error:', err));
+            }
+        }
+
+        function updateTaskStatus(taskId, newStatus) {
+            // Update local state immediately for snappy UI
+            const localIdx = allTasks.findIndex(t => t.id === taskId);
+            if (localIdx !== -1) {
+                allTasks[localIdx].status = newStatus;
+                localStorage.setItem('civitas_tasks_' + workerMobile, JSON.stringify(allTasks));
+            }
+
+            // Sync if online, otherwise queue it
+            if (isOnline && window.db) {
+                window.db.collection('tasks').doc(taskId).update({ status: newStatus, updatedAt: new Date().toISOString() })
+                    .catch(e => {
+                        console.warn('Task sync failed, queuing:', e);
+                        queueOfflineTaskUpdate(taskId, newStatus);
+                    });
+            } else {
+                queueOfflineTaskUpdate(taskId, newStatus);
+            }
+            renderTasks();
+            renderHistory();
+        }
+
+        function queueOfflineTaskUpdate(taskId, newStatus) {
+            const pending = JSON.parse(localStorage.getItem('civitas_pending_sync_' + workerMobile) || '[]');
+            // Remove previous updates for same task to prevent redundant queues
+            const cleaned = pending.filter(x => x.taskId !== taskId);
+            cleaned.push({ type: 'task_status', taskId, newStatus, at: new Date().toISOString() });
+            localStorage.setItem('civitas_pending_sync_' + workerMobile, JSON.stringify(cleaned));
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('tasks-container');
+            const active = allTasks.filter(t => t.status !== 'Completed');
+            if (active.length === 0) {
+                container.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">All caught up!</div><div class="empty-sub">No pending tasks assigned to you.</div></div>`;
+                return;
+            }
+            const priIcons = { High: '🔴', Medium: '🟠', Low: '🟢' };
+            const catNames = { roads: 'Roads', water: 'Water', electricity: 'Electricity', sanitation: 'Sanitation', healthcare: 'Healthcare', other: 'Other' };
+            container.innerHTML = active.map(task => {
+                const statusNorm = task.status.replace(/\s/g, '');
+                const isInProgress = task.status === 'In Progress';
+                return `<div class="task-card pri-${task.priority}">
+          <div class="task-card-header">
+            <div class="task-title">${task.title}</div>
+            <span class="task-badge badge-${task.priority}">${priIcons[task.priority] || ''} ${task.priority}</span>
+          </div>
+          ${task.description ? `<div class="task-desc">${task.description}</div>` : ''}
+          <div class="task-meta">
+            ${task.area ? `<span class="task-meta-chip">📍 ${task.area}</span>` : ''}
+            <span class="task-meta-chip">🗓️ Due: ${fmtDate(task.dueDate)}</span>
+            <span class="task-meta-chip">🏷️ ${catNames[task.category] || task.category || 'Task'}</span>
+            <span class="current-status status-${statusNorm}">${task.status}</span>
+          </div>
+          <div class="task-status-buttons">
+            ${!isInProgress ? `<button class="status-btn btn-start" onclick="updateTaskStatus('${task.id}','In Progress');toast('⏳ Task started!')">▶ Start Task</button>` : ''}
+            <button class="status-btn btn-done"  onclick="updateTaskStatus('${task.id}','Completed');toast('✅ Task marked done!')">✓ Mark Done</button>
+            <button class="status-btn btn-issue" onclick="updateTaskStatus('${task.id}','Issue');toast('⚠️ Issue reported!')">⚠ Report Issue</button>
+          </div>
+        </div>`;
+            }).join('');
+        }
+
+        /* ── RENDER HISTORY ── */
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            const done = allTasks.filter(t => t.status === 'Completed');
+            if (done.length === 0) {
+                container.innerHTML = `<div class="empty"><div class="empty-icon">📁</div><div class="empty-title">No completed tasks yet</div><div class="empty-sub">Complete your assigned tasks to see history here.</div></div>`;
+                return;
+            }
+            container.innerHTML = done.map(t => `
+        <div class="task-card pri-Low">
+          <div class="task-card-header">
+            <div class="task-title">${t.title}</div>
+            <span class="current-status status-Completed">✅ Done</span>
+          </div>
+          <div class="task-meta">
+            ${t.area ? `<span class="task-meta-chip">📍 ${t.area}</span>` : ''}
+            <span class="task-meta-chip">Due: ${fmtDate(t.dueDate)}</span>
+          </div>
+        </div>`).join('');
+        }
+
+        /* ── ALERTS ── */
+        function renderAlerts() {
+            const container = document.getElementById('alerts-container');
+            const alerts = [
+                { icon: '📋', title: 'New Task Assigned', body: 'You have a new task: "' + (allTasks[0]?.title || 'Check your task list') + '"', type: 'info', time: 'Just now' },
+                { icon: '⏰', title: 'Reminder', body: 'Please mark your attendance for today before 10:00 AM.', type: 'warn', time: '8:00 AM' },
+                { icon: '📢', title: 'From Manager', body: 'Please ensure all field reports are submitted by end of day.', type: 'info', time: 'Yesterday' },
+            ];
+            if (allTasks.some(t => { return t.dueDate && new Date(t.dueDate) < new Date() && t.status !== 'Completed'; })) {
+                alerts.unshift({ icon: '🔴', title: 'Overdue Task Alert!', body: 'You have tasks past their due date. Please update or contact your manager.', type: 'high', time: 'Now' });
+            }
+            container.innerHTML = alerts.map(a => `<div class="alert-card priority-${a.type}">
+        <div class="alert-icon">${a.icon}</div>
+        <div>
+          <div class="alert-title">${a.title}</div>
+          <div class="alert-body">${a.body}</div>
+          <div class="alert-time">${a.time}</div>
+        </div>
+      </div>`).join('');
+        }
+
+        /* ── TABS ── */
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+                if (btn.dataset.tab === 'history') renderHistory();
+                if (btn.dataset.tab === 'alerts') renderAlerts();
+            });
+        });
+
+        /* ── OFFLINE SYNC ── */
+        window.addEventListener('online', () => {
+            updateOnlineStatus();
+            const pendingKey = 'civitas_pending_sync_' + workerMobile;
+            const pending = JSON.parse(localStorage.getItem(pendingKey) || '[]');
+            if (pending.length > 0 && window.db) {
+                pending.forEach(item => {
+                    if (item.type === 'task_status') {
+                        window.db.collection('tasks').doc(item.taskId).update({ status: item.newStatus, updatedAt: item.at }).catch(() => { });
+                    }
+                });
+                localStorage.removeItem(pendingKey);
+                toast('📶 Synced ' + pending.length + ' offline update(s)!');
+            }
+        });
+
+        /* ── INIT ── */
+        checkAttendance();
+        loadTasks();
+        renderAlerts();
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => { });
+        }
+    </script>
+</body>
+
+</html>
