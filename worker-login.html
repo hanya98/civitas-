@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Field Worker Login — CIVITAS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style2.css" />
+    <script src="auth.js"></script>
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #006937 0%, #1a3a6b 100%);
+            font-family: 'Noto Sans', sans-serif;
+        }
+
+        .login-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .login-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 48px 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-logo {
+            text-align: center;
+            font-size: 2.8rem;
+            margin-bottom: 8px;
+        }
+
+        .login-brand {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #006937;
+            margin-bottom: 4px;
+        }
+
+        .login-role-wrap {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .login-role {
+            font-size: 0.82rem;
+            color: #718096;
+            background: #e6f4ed;
+            padding: 4px 14px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 6px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #d0d5dd;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .field input:focus {
+            border-color: #006937;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #006937;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-login:hover {
+            background: #005029;
+        }
+
+        .err-msg {
+            color: #c0392b;
+            font-size: 0.83rem;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.83rem;
+            color: #718096;
+        }
+
+        .back-link a {
+            color: #006937;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .hint {
+            font-size: 0.75rem;
+            color: #a0aec0;
+            margin-top: 16px;
+            text-align: center;
+            background: #f7f8fa;
+            border-radius: 8px;
+            padding: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-logo">👷</div>
+            <div class="login-brand">CIVITAS</div>
+            <div class="login-role-wrap"><span class="login-role">Field Worker Portal</span></div>
+
+            <div class="field">
+                <label for="worker-mobile">Mobile Number</label>
+                <input type="tel" id="worker-mobile" placeholder="10-digit mobile number" maxlength="10"
+                    inputmode="numeric" autocomplete="username" />
+            </div>
+            <div class="field">
+                <label for="worker-pwd">Password</label>
+                <input type="password" id="worker-pwd" placeholder="Enter your password"
+                    autocomplete="current-password" />
+            </div>
+
+            <button class="btn-login" id="login-btn">Login to Worker Portal</button>
+            <div class="err-msg" id="err-msg">❌ Invalid credentials. Please try again.</div>
+
+            <div class="hint">Demo credentials — Password: <strong>worker123</strong><br>
+                <strong>9000000001</strong> Ramesh Kumar (Roads) &nbsp;|&nbsp; <strong>9000000002</strong> Sunita Devi
+                (Water)<br>
+                <strong>9000000003</strong> Amit Sharma (Sanitation) &nbsp;|&nbsp; <strong>9000000005</strong> Vijay Rao
+                (Electricity)<br>
+                <strong>9000000006</strong> Raju Bhai (Other)
+            </div>
+
+            <div class="back-link"><a href="index.html">← Back to Home</a></div>
+        </div>
+    </div>
+
+    <script>
+        if (Auth.isWorkerLoggedIn()) {
+            const redir = new URLSearchParams(window.location.search).get('redirect');
+            window.location.href = redir ? decodeURIComponent(redir) : 'worker.html';
+        }
+
+        // Demo workers — all workers that AI can assign tasks to
+        const WORKERS = {
+            '9000000001': 'worker123',  // Ramesh Kumar — roads
+            '9000000002': 'worker123',  // Sunita Devi — water
+            '9000000003': 'worker123',  // Amit Sharma — sanitation
+            '9000000005': 'worker123',  // Vijay Rao — electricity
+            '9000000006': 'worker123',  // Raju Bhai — other
+        };
+
+
+        document.getElementById('login-btn').addEventListener('click', doLogin);
+        document.getElementById('worker-pwd').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+        document.getElementById('worker-mobile').addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 10);
+        });
+
+        function doLogin() {
+            const mobile = document.getElementById('worker-mobile').value.trim();
+            const pwd = document.getElementById('worker-pwd').value;
+            const err = document.getElementById('err-msg');
+            if (WORKERS[mobile] === pwd) {
+                Auth.workerLogin(mobile);
+                err.style.display = 'none';
+                const redir = new URLSearchParams(window.location.search).get('redirect');
+                window.location.href = redir ? decodeURIComponent(redir) : 'worker.html';
+            } else {
+                err.style.display = 'block';
+                document.getElementById('worker-pwd').value = '';
+            }
+        }
+    </script>
+</body>
+
+</html>
