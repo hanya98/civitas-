@@ -57,7 +57,7 @@ Civitas leverages Google’s **Gemini 2.0 Flash** to automate complex administra
 1. **Clone the repository:**
    ```bash
    git clone <repository-url>
-   cd seedtoscale
+   cd Team HR
    ```
 
 2. **Install dependencies:**
@@ -87,4 +87,4 @@ Civitas leverages Google’s **Gemini 2.0 Flash** to automate complex administra
 ---
 
 ## 👥 Authors
-Developed by **Team SeedtoScale** for the next generation of digital governance.
+Developed by **Team HR** for the next generation of digital governance.
