@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Development Near Me | PGMS 2.0</title>
+  <meta name="description"
+    content="Track ongoing construction and government development projects near your location." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Serif:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style2.css" />
+  <link rel="stylesheet" href="development.css" />
+</head>
+
+<body>
+
+  <!-- ── CIVITAS NAVBAR ── -->
+  <nav class="navbar">
+    <ul class="nav-right">
+      <li><a href="index.html">Home</a></li>
+      <li class="dropdown">
+        <a href="services.html" class="dropbtn">Services</a>
+        <div class="dropdown-content">
+          <a href="citizen.html">Complaint Registration</a>
+          <a href="tracking.html">Complaint Status</a>
+          <a href="happiness.html">Happiness Index Feedback</a>
+          <a href="development.html">Development Near Me</a>
+          <a href="#">RTI</a>
+        </div>
+      </li>
+      <li><a href="https://newsroom-seedtosuccess.onrender.com/">Newsroom</a></li>
+      <li><a href="#">Contact</a></li>
+      <div class="nav-center">
+        <div class="logo">CIVITAS</div>
+      </div>
+      <div class="tricolor-bar">
+        <span class="stripe saffron"></span>
+        <span class="stripe white"></span>
+        <span class="stripe green"></span>
+      </div>
+    </ul>
+    <div class="nav-left">
+      <select class="language-switch">
+        <option>English</option>
+        <option>हिन्दी</option>
+      </select>
+      <a href="citizen-profile.html" class="login-btn citizen">Login as Citizen</a>
+      <a href="admin.html" class="login-btn admin">Login as Admin</a>
+    </div>
+  </nav>
+  <div class="tricolor-bar">
+    <span class="stripe saffron"></span>
+    <span class="stripe white"></span>
+    <span class="stripe green"></span>
+  </div>
+
+  <!-- ── MAIN ── -->
+  <div class="main-layout">
+
+    <!-- LEFT PANEL -->
+    <aside class="left-panel">
+
+      <!-- LOCATION CARD -->
+      <div class="location-card">
+        <div class="location-header">
+          <div class="location-header-top">
+            <div class="location-title">📍 Your Location</div>
+            <button class="locate-btn" id="locate-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+              </svg>
+              Detect
+            </button>
+          </div>
+          <div class="location-display">
+            <div class="location-name" id="location-name">Click "Detect" to find your location</div>
+            <div class="location-coords" id="location-coords">GPS coordinates will appear here</div>
+          </div>
+        </div>
+        <div class="location-body">
+          <div class="radius-label">Search Radius</div>
+          <div class="radius-options">
+            <button class="radius-btn" data-radius="1000">1 km</button>
+            <button class="radius-btn active" data-radius="3000">3 km</button>
+            <button class="radius-btn" data-radius="5000">5 km</button>
+            <button class="radius-btn" data-radius="10000">10 km</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILTER CARD -->
+      <div class="filter-card">
+        <div class="filter-card-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+          </svg>
+          Filter by Type
+        </div>
+        <div class="filter-tags">
+          <div class="filter-tag active" data-type="roads">
+            <span class="tag-dot" style="background:#f39c12"></span> Roads
+          </div>
+          <div class="filter-tag active" data-type="construction">
+            <span class="tag-dot" style="background:#e74c3c"></span> Buildings
+          </div>
+          <div class="filter-tag active" data-type="government">
+            <span class="tag-dot" style="background:#1a3a6b"></span> Govt Schemes
+          </div>
+          <div class="filter-tag active" data-type="metro">
+            <span class="tag-dot" style="background:#8b5cf6"></span> Metro
+          </div>
+          <div class="filter-tag active" data-type="utility">
+            <span class="tag-dot" style="background:#27ae60"></span> Utilities
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="mini-stat">
+          <div class="mini-stat-val" id="stat-total">—</div>
+          <div class="mini-stat-label">Total Found</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-val" id="stat-ongoing" style="color:#d4770b">—</div>
+          <div class="mini-stat-label">Ongoing</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-val" id="stat-complete" style="color:#006937">—</div>
+          <div class="mini-stat-label">Completed</div>
+        </div>
+      </div>
+
+      <!-- LEGEND -->
+      <div class="filter-card">
+        <div class="filter-card-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          Map Legend
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+          <div style="display:flex;align-items:center;gap:10px"><span
+              style="width:12px;height:12px;border-radius:50%;background:#1a3a6b;border:2px solid #fff;box-shadow:0 0 0 2px #1a3a6b;flex-shrink:0"></span><span
+              style="color:#4a5568">Your location</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span
+              style="width:10px;height:10px;border-radius:50%;background:#f39c12;flex-shrink:0"></span><span
+              style="color:#4a5568">Roads &amp; Infrastructure</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span
+              style="width:10px;height:10px;border-radius:50%;background:#e74c3c;flex-shrink:0"></span><span
+              style="color:#4a5568">Building Construction</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span
+              style="width:10px;height:10px;border-radius:50%;background:#1a3a6b;opacity:0.7;flex-shrink:0"></span><span
+              style="color:#4a5568">Government Schemes</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span
+              style="width:10px;height:10px;border-radius:50%;background:#8b5cf6;flex-shrink:0"></span><span
+              style="color:#4a5568">Metro / Transport</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span
+              style="width:10px;height:10px;border-radius:50%;background:#27ae60;flex-shrink:0"></span><span
+              style="color:#4a5568">Utility Work</span></div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+
+      <!-- MAP -->
+      <div class="map-card">
+        <div class="map-toolbar">
+          <div class="map-title">
+            🗺️ Live Map
+            <span class="live-badge" id="live-badge" style="display:none">
+              <span class="live-dot"></span> Live
+            </span>
+          </div>
+          <div style="font-size:12px;color:#718096">Click any marker for project details</div>
+        </div>
+        <div id="map">
+          <div class="map-placeholder">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#718096" stroke-width="1.5">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <div style="margin-top:12px;font-size:14px;font-weight:600;color:#4a5568">Detect your location to load the
+              map</div>
+            <div style="margin-top:6px;font-size:12px">Click the "Detect" button on the left</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECTS LIST -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="projects-header">
+          <div class="projects-title">🏗️ Nearby Projects</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="projects-count" id="projects-count">—</span>
+            <select class="sort-select" id="sort-select">
+              <option value="distance">Sort: Nearest first</option>
+              <option value="progress">Sort: Most complete</option>
+              <option value="status">Sort: By status</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="projects-grid" id="projects-grid">
+          <!-- Cards rendered by JS -->
+          <div class="empty-state">
+            <div class="empty-icon">📍</div>
+            <div class="empty-title">Ready to search</div>
+            <div class="empty-sub">Allow location access and click "Detect" to find development projects near you.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.right-panel -->
+  </div><!-- /.main-layout -->
+
+  <!-- ── DETAIL MODAL ── -->
+  <div id="modal-overlay">
+    <div id="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div class="modal-header-row">
+          <div class="modal-project-name" id="modal-name">Project Name</div>
+          <button class="modal-close" id="modal-close" aria-label="Close">×</button>
+        </div>
+        <div class="modal-badges">
+          <span id="modal-type-badge" class="type-badge"></span>
+          <span id="modal-status-pill" class="status-pill"></span>
+        </div>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast"></div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <p>© 2025 Government of India | PGMS 2.0 — Infrastructure Transparency Initiative &nbsp;|&nbsp;
+      Data sourced from Google Places API &nbsp;|&nbsp; Project metadata is AI-estimated for display purposes
+    </p>
+  </footer>
+
+  <!-- JS — loads Leaflet from CDN, then detects location + fetches OSM data -->
+  <script src="development.js"></script>
+
+</body>
+
+</html>

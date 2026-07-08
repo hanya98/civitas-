@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manager Login — CIVITAS Command Centre</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style2.css" />
+    <script src="auth.js"></script>
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #0f2347 0%, #1a3a6b 50%, #006937 100%);
+        }
+
+        .login-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .login-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 48px 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 2.5rem;
+        }
+
+        .login-brand {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a3a6b;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .login-role {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #718096;
+            margin-bottom: 32px;
+            background: #e8eef8;
+            padding: 4px 14px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .login-role-wrap {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 6px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #d0d5dd;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .field input:focus {
+            border-color: #1a3a6b;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #1a3a6b;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-login:hover {
+            background: #0f2347;
+        }
+
+        .err-msg {
+            color: #c0392b;
+            font-size: 0.83rem;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.83rem;
+            color: #718096;
+        }
+
+        .back-link a {
+            color: #1a3a6b;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .hint {
+            font-size: 0.75rem;
+            color: #a0aec0;
+            margin-top: 16px;
+            text-align: center;
+            background: #f7f8fa;
+            border-radius: 8px;
+            padding: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-logo">🧑‍💼</div>
+            <div class="login-brand">CIVITAS</div>
+            <div class="login-role-wrap"><span class="login-role">Command Centre — Manager</span></div>
+
+            <div class="field">
+                <label for="manager-id">Manager ID</label>
+                <input type="text" id="manager-id" placeholder="e.g., MGR001" autocomplete="username" />
+            </div>
+            <div class="field">
+                <label for="manager-pwd">Password</label>
+                <input type="password" id="manager-pwd" placeholder="Enter your password"
+                    autocomplete="current-password" />
+            </div>
+
+            <button class="btn-login" id="login-btn">Login to Command Centre</button>
+            <div class="err-msg" id="err-msg">❌ Invalid credentials. Please try again.</div>
+
+            <div class="hint">Demo credentials: ID <strong>MGR001</strong> / Password <strong>manager123</strong></div>
+            <div class="back-link"><a href="index.html">← Back to Home</a></div>
+        </div>
+    </div>
+
+    <script>
+        // Auto redirect if already logged in
+        if (Auth.isManagerLoggedIn()) {
+            const redir = new URLSearchParams(window.location.search).get('redirect');
+            window.location.href = redir ? decodeURIComponent(redir) : 'manager.html';
+        }
+
+        const VALID_CREDENTIALS = { MGR001: 'manager123', MGR002: 'manager123', ADMIN: 'admin123' };
+
+        document.getElementById('login-btn').addEventListener('click', doLogin);
+        document.getElementById('manager-pwd').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+        function doLogin() {
+            const id = document.getElementById('manager-id').value.trim().toUpperCase();
+            const pwd = document.getElementById('manager-pwd').value;
+            const err = document.getElementById('err-msg');
+            if (VALID_CREDENTIALS[id] === pwd) {
+                Auth.managerLogin();
+                err.style.display = 'none';
+                const redir = new URLSearchParams(window.location.search).get('redirect');
+                window.location.href = redir ? decodeURIComponent(redir) : 'manager.html';
+            } else {
+                err.style.display = 'block';
+                document.getElementById('manager-pwd').value = '';
+            }
+        }
+    </script>
+</body>
+
+</html>

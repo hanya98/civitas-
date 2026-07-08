@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Wipe Civitas Firestore</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        firebase.initializeApp({
+            apiKey: "AIzaSyARUCovi6he0lYE6pikBB_doz72Nae2-h0",
+            authDomain: "grievance-form-39f6a.firebaseapp.com",
+            projectId: "grievance-form-39f6a"
+        });
+        const db = firebase.firestore();
+
+        async function wipeCollection(name) {
+            const snap = await db.collection(name).get();
+            const batch = db.batch();
+            snap.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+            document.body.innerHTML += `<p>Wiped ${snap.size} docs from ${name}</p>`;
+        }
+
+        async function wipeAll() {
+            document.body.innerHTML += `<p>Starting wipe...</p>`;
+            localStorage.clear();
+            document.body.innerHTML += `<p>Cleared LocalStorage</p>`;
+            await Promise.all([
+                wipeCollection('complaints'),
+                wipeCollection('tasks'),
+                wipeCollection('projects'),
+                wipeCollection('bills')
+            ]);
+            document.body.innerHTML += `<h3>All clean! You can now test the app from scratch.</h3>`;
+        }
+    </script>
+</head>
+
+<body style="font-family:sans-serif; padding:50px;">
+    <h2>Civitas Database Cleaner</h2>
+    <p>Click below to wipe all complaints, tasks, projects, and local storage to test the AI assignments properly.</p>
+    <button onclick="wipeAll()"
+        style="padding:10px 20px; font-size:16px; background:red; color:white; border:none; border-radius:4px; cursor:pointer;">WIPE
+        DATABASE</button>
+</body>
+
+</html>

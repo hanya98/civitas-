@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Citizen Portal | CIVITAS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Serif:wght@600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style2.css" />
+    <link rel="stylesheet" href="citizen-profile.css" />
+
+    <!-- ═══ FIREBASE SDK v9 COMPAT ═══ -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyARUCovi6he0lYE6pikBB_doz72Nae2-h0",
+            authDomain: "grievance-form-39f6a.firebaseapp.com",
+            projectId: "grievance-form-39f6a",
+            storageBucket: "grievance-form-39f6a.firebasestorage.app",
+            messagingSenderId: "149185682282",
+            appId: "1:149185682282:web:785c21c17d3470592ca313",
+            measurementId: "G-9V6SPFXDV0"
+        };
+        firebase.initializeApp(firebaseConfig);
+        window.db = firebase.firestore();
+    </script>
+
+    <style>
+        /* ── HUB PAGE STYLES ── */
+        .hub-hero {
+            background: linear-gradient(135deg, #1a3a6b 0%, #0f2347 100%);
+            color: white;
+            padding: 60px 8%;
+            text-align: center;
+        }
+
+        .hub-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .hub-hero p {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            max-width: 600px;
+            margin: 0 auto 32px;
+        }
+
+        .hub-hero .mobile-login-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hub-hero .mobile-login-row input {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            width: 260px;
+            outline: none;
+        }
+
+        .hub-hero .mobile-login-row button {
+            padding: 12px 28px;
+            background: #FF6200;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .hub-hero .mobile-login-row button:hover {
+            background: #d95200;
+        }
+
+        .hub-greeting {
+            font-size: 1rem;
+            opacity: 0.75;
+            margin-top: 16px;
+        }
+
+        .hub-greeting span {
+            font-weight: 700;
+            color: #fbbf24;
+        }
+
+        /* ── Services grid ── */
+        .services-hub {
+            padding: 64px 8%;
+            background: #f4f6f8;
+        }
+
+        .services-hub-title {
+            text-align: center;
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #1a3a6b;
+            margin-bottom: 8px;
+        }
+
+        .services-hub-sub {
+            text-align: center;
+            color: #5e6b7c;
+            margin-bottom: 48px;
+            font-size: 1.05rem;
+        }
+
+        .services-hub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 28px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .service-hub-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 28px;
+            box-shadow: 0 4px 16px rgba(26, 58, 107, 0.08);
+            border: 1px solid #e2e8f0;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .service-hub-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(26, 58, 107, 0.14);
+            border-color: #1a3a6b;
+        }
+
+        .card-icon-wrap {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .service-hub-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1d2b3a;
+        }
+
+        .service-hub-card p {
+            font-size: 0.92rem;
+            color: #5e6b7c;
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .card-arrow {
+            color: #1a3a6b;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-arrow::after {
+            content: '→';
+        }
+
+        /* ── Quick stats strip ── */
+        .quick-strip {
+            background: #1a3a6b;
+            color: white;
+            padding: 32px 8%;
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            flex-wrap: wrap;
+        }
+
+        .quick-stat {
+            text-align: center;
+        }
+
+        .quick-stat .number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .quick-stat .label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── CIVITAS NAVBAR ── -->
+    <nav class="navbar">
+        <ul class="nav-right">
+            <li><a href="index.html">Home</a></li>
+            <li class="dropdown">
+                <a href="services.html" class="dropbtn">Services</a>
+                <div class="dropdown-content">
+                    <a href="citizen.html">Complaint Registration</a>
+                    <a href="tracking.html">Complaint Status</a>
+                    <a href="survey.html">Happiness Index Feedback</a>
+                    <a href="development.html">Development Near Me</a>
+                    <a href="#">RTI</a>
+                </div>
+            </li>
+            <li><a href="https://newsroom-seedtosuccess.onrender.com/">Newsroom</a></li>
+            <li><a href="#site-footer">Contact</a></li>
+            <div class="nav-center">
+                <div class="logo">CIVITAS</div>
+            </div>
+            <div class="tricolor-bar">
+                <span class="stripe saffron"></span>
+                <span class="stripe white"></span>
+                <span class="stripe green"></span>
+            </div>
+        </ul>
+        <div class="nav-left">
+            <select class="language-switch">
+                <option>English</option>
+                <option>हिन्दी</option>
+            </select>
+        </div>
+    </nav>
+    <div class="tricolor-bar">
+        <span class="stripe saffron"></span>
+        <span class="stripe white"></span>
+        <span class="stripe green"></span>
+    </div>
+
+    <!-- ── HERO / LOGIN ── -->
+    <div class="hub-hero">
+        <h1>🏛️ Citizen Services Portal</h1>
+        <p>Access all government services in one place — submit grievances, track issues, explore schemes, and
+            participate in your community.</p>
+        <div class="mobile-login-row">
+            <input type="text" id="mobile-input" placeholder="Enter 12-digit Aadhaar number" maxlength="12"
+                inputmode="numeric" />
+            <button id="login-btn" onclick="handleLogin()">Access My Profile</button>
+        </div>
+        <p class="hub-greeting" id="greeting-text">Enter your Aadhaar number to view your submitted grievances &amp;
+            profile</p>
+    </div>
+
+    <!-- ── QUICK STATS ── -->
+    <div class="quick-strip">
+        <div class="quick-stat">
+            <span class="number">1,24,000+</span>
+            <span class="label">Grievances Resolved</span>
+        </div>
+        <div class="quick-stat">
+            <span class="number">98+</span>
+            <span class="label">Government Schemes Listed</span>
+        </div>
+        <div class="quick-stat">
+            <span class="number">30 Days</span>
+            <span class="label">Average Resolution Time</span>
+        </div>
+        <div class="quick-stat">
+            <span class="number">28 States</span>
+            <span class="label">Coverage Across India</span>
+        </div>
+    </div>
+
+    <!-- ── SERVICES HUB GRID ── -->
+    <section class="services-hub">
+        <h2 class="services-hub-title">All Citizen Services</h2>
+        <p class="services-hub-sub">Select a service to get started</p>
+
+        <div class="services-hub-grid">
+
+            <a href="citizen.html" class="service-hub-card">
+                <div class="card-icon-wrap" style="background:#e8eef8;">📝</div>
+                <h3>Submit a Grievance</h3>
+                <p>Register a complaint about public services, infrastructure, sanitation, electricity, or any civic
+                    issue. Track it in real-time.</p>
+                <span class="card-arrow">Register Now</span>
+            </a>
+
+            <a href="tracking.html" class="service-hub-card">
+                <div class="card-icon-wrap" style="background:#e6f4ed;">🔍</div>
+                <h3>Track Complaint Status</h3>
+                <p>Check the current status of your submitted complaints, view updates from the assigned officer, and
+                    see resolution timelines.</p>
+                <span class="card-arrow">Track Now</span>
+            </a>
+
+            <a href="development.html" class="service-hub-card">
+                <div class="card-icon-wrap" style="background:#fff3ec;">🏗️</div>
+                <h3>Development Near Me</h3>
+                <p>View ongoing construction, infrastructure, and government development projects happening near your
+                    location on a live map.</p>
+                <span class="card-arrow">Explore Map</span>
+            </a>
+
+            <a href="schemes.html" class="service-hub-card">
+                <div class="card-icon-wrap" style="background:#f0e8f8;">📋</div>
+                <h3>Policies &amp; Schemes</h3>
+                <p>Discover government welfare schemes and local policies you may be eligible for – filtered by age,
+                    income, and occupation.</p>
+                <span class="card-arrow">Browse Schemes</span>
+            </a>
+
+            <a href="survey.html" class="service-hub-card">
+                <div class="card-icon-wrap" style="background:#fef3c7;">📊</div>
+                <h3>Surveys &amp; Polls</h3>
+                <p>Participate in community polls on local governance topics and provide suggestions to help authorities
+                    make better decisions.</p>
+                <span class="card-arrow">Vote &amp; Suggest</span>
+            </a>
+
+            <a href="survey.html#panel-feedback" class="service-hub-card">
+                <div class="card-icon-wrap" style="background:#fdf2f2;">😊</div>
+                <h3>Happiness Index</h3>
+                <p>Rate public services in your area and share your overall satisfaction score to help the government
+                    improve quality of life.</p>
+                <span class="card-arrow">Share Feedback</span>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer" id="site-footer" role="contentinfo">
+        <div class="footer-inner">
+            <div class="footer-col">
+                <p class="footer-title">Citizen Grievance Redressal Portal</p>
+                <p>A Government of India Initiative under the Right to Public Services Act</p>
+            </div>
+            <div class="footer-col">
+                <p class="footer-title">Helpline</p>
+                <p>Toll-Free: <strong>1800-111-555</strong></p>
+                <p>Mon–Sat: 9:00 AM – 6:00 PM</p>
+            </div>
+            <div class="footer-col">
+                <p class="footer-title">Quick Links</p>
+                <ul class="footer-links">
+                    <li><a href="citizen.html">Submit Grievance</a></li>
+                    <li><a href="my-complaints.html">My Complaints</a></li>
+                    <li><a href="schemes.html">Schemes &amp; Policies</a></li>
+                    <li><a href="index.html">Home</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Civitas | Made by Team SeedtoScale</p>
+        </div>
+    </footer>
+
+    <script>
+        function handleLogin() {
+            const aadhaar = document.getElementById('mobile-input').value.trim();
+            if (!/^\d{12}$/.test(aadhaar)) {
+                document.getElementById('greeting-text').innerHTML = '⚠ Please enter a valid 12-digit Aadhaar number.';
+                return;
+            }
+            // Store Aadhaar and redirect to My Complaints page
+            localStorage.setItem('Aadhaar', aadhaar);
+            sessionStorage.setItem('citizen_mobile', aadhaar); // Keep fallback if tracking page uses it
+            document.getElementById('greeting-text').innerHTML = 'Welcome back! Redirecting to your profile…';
+            setTimeout(() => {
+                window.location.href = 'my-complaints.html';
+            }, 1000);
+        }
+
+        // Allow Enter key on mobile input
+        document.getElementById('mobile-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') handleLogin();
+        });
+    </script>
+
+</body>
+
+</html>

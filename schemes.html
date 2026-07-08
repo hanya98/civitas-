@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Policies & Schemes - Civitas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style2.css">
+    <link rel="stylesheet" href="schemes.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <ul class="nav-right">
+            <li><a href="index.html">Home</a></li>
+            <li class="dropdown">
+                <a href="services.html" class="dropbtn">Services</a>
+                <div class="dropdown-content">
+                    <a href="citizen.html">Complaint Registration</a>
+                    <a href="tracking.html">Complaint Status</a>
+                    <a href="happiness.html">Happiness Index Feedback</a>
+                    <a href="development.html">Development Near Me</a>
+                    <a href="#">RTI</a>
+                    <a href="schemes.html">Policies & Schemes</a>
+                </div>
+            </li>
+            <li><a href="https://newsroom-seedtosuccess.onrender.com/">Newsroom</a></li>
+            <li><a href="#site-footer">Contact</a></li>
+
+            <div class="nav-center">
+                <div class="logo">CIVITAS</div>
+            </div>
+
+            <div class="tricolor-bar">
+                <span class="stripe saffron"></span>
+                <span class="stripe white"></span>
+                <span class="stripe green"></span>
+            </div>
+        </ul>
+
+        <div class="nav-left">
+            <select class="language-switch">
+                <option>English</option>
+                <option>हिन्दी</option>
+            </select>
+            <a href="citizen-profile.html" class="login-btn citizen">Login as Citizen</a>
+            <a href="admin.html" class="login-btn admin">Login as Admin</a>
+        </div>
+    </nav>
+
+    <section class="schemes-hero">
+        <div class="schemes-hero-content">
+            <h1>Policies & Schemes</h1>
+            <p>Discover government policies, local regulations, and recommended schemes crafted for you.</p>
+        </div>
+    </section>
+
+    <div class="schemes-container">
+        <!-- Sidebar Filters -->
+        <aside class="filters-sidebar">
+            <div class="filter-header">
+                <h2>Eligibility Filters</h2>
+                <button id="resetFiltersBtn" class="reset-btn">Reset</button>
+            </div>
+
+            <div class="filter-group">
+                <label for="keywordSearch">Search Keyword</label>
+                <input type="text" id="keywordSearch" placeholder="e.g. Health, Farmer, Education">
+            </div>
+
+            <div class="filter-group">
+                <label for="ageInput">Age</label>
+                <input type="number" id="ageInput" placeholder="Enter age (e.g. 60)" min="1" max="120">
+            </div>
+
+            <div class="filter-group">
+                <label for="occupationSelect">Occupation</label>
+                <select id="occupationSelect">
+                    <option value="">Any</option>
+                    <option value="Farmer">Farmer / Agriculture</option>
+                    <option value="Student">Student</option>
+                    <option value="Business">MSME / Business Owner</option>
+                    <option value="Senior Citizen">Senior Citizen / Retired</option>
+                    <option value="Women">Women Entrepreneur</option>
+                    <option value="Unemployed">Unemployed</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="marginInput">Annual Income Limit (Margin)</label>
+                <input type="range" id="marginInput" min="0" max="2000000" step="50000" value="2000000">
+                <div class="margin-display">₹<span id="marginValue">20,00,000</span>+</div>
+            </div>
+
+            <div class="filter-info">
+                <p>Use filters to see personalized scheme recommendations based on your eligibility.</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="schemes-main">
+            <!-- Tabs for Policies and Schemes -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="schemes-tab">Recommended Schemes</button>
+                <button class="tab-btn" data-tab="policies-tab">Local Policies</button>
+            </div>
+
+            <!-- Schemes Tab Content -->
+            <section id="schemes-tab" class="tab-content active">
+                <div class="results-header">
+                    <h2 id="resultsCount">Loading Schemes...</h2>
+                </div>
+                <div id="schemesGrid" class="cards-grid">
+                    <!-- Cards will be populated by JS -->
+                </div>
+            </section>
+
+            <!-- Policies Tab Content -->
+            <section id="policies-tab" class="tab-content">
+                <div class="results-header">
+                    <h2>Active Local Policies</h2>
+                    <p>Current civic rules and regulations effective in your area.</p>
+                </div>
+                <div id="policiesGrid" class="cards-grid">
+                    <!-- Cards will be populated by JS -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="site-footer" id="site-footer" role="contentinfo">
+        <div class="footer-inner">
+            <div class="footer-col">
+                <p class="footer-title">Citizen Grievance Redressal Portal</p>
+                <p>A Government of India Initiative under the Right to Public Services Act</p>
+            </div>
+            <div class="footer-col">
+                <p class="footer-title">Helpline</p>
+                <p>Toll-Free: <strong>1800-111-555</strong></p>
+                <p>Mon–Sat: 9:00 AM – 6:00 PM</p>
+            </div>
+            <div class="footer-col">
+                <p class="footer-title">Links</p>
+                <ul class="footer-links">
+                    <li><a href="citizen.html">Register Grievance</a></li>
+                    <li><a href="services.html">FAQ</a></li>
+                    <li><a href="tracking.html">Track Raised Tickets</a></li>
+                    <li><a href="index.html">Home page</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy;© 2026 Civitas | Made by Team SeedtoScale</p>
+        </div>
+    </footer>
+
+    <script src="schemes.js"></script>
+</body>
+
+</html>
